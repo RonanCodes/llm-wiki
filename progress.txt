@@ -12,6 +12,21 @@ Started: 2026-04-13
 
 ---
 
+## [2026-04-13] - US-003: Create wiki-templates reference skill
+- Created .claude/skills/wiki-templates/SKILL.md (388 lines)
+- Defines 5 page types: source-note, entity, concept, comparison, summary
+- Full frontmatter specs with complete filled-in examples for each type
+- Universal fields: title, date-created, date-modified, page-type, domain, tags, sources, related
+- source-note extras: source-url, source-type, author, date-accessed, raw-file
+- entity extras: entity-type, aliases
+- Cross-referencing rules documented
+- Files changed: .claude/skills/wiki-templates/SKILL.md
+- **Learnings for future iterations:**
+  - This is the longest skill at 388 lines — should consider splitting into separate files per page type if it grows, but SKILL.md under 500 lines is fine per docs
+  - Complete examples with real data (Karpathy gist) make the templates much clearer than abstract placeholders
+  - user-invocable: false is correct — this is a reference doc loaded by other skills
+---
+
 ## [2026-04-13] - US-002: Create vault-status skill
 - Created .claude/skills/vault-status/SKILL.md
 - Scans vaults/ for directories containing CLAUDE.md
