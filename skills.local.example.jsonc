@@ -1,0 +1,69 @@
+// LLM Wiki — Personal Skills Config
+// Copy this file to skills.local.jsonc and customize.
+// skills.local.jsonc is gitignored — your personal additions stay private.
+//
+// The /setup skill reads both skills.json (project) and skills.local.jsonc (yours)
+// to give you a complete picture of what's installed and what's recommended.
+
+{
+  // Your personal skills — installed in ~/.claude/skills/ on your machine.
+  // These won't be in the project repo, but /setup will check for them.
+  "personal": [
+    // {
+    //   "name": "write-a-prd",
+    //   "path": "~/.claude/skills/write-a-prd",
+    //   "source": "github:mattpocock/skills/write-a-prd",
+    //   "description": "Create PRDs through user interview and codebase exploration"
+    // },
+    // {
+    //   "name": "grill-me",
+    //   "path": "~/.claude/skills/grill-me",
+    //   "source": "github:mattpocock/skills/grill-me",
+    //   "description": "Interview the user relentlessly to refine requirements"
+    // },
+    // {
+    //   "name": "tdd",
+    //   "path": "~/.claude/skills/tdd",
+    //   "source": "github:mattpocock/skills/tdd",
+    //   "description": "Test-driven development workflow"
+    // }
+  ],
+
+  // Skills in your .private/ overlay for this project.
+  // These are project-specific but private (e.g. employer/client skills).
+  "private": [
+    // {
+    //   "name": "aviva-workflows",
+    //   "path": ".private/.claude/skills/aviva-workflows",
+    //   "description": "Aviva-specific ingestion and reporting workflows"
+    // }
+  ],
+
+  // Additional external skill repos you want /setup to check.
+  // These are git repos containing skills you've found useful.
+  "repositories": [
+    // {
+    //   "name": "mattpocock-skills",
+    //   "url": "https://github.com/mattpocock/skills.git",
+    //   "install": "git clone https://github.com/mattpocock/skills.git ~/.claude/skills-repos/mattpocock",
+    //   "description": "Matt Pocock's Claude Code skills collection (write-a-prd, tdd, etc.)"
+    // },
+    // {
+    //   "name": "my-skills",
+    //   "url": "https://github.com/RonanCodes/my-claude-skills.git",
+    //   "install": "git clone https://github.com/RonanCodes/my-claude-skills.git ~/.claude/skills",
+    //   "description": "My personal skills collection — synced across machines"
+    // }
+  ],
+
+  // Extra tools beyond what skills.json defines.
+  // Same format as skills.json tools.optional entries.
+  "tools": [
+    // {
+    //   "name": "ollama",
+    //   "check": "which ollama",
+    //   "install": "brew install ollama",
+    //   "description": "Local LLM inference for offline wiki queries"
+    // }
+  ]
+}

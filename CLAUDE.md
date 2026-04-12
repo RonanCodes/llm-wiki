@@ -8,7 +8,7 @@ A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wi
 
 If this is a fresh Claude Code session, here's what you can do:
 
-1. **First time on this machine?** Run `/setup` to check/install dependencies.
+1. **First time on this machine?** Run `/setup` — checks tools, verifies skills from `skills.json`, recommends missing ones from `skills.local.jsonc`.
 2. **Create a vault:** `/vault-create my-research --domain ai-research`
 3. **Import existing vault:** `/vault-import ~/path/to/obsidian-vault --name my-vault`
 4. **Check vault status:** `/vault-status`

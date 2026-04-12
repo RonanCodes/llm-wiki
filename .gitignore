@@ -5,6 +5,9 @@ vaults/*
 # Private overlay (your own git repo for private skills/config)
 .private/
 
+# Personal skills config (copy from skills.local.example.jsonc)
+skills.local.jsonc
+
 # Reference repos (cloned for study)
 /.reference/
 
