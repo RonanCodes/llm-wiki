@@ -1,0 +1,12 @@
+/* LLM Wiki — Starlight custom theme overrides */
+:root {
+    --sl-color-accent-low: #2a2010;
+    --sl-color-accent: #d4a537;
+    --sl-color-accent-high: #f5d68a;
+    --sl-font-system-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+}
+[data-theme="light"] {
+    --sl-color-accent-low: #f5ecd4;
+    --sl-color-accent: #a67c10;
+    --sl-color-accent-high: #5a4208;
+}

@@ -31,3 +31,5 @@ out/
 
 # Docker
 .docker/
+site-astro/node_modules/
+site-starlight/node_modules/

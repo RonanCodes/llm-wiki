@@ -1,0 +1,51 @@
+---
+title: LLM Wiki
+description: A compounding knowledge base built by LLMs.
+template: splash
+hero:
+  tagline: A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it. Inspired by Karpathy's LLM Wiki pattern (55K likes).
+  actions:
+    - text: Get Started
+      link: /llm-wiki/getting-started/quick-start/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/RonanCodes/llm-wiki
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What You Can Do
+
+<CardGrid stagger>
+  <Card title="Ingest" icon="document">
+    Feed in any source — articles, PDFs, YouTube, tweets, gists, Office docs. 7 source types, zero config.
+  </Card>
+  <Card title="Query" icon="magnifier">
+    Ask questions. Get synthesized answers with citations. `--save` files answers back into the wiki.
+  </Card>
+  <Card title="Lint" icon="warning">
+    Health-check your wiki. Find orphans, broken links, contradictions. Auto-fix what's fixable.
+  </Card>
+  <Card title="Promote" icon="up-caret">
+    Graduate reusable knowledge between vaults. Carry forward what matters.
+  </Card>
+</CardGrid>
+
+## Quick Start
+
+```bash
+git clone https://github.com/RonanCodes/llm-wiki.git
+cd llm-wiki
+./install.sh
+claude
+```
+
+Then:
+
+```
+/vault-create my-research --domain ai-research
+/ingest https://some-article.com --vault my-research
+/query "What are the key takeaways?" --vault my-research
+```

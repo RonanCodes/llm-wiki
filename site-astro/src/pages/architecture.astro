@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import Specimen from '../components/Specimen.astro';
+---
+
+<Base title="Architecture" activePage="architecture">
+    <section style="padding: 100px 0 40px; text-align: center;">
+        <div class="container">
+            <div class="eyebrow">How It Works</div>
+            <h1 style="font-size: clamp(2.4rem, 6vw, 3.5rem); margin: 16px 0 12px;">Architecture</h1>
+            <p class="text-dim" style="max-width: 520px; margin: 0 auto;">One engine, many vaults. No database, no embeddings, no server.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Three Layers</span></div>
+            <div class="epigraph">
+                The idea is related in spirit to Vannevar Bush's Memex (1945) &mdash; a personal knowledge store with associative trails. The part he couldn't solve was who does the maintenance. The LLM handles that.
+                <cite>&mdash; Andrej Karpathy</cite>
+            </div>
+
+            <div class="card-grid" style="margin-top: 24px;">
+                <div class="card" style="border-top: 2px solid var(--amber);">
+                    <h4 style="color: var(--amber);">Raw Sources</h4>
+                    <p>Immutable source documents. The LLM reads but never modifies. Source of truth.</p>
+                    <code>vaults/name/raw/</code>
+                </div>
+                <div class="card" style="border-top: 2px solid var(--cyan);">
+                    <h4 style="color: var(--cyan);">The Wiki</h4>
+                    <p>LLM-generated markdown. Summaries, entities, concepts. The LLM owns this entirely.</p>
+                    <code>vaults/name/wiki/</code>
+                </div>
+                <div class="card" style="border-top: 2px solid var(--green);">
+                    <h4 style="color: var(--green);">The Schema</h4>
+                    <p>Conventions document. Structure, workflows, frontmatter rules. Co-evolved over time.</p>
+                    <code>vaults/name/CLAUDE.md</code>
+                </div>
+            </div>
+
+            <div class="chapter"><span class="chapter-label">Engine &amp; Vaults</span></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0;">
+                <Specimen title="engine (this repo)">
+                    <Fragment set:html={`llm-wiki/
+<span class="t-dim">├──</span> .claude/skills/     <span class="t-dim">&lt;- 25 skills</span>
+<span class="t-dim">├──</span> .private/           <span class="t-dim">&lt;- your private skills</span>
+<span class="t-dim">├──</span> vaults/             <span class="t-dim">&lt;- gitignored</span>
+<span class="t-dim">└──</span> <span class="t-engine">CLAUDE.md</span>`} />
+                </Specimen>
+                <Specimen title="vault (separate repo)">
+                    <Fragment set:html={`vaults/my-research/
+<span class="t-dim">├──</span> raw/
+<span class="t-dim">├──</span> wiki/
+<span class="t-dim">│   ├──</span> <span class="t-cmd">index.md</span>
+<span class="t-dim">│   ├──</span> sources/
+<span class="t-dim">│   ├──</span> entities/
+<span class="t-dim">│   ├──</span> concepts/
+<span class="t-dim">│   └──</span> comparisons/
+<span class="t-dim">├──</span> <span class="t-amber">log.md</span>
+<span class="t-dim">└──</span> <span class="t-engine">CLAUDE.md</span>`} />
+                </Specimen>
+            </div>
+
+            <div class="chapter"><span class="chapter-label">Obsidian</span></div>
+            <h2>Direct file access, no MCP</h2>
+            <p class="text-dim" style="max-width: 620px; margin-bottom: 20px;">
+                Claude Code reads and writes files directly. Obsidian watches the same directory. No middleware needed. Add <a href="https://github.com/tobi/qmd">qmd</a> for search at scale.
+            </p>
+            <Specimen title="data flow">
+                <Fragment set:html={`<span class="t-engine">Claude Code</span> <span class="t-dim">--writes--&gt;</span> <span class="t-amber">filesystem</span> <span class="t-dim">--renders--&gt;</span> <span class="t-cmd">Obsidian</span>`} />
+            </Specimen>
+        </div>
+    </section>
+</Base>

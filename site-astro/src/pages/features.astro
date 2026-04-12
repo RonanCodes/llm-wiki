@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import Specimen from '../components/Specimen.astro';
+---
+
+<Base title="Features" activePage="features">
+    <section style="padding: 100px 0 40px; text-align: center;">
+        <div class="container">
+            <div class="eyebrow">Capabilities</div>
+            <h1 style="font-size: clamp(2.4rem, 6vw, 3.5rem); margin: 16px 0 12px;">Features</h1>
+            <p class="text-dim" style="max-width: 500px; margin: 0 auto;">25 skills that turn Claude Code into a knowledge engine.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Ingest</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--cyan);">Process any source into wiki pages</h3>
+                    <p>Drop in a URL, PDF, YouTube video, tweet, gist, Office doc, or pasted text. Claude reads it, extracts key information, creates source notes, entity pages, and concept pages.</p>
+                    <p>A single source typically creates 3-7 wiki pages with full YAML frontmatter and wikilinks.</p>
+                </div>
+                <div>
+                    <Specimen title="ingest">
+                        <Fragment set:html={`<span class="prompt">&gt;</span> <span class="t-cmd">/ingest</span> https://article.com <span class="t-dim">--vault research</span>
+
+<span class="t-dim">Creating pages:</span>
+  <span class="t-cmd">+</span> wiki/sources/article-name.md
+  <span class="t-cmd">+</span> wiki/entities/author-name.md
+  <span class="t-cmd">+</span> wiki/concepts/key-idea.md
+  <span class="t-amber">~</span> wiki/index.md <span class="t-dim">(updated)</span>
+<span class="t-dim">Committed:</span> <span class="t-engine">ingest article-name</span>`} />
+                    </Specimen>
+                </div>
+            </div>
+
+            <div class="chapter"><span class="chapter-label">Query</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--green);">Ask questions, get cited answers</h3>
+                    <p>Claude reads your wiki's index, finds relevant pages, and synthesizes answers with citations. Add <code>--save</code> to file answers back into the wiki &mdash; your explorations compound.</p>
+                </div>
+                <div>
+                    <Specimen title="query">
+                        <Fragment set:html={`<span class="prompt">&gt;</span> <span class="t-cmd">/query</span> "Compare RAG vs wiki" <span class="t-dim">--save</span>
+
+<span class="t-dim">Found 4 relevant pages...</span>
+
+RAG re-derives each query. A persistent
+wiki compiles once, keeps current.
+
+<span class="t-dim">Saved to:</span> <span class="t-cmd">+</span> wiki/comparisons/rag-vs-wiki.md`} />
+                    </Specimen>
+                </div>
+            </div>
+
+            <div class="chapter"><span class="chapter-label">Lint</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--rose);">Health-check your knowledge</h3>
+                    <p>8 automated checks: orphan pages, broken wikilinks, missing frontmatter, empty source links, contradictions. Reports grouped by severity. <code>--fix</code> auto-repairs.</p>
+                </div>
+                <div>
+                    <Specimen title="lint">
+                        <Fragment set:html={`<span class="prompt">&gt;</span> <span class="t-cmd">/lint</span> <span class="t-dim">--vault research --fix</span>
+
+<span style="color: var(--rose);">Critical:</span> [[missing-page]] referenced but missing
+<span class="t-amber">Warning:</span> old-tool.md — orphan (0 inlinks)
+<span class="t-cmd">Info:</span> "ML" — 8 mentions, no page
+
+<span class="t-dim">Auto-fixed: 2 issues</span>`} />
+                    </Specimen>
+                </div>
+            </div>
+
+            <div class="chapter"><span class="chapter-label">Promote</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--amber);">Graduate knowledge between vaults</h3>
+                    <p>When finishing a project, promote reusable learnings to your meta vault. Claude identifies what's reusable vs project-specific, creates or merges pages in the target vault.</p>
+                </div>
+                <div>
+                    <Specimen title="promote">
+                        <Fragment set:html={`<span class="prompt">&gt;</span> <span class="t-cmd">/promote</span> project-alpha <span class="t-dim">--to meta</span>
+
+<span class="t-cmd">Promoted:</span>
+  <span class="t-cmd">+</span> meta/concepts/nextjs-deploy.md
+  <span class="t-amber">~</span> meta/concepts/auth-patterns.md <span class="t-dim">(merged)</span>
+<span class="t-dim">Skipped:</span>
+  <span class="t-dim">-</span> client-api.md <span class="t-dim">(project-specific)</span>`} />
+                    </Specimen>
+                </div>
+            </div>
+        </div>
+    </section>
+</Base>

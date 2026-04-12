@@ -1,0 +1,149 @@
+---
+import Base from '../layouts/Base.astro';
+import Specimen from '../components/Specimen.astro';
+---
+
+<Base title="Personal Knowledge Engine" activePage="home">
+    <!-- Hero -->
+    <section style="padding: 120px 0 48px; text-align: center;">
+        <div class="container">
+            <div class="eyebrow anim anim-1">Personal Knowledge Engine</div>
+            <h1 class="anim anim-2" style="font-size: clamp(3.2rem, 9vw, 5.5rem); margin: 20px 0;">LLM <span>Wiki</span></h1>
+            <p class="anim anim-3" style="font-size: 1.2rem; color: var(--text-dim); max-width: 560px; margin: 0 auto 28px; line-height: 1.7;">
+                A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it. Your knowledge grows with every source and every question.
+            </p>
+            <div class="anim anim-4" style="margin-bottom: 32px;">
+                <span class="badge"><span class="dot"></span> Inspired by Karpathy's LLM Wiki pattern &mdash; 55K likes</span>
+            </div>
+            <div class="cta-group anim anim-5" style="justify-content: center;">
+                <a href="/llm-wiki/getting-started" class="btn btn-primary">Get Started &rarr;</a>
+                <a href="https://github.com/RonanCodes/llm-wiki" target="_blank" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preview -->
+    <section class="anim anim-6">
+        <div class="container">
+            <img src="/llm-wiki/assets/linkedin-preview.png" alt="LLM Wiki preview" class="preview-img" style="animation: glowPulse 5s ease-in-out infinite;">
+        </div>
+    </section>
+
+    <!-- Terminal Diagram -->
+    <section style="padding: 48px 0;">
+        <div class="container">
+            <Specimen title="llm-wiki">
+                <Fragment set:html={`<span class="t-amber">You</span> (terminal)                    <span class="t-amber">You</span> (Obsidian)
+<span class="t-dim">    |                                 |</span>
+<span class="t-dim">    |--</span> <span class="t-cmd">/ingest</span> &lt;source&gt;              <span class="t-dim">|--</span> Browse wiki pages
+<span class="t-dim">    |--</span> <span class="t-cmd">/query</span>  "question"            <span class="t-dim">|--</span> Graph view
+<span class="t-dim">    |--</span> <span class="t-cmd">/lint</span>                         <span class="t-dim">|--</span> Backlinks
+<span class="t-dim">    |--</span> <span class="t-cmd">/promote</span>                      <span class="t-dim">|--</span> Search
+<span class="t-dim">    |                                 |</span>
+<span class="t-dim">    '--</span> <span class="t-engine">Claude Code</span> <span class="t-dim">--writes--&gt;</span> vaults/&lt;name&gt;/wiki/*.md`} />
+            </Specimen>
+        </div>
+    </section>
+
+    <!-- The Problem -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">The Problem</span></div>
+            <div class="epigraph">
+                Most people's experience with LLMs and documents is stateless. RAG re-derives knowledge from scratch on every query. Nothing compounds. Ask a subtle question that requires synthesizing five documents, and the LLM has to piece together fragments every time.
+                <cite>&mdash; Andrej Karpathy</cite>
+            </div>
+
+            <div class="chapter"><span class="chapter-label">The Solution</span></div>
+            <h2>Knowledge that compounds</h2>
+            <p style="color: var(--text-dim); max-width: 640px; margin-bottom: 24px;">
+                When you add a source, Claude reads it, extracts key information, and integrates it into a persistent wiki &mdash; updating entity pages, revising summaries, flagging contradictions, maintaining cross-references.
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">What You Can Do</span></div>
+            <div class="card-grid">
+                <div class="card">
+                    <h4 style="color: var(--cyan);">Ingest</h4>
+                    <p>Feed in any source &mdash; articles, PDFs, YouTube, tweets, gists, Office docs, notes. 7 source types.</p>
+                    <code>/ingest &lt;source&gt;</code>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--green);">Query</h4>
+                    <p>Ask questions. Get synthesized answers with citations. Save answers back to compound.</p>
+                    <code>/query "question" --save</code>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--rose);">Lint</h4>
+                    <p>Health-check your wiki. Find orphans, broken links, contradictions. Auto-fix.</p>
+                    <code>/lint --fix</code>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--amber);">Promote</h4>
+                    <p>Graduate reusable knowledge between vaults. Carry forward what matters.</p>
+                    <code>/promote project --to meta</code>
+                </div>
+                <div class="card">
+                    <h4>Search</h4>
+                    <p>Hybrid BM25 + vector search via qmd when your wiki grows.</p>
+                    <code>/search "terms"</code>
+                </div>
+                <div class="card">
+                    <h4>Slides</h4>
+                    <p>Generate Marp presentations from wiki content.</p>
+                    <code>/slides "topic"</code>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 24px;">
+                <a href="/llm-wiki/features" class="btn btn-secondary">All features &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Quick Start</span></div>
+            <h2>Three commands to knowledge</h2>
+            <pre style="margin: 20px 0;"><code><span class="prompt">$</span> git clone https://github.com/RonanCodes/llm-wiki.git
+<span class="prompt">$</span> cd llm-wiki
+<span class="prompt">$</span> ./install.sh</code></pre>
+            <div class="cta-group" style="margin-top: 24px;">
+                <a href="/llm-wiki/getting-started" class="btn btn-primary">Full setup guide &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Architecture</span></div>
+            <h2>One engine, many vaults</h2>
+            <p class="text-dim" style="max-width: 600px; margin-bottom: 20px;">
+                Claude Code is the engine (25 skills). Vaults are dumb folders of markdown. Obsidian is the viewer. No database, no embeddings, no server.
+            </p>
+            <Specimen title="vault structure">
+                <Fragment set:html={`vaults/my-research/           <span class="t-dim">&lt;- separate git repo</span>
+<span class="t-dim">├──</span> raw/                       <span class="t-dim">&lt;- immutable source docs</span>
+<span class="t-dim">├──</span> wiki/
+<span class="t-dim">│   ├──</span> <span class="t-cmd">index.md</span>               <span class="t-dim">&lt;- catalog of all pages</span>
+<span class="t-dim">│   ├──</span> sources/
+<span class="t-dim">│   ├──</span> entities/
+<span class="t-dim">│   ├──</span> concepts/
+<span class="t-dim">│   └──</span> comparisons/
+<span class="t-dim">├──</span> <span class="t-amber">log.md</span>
+<span class="t-dim">└──</span> <span class="t-engine">CLAUDE.md</span>`} />
+            </Specimen>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/llm-wiki/architecture" class="btn btn-secondary">How it works &rarr;</a>
+            </div>
+        </div>
+    </section>
+</Base>

@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Getting Started" activePage="getting-started">
+    <section style="padding: 100px 0 40px; text-align: center;">
+        <div class="container">
+            <div class="eyebrow">Setup Guide</div>
+            <h1 style="font-size: clamp(2.4rem, 6vw, 3.5rem); margin: 16px 0 12px;">Getting Started</h1>
+            <p class="text-dim" style="max-width: 500px; margin: 0 auto;">Three commands to install. Six steps to your first wiki.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Install</span></div>
+            <pre><code><span class="prompt">$</span> git clone https://github.com/RonanCodes/llm-wiki.git
+<span class="prompt">$</span> cd llm-wiki
+<span class="prompt">$</span> ./install.sh</code></pre>
+
+            <div class="chapter"><span class="chapter-label">First Vault</span></div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Run the installer</h3>
+                        <pre><code>./install.sh</code></pre>
+                        <p>Checks environment, installs missing tools via Homebrew.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Open Claude Code</h3>
+                        <pre><code>claude</code></pre>
+                        <p>Launch in the llm-wiki directory.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Create your first vault</h3>
+                        <pre><code>/vault-create my-research --domain ai-research</code></pre>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Open in Obsidian</h3>
+                        <p>Open Obsidian &rarr; Open folder as vault &rarr; <code>vaults/my-research</code></p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Ingest your first source</h3>
+                        <pre><code>/ingest https://some-article.com --vault my-research</code></pre>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Ask questions</h3>
+                        <pre><code>/query "What are the key takeaways?" --vault my-research --save</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</Base>
