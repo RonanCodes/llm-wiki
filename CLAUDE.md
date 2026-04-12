@@ -41,21 +41,18 @@ You (terminal)                    You (Obsidian)
 
 ## Key Documents
 
-### Reference docs (markdown, in `reference/`)
+### Internal docs (in `reference/`)
 - `reference/vision.md` — what we're building, why, core concept
-- `reference/architecture.md` — technical architecture, vault structure
-- `reference/workflow.md` — daily usage guide (what's manual vs automated)
-- `reference/dependencies.md` — all tools with install methods
 - `reference/decisions.md` — decisions made, open questions
-- `reference/roadmap.md` — project roadmap with mermaid diagrams
-- `reference/karpathy-research.md` — Karpathy's gist, tweets, community findings
-- `reference/ralph-loop-research.md` — Ralph Wiggum autonomous coding technique
+- `reference/workflow.md` — daily usage guide (what's manual vs automated)
 
-### Website (HTML, in `docs/` — served via GitHub Pages)
-- `docs/index.html` — landing page (ronancodes.github.io/llm-wiki)
-- `docs/getting-started.html` — setup guide
-- `docs/features.html` — features deep-dive
-- `docs/architecture.html` — how it works
+### Public docs (Starlight, in `sites/docs/src/content/docs/`)
+All other documentation lives in the Starlight site — architecture, features, commands, dependencies, research. These are the single source of truth.
+
+### Website (built by GitHub Actions, deployed to Pages)
+- `sites/landing/` — Astro landing site (ronancodes.github.io/llm-wiki)
+- `sites/docs/` — Starlight docs (ronancodes.github.io/llm-wiki/docs)
+- `docs/` is gitignored — built by CI, not committed
 
 ## Repo Structure
 
@@ -80,10 +77,16 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 │   └── yt-transcript/               <- /yt-transcript — YouTube transcript
 ├── .private/                         <- GITIGNORED — private overlay (own git repo)
 │   └── .claude/skills/              <- private skills loaded via --add-dir
+├── sites/
+│   ├── landing/                     <- Astro landing site source
+│   └── docs/                        <- Starlight docs site source
+├── reference/                        <- internal docs (vision, decisions, workflow)
+├── shared/                           <- shared design tokens (CSS)
 ├── vaults/                           <- GITIGNORED — each vault is its own git repo
+├── .private/                         <- GITIGNORED — private skills, private docs
 ├── .reference/                       <- GITIGNORED — cloned repos for study
-├── reference/                        <- markdown docs (architecture, research, roadmap)
-├── docs/                             <- HTML website (GitHub Pages)
+├── docs/                             <- GITIGNORED — build output (CI deploys this)
+├── .github/workflows/deploy.yml      <- GitHub Actions: build + deploy to Pages
 ├── ralph.sh                          <- Ralph loop runner script
 ├── prd.json                          <- current Ralph PRD
 ├── progress.txt                      <- Ralph progress log

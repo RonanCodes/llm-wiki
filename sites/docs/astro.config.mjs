@@ -46,6 +46,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Quick Start', slug: 'getting-started/quick-start' },
 						{ label: 'Installation', slug: 'getting-started/installation' },
+						{ label: 'Web Clipper', slug: 'getting-started/web-clipper' },
 					],
 				},
 				{
