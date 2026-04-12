@@ -41,13 +41,13 @@ You (terminal)                    You (Obsidian)
 
 ## Key Documents
 
-### Internal docs (in `reference/`)
-- `reference/vision.md` — what we're building, why, core concept
-- `reference/decisions.md` — decisions made, open questions
-- `reference/workflow.md` — daily usage guide (what's manual vs automated)
-
-### Public docs (Starlight, in `sites/docs/src/content/docs/`)
-All other documentation lives in the Starlight site — architecture, features, commands, dependencies, research. These are the single source of truth.
+### All docs (Starlight, in `sites/docs/src/content/docs/`)
+All documentation lives in the Starlight site — single source of truth. Key pages:
+- `getting-started/` — quick start, installation, web clipper, daily workflow
+- `features/` — ingest, query, lint, promote, search, slides
+- `architecture/` — how it works, vault structure, obsidian integration
+- `reference/` — commands, source types, page templates, dataview, dependencies
+- `research/` — vision, decisions, karpathy's pattern, ralph loop, roadmap
 
 ### Website (built by GitHub Actions, deployed to Pages)
 - `sites/landing/` — Astro landing site (ronancodes.github.io/llm-wiki)
@@ -80,7 +80,7 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 ├── sites/
 │   ├── landing/                     <- Astro landing site source
 │   └── docs/                        <- Starlight docs site source
-├── reference/                        <- internal docs (vision, decisions, workflow)
+├── archive/                          <- archived PRDs from completed phases
 ├── shared/                           <- shared design tokens (CSS)
 ├── vaults/                           <- GITIGNORED — each vault is its own git repo
 ├── .private/                         <- GITIGNORED — private skills, private docs

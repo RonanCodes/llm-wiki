@@ -268,13 +268,13 @@ a:hover { color: var(--cyan); }
     line-height: 1.85;
     white-space: pre;
     overflow-x: auto;
-    color: #9a978f;
+    color: #c5c2b8;
 }
 /* Specimen colors are fixed (always on dark bg) */
-.specimen-body .t-amber { color: #daa520; font-weight: 600; }
-.specimen-body .t-cmd { color: #5cb87a; }
-.specimen-body .t-engine { color: #56b3c4; }
-.specimen-body .t-dim { color: var(--specimen-dim); }
+.specimen-body .t-amber { color: #f0c040; font-weight: 600; }
+.specimen-body .t-cmd { color: #7dd89a; }
+.specimen-body .t-engine { color: #70c8d8; }
+.specimen-body .t-dim { color: #6a6e85; }
 
 /* ── Code ── ALWAYS DARK (like printed code listings) */
 code {

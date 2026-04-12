@@ -47,6 +47,7 @@ export default defineConfig({
 						{ label: 'Quick Start', slug: 'getting-started/quick-start' },
 						{ label: 'Installation', slug: 'getting-started/installation' },
 						{ label: 'Web Clipper', slug: 'getting-started/web-clipper' },
+						{ label: 'Daily Workflow', slug: 'getting-started/workflow' },
 					],
 				},
 				{
@@ -82,6 +83,8 @@ export default defineConfig({
 					label: 'Research',
 					collapsed: true,
 					items: [
+						{ label: 'Vision', slug: 'research/vision' },
+						{ label: 'Decisions', slug: 'research/decisions' },
 						{ label: 'Karpathy\'s Pattern', slug: 'research/karpathy' },
 						{ label: 'Ralph Loop', slug: 'research/ralph-loop' },
 						{ label: 'Roadmap', slug: 'research/roadmap' },
