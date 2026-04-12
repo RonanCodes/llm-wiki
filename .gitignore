@@ -2,6 +2,12 @@
 vaults/*
 !vaults/.gitkeep
 
+# Private overlay (your own git repo for private skills/config)
+.private/
+
+# Reference repos (cloned for study)
+/.reference/
+
 # Dependencies
 node_modules/
 
@@ -19,4 +25,3 @@ out/
 
 # Docker
 .docker/
-/.reference/
