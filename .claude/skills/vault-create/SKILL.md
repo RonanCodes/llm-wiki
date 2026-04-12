@@ -17,6 +17,16 @@ Scaffold a new LLM Wiki vault as a separate git repo.
 /vault-create my-research --domain ai-research   # direct — skips interview
 ```
 
+## Vault Naming Convention
+
+All vaults are prefixed with `llm-wiki-` so they're easy to identify in Obsidian's vault switcher alongside non-LLM Wiki vaults.
+
+- User says "research" → vault name becomes `llm-wiki-research`
+- User says "project-alpha" → vault name becomes `llm-wiki-project-alpha`
+- User says "personal" → vault name becomes `llm-wiki-personal`
+
+If the user provides a name that already starts with `llm-wiki-`, don't double-prefix.
+
 ## Step 0: Interview (if no arguments provided)
 
 If the user runs `/vault-create` with no arguments, interview them to figure out the right vault setup. Use AskUserQuestion for each question.
@@ -51,6 +61,7 @@ After the interview, proceed to Step 1 with the gathered info.
 1. **Parse arguments** from `$ARGUMENTS`:
    - First argument: vault name (required, kebab-case)
    - `--domain <domain>`: optional domain tag (e.g. `ai-research`, `personal`, `work-project-x`)
+   - **Apply prefix**: if the name doesn't start with `llm-wiki-`, prepend it. E.g. `research` → `llm-wiki-research`
 
 2. **Create vault directory structure** at `vaults/<name>/`:
 

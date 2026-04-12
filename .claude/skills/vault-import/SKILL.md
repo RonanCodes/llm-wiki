@@ -22,7 +22,7 @@ Import an existing collection of markdown files, Obsidian vault, or git repo int
 ## Step 1: Parse Arguments
 
 - First argument: path to existing folder OR git repo URL
-- `--name <name>`: vault name (default: derive from folder name, kebab-case)
+- `--name <name>`: vault name (default: derive from folder name, kebab-case). Prefix with `llm-wiki-` if not already prefixed.
 - `--domain <domain>`: default domain tag for the vault
 
 ## Step 2: Bring Content In

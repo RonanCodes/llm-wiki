@@ -96,7 +96,7 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 ## Conventions
 
 - **Vaults are data, not applications.** Keep logic centralized in `.claude/skills/`.
-- **Each vault is its own git repo**, gitignored from this repo.
+- **Each vault is its own git repo**, gitignored from this repo. All vault names prefixed with `llm-wiki-` (e.g. `llm-wiki-research`, `llm-wiki-personal`).
 - **Vault-specific conventions** go in each vault's own CLAUDE.md (thin config, not skills).
 - **Private skills** go in `.private/.claude/skills/` (gitignored, own git repo). Load with `--add-dir .private`.
 - **Every wiki page** must have YAML frontmatter with: title, dates, page-type, domain, tags, sources, related.
