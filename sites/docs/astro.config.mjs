@@ -17,8 +17,7 @@ export default defineConfig({
 					content: `document.addEventListener('DOMContentLoaded', () => {
 						var landing = 'https://ronancodes.github.io/llm-wiki/';
 						if (location.hostname === 'localhost') landing = 'http://localhost:4321/llm-wiki/';
-						var t = document.querySelector('.site-title');
-						if (t) t.href = landing;
+						// Title link stays at docs home (default behavior) — don't override it
 						var s = document.querySelector('.social-icons');
 						if (s) {
 							var a = document.createElement('a');
