@@ -158,6 +158,14 @@ git add .
 git commit -m "✨ feat: initialize <name> vault"
 ```
 
-7. **Report success** with next steps:
-   - Open `vaults/<name>/` as an Obsidian vault
+7. **Open in Obsidian** (ask user first):
+
+```bash
+open "obsidian://open?path=$(pwd)/vaults/<name>"
+```
+
+This opens the vault directly in Obsidian via URI scheme. Works on macOS. No MCP needed.
+
+8. **Report success** with next steps:
+   - Vault is open in Obsidian (or tell them to open it)
    - Ingest first source: `/ingest <source> --vault <name>`
