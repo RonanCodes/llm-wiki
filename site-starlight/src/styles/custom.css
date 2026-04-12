@@ -1,12 +1,51 @@
-/* LLM Wiki — Starlight custom theme overrides */
+/* LLM Wiki — Starlight theme overrides
+   Imports shared tokens and maps to Starlight's CSS variables */
+
+@import '../../../shared/tokens.css';
+
+/* Map tokens to Starlight variables */
 :root {
-    --sl-color-accent-low: #2a2010;
-    --sl-color-accent: #d4a537;
+    /* Accent */
+    --sl-color-accent-low: #1a1508;
+    --sl-color-accent: #daa520;
     --sl-color-accent-high: #f5d68a;
-    --sl-font-system-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+
+    /* Typography */
+    --sl-font-system-mono: var(--font-mono);
+
+    /* Borders */
+    --sl-color-hairline-shade: var(--border);
+    --sl-color-hairline-light: var(--border-hover);
 }
+
 [data-theme="light"] {
-    --sl-color-accent-low: #f5ecd4;
-    --sl-color-accent: #a67c10;
-    --sl-color-accent-high: #5a4208;
+    --sl-color-accent-low: #faf5e8;
+    --sl-color-accent: #b8860b;
+    --sl-color-accent-high: #4a3505;
+}
+
+/* Make Starlight headings use our serif */
+:root {
+    --sl-font: var(--font-sans);
+}
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+}
+.sl-markdown-content h1 { font-style: italic; }
+
+/* Improve code blocks in Starlight */
+.sl-markdown-content pre {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Improve table styling */
+.sl-markdown-content table th {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 }

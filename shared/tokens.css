@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════════════════════
+   LLM Wiki — Design Tokens
+   "Ink & Amber" — editorial precision, knowledge warmth
+
+   Shared between Astro landing site and Starlight docs.
+   Dark = ink on deep paper. Light = broadsheet clarity.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Dark Mode (default) ── */
+:root, [data-theme="dark"] {
+    /* Backgrounds: ink-blue progression */
+    --void: #08090f;
+    --deep: #0e1019;
+    --surface: #141722;
+    --surface-raised: #1a1e2c;
+    --surface-overlay: rgba(14,16,25,0.92);
+
+    /* Borders */
+    --border: #232840;
+    --border-hover: #343a58;
+
+    /* Text: warm whites */
+    --text: #b8b5ad;
+    --text-dim: #686560;
+    --text-bright: #ededeb;
+    --text-heading: #f0efed;
+
+    /* Accent: warm amber */
+    --amber: #daa520;
+    --amber-hover: #c4940f;
+    --amber-soft: rgba(218,165,32,0.12);
+    --amber-softer: rgba(218,165,32,0.06);
+
+    /* Semantic colors */
+    --cyan: #56b3c4;
+    --cyan-soft: rgba(86,179,196,0.1);
+    --green: #5cb87a;
+    --green-soft: rgba(92,184,122,0.1);
+    --rose: #d06060;
+    --rose-soft: rgba(208,96,96,0.1);
+
+    /* Code */
+    --code-bg: #0b0d14;
+    --code-border: #1e2235;
+    --code-text: #c8c5bc;
+
+    /* Specimen / Terminal */
+    --specimen-bg: #0c0e16;
+    --specimen-bar: #12151f;
+    --specimen-dim: #3a3e55;
+
+    /* Nav */
+    --nav-bg: rgba(8,9,15,0.88);
+
+    /* Effects */
+    --starfield: 1;
+    --grain: 0.02;
+    --light-texture: 0;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* ── Light Mode ── */
+[data-theme="light"] {
+    /* Backgrounds: crisp white to warm grey */
+    --void: #ffffff;
+    --deep: #f7f6f3;
+    --surface: #ffffff;
+    --surface-raised: #f2f1ed;
+    --surface-overlay: rgba(255,255,255,0.92);
+
+    /* Borders: visible but not heavy */
+    --border: #ddd9d0;
+    --border-hover: #c5c0b5;
+
+    /* Text: strong contrast */
+    --text: #3d3a35;
+    --text-dim: #7a756c;
+    --text-bright: #1a1816;
+    --text-heading: #141210;
+
+    /* Accent: rich deep gold (NOT washed out) */
+    --amber: #b8860b;
+    --amber-hover: #9a7009;
+    --amber-soft: rgba(184,134,11,0.1);
+    --amber-softer: rgba(184,134,11,0.04);
+
+    /* Semantic: darker for contrast on white */
+    --cyan: #1a7a8a;
+    --cyan-soft: rgba(26,122,138,0.07);
+    --green: #2d7a4e;
+    --green-soft: rgba(45,122,78,0.07);
+    --rose: #b04040;
+    --rose-soft: rgba(176,64,64,0.07);
+
+    /* Code: dark blocks that pop */
+    --code-bg: #1a1e2c;
+    --code-border: #2a2f42;
+    --code-text: #e0ddd5;
+
+    /* Specimen / Terminal: dark even in light mode */
+    --specimen-bg: #1a1e2c;
+    --specimen-bar: #222738;
+    --specimen-dim: #4a4e65;
+
+    /* Nav */
+    --nav-bg: rgba(255,255,255,0.9);
+
+    /* Effects */
+    --starfield: 0;
+    --grain: 0;
+    --light-texture: 1;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-card: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+/* ── Typography tokens ── */
+:root {
+    --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Menlo', monospace;
+    --font-serif: Baskerville, 'Libre Baskerville', Georgia, serif;
+    --font-sans: 'Avenir Next', 'Avenir', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+}

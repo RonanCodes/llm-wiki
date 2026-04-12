@@ -11,6 +11,9 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'LLM Wiki Docs',
+			head: [
+				{ tag: 'script', content: `document.addEventListener('DOMContentLoaded', () => { const a = document.querySelector('.site-title'); if (a) a.href = 'https://ronancodes.github.io/llm-wiki/'; });` },
+			],
 			description: 'A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it.',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RonanCodes/llm-wiki' },
@@ -18,7 +21,7 @@ export default defineConfig({
 			],
 			customCss: ['./src/styles/custom.css'],
 			sidebar: [
-				{ label: '← Back to Home', link: LANDING_URL },
+				{ label: 'Back to Home', link: LANDING_URL },
 				{ label: 'Docs Home', slug: '' },
 				{
 					label: 'Getting Started',
