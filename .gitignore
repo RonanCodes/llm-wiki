@@ -35,3 +35,4 @@ out/
 # Docker
 .docker/
 sites/*/node_modules/
+social-cards/
