@@ -12,6 +12,16 @@ Started: 2026-04-13
 
 ---
 
+## [2026-04-13] - US-002: Create vault-status skill
+- Created .claude/skills/vault-status/SKILL.md
+- Scans vaults/ for directories containing CLAUDE.md
+- Displays markdown table: vault name, domain, page count, source count, last log entry, git status
+- Files changed: .claude/skills/vault-status/SKILL.md
+- **Learnings for future iterations:**
+  - Skills that gather stats need concrete bash commands documented — the LLM needs exact commands to run, not vague "check the status"
+  - Parsing log.md with `grep "^## \["` is the standard pattern for extracting activity entries
+---
+
 ## [2026-04-13] - US-001: Create vault-create skill
 - Created .claude/skills/vault-create/SKILL.md
 - Includes full templates for: directory structure, index.md (grouped by type with table columns), log.md (parseable format), CLAUDE.md (domain inheritance, frontmatter requirements, source linking rules, cross-reference conventions)

@@ -30,8 +30,8 @@
         "Shows for each vault: name, page count (wiki/*.md), source count (raw/*), last log entry date, git status (clean/dirty)"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-13. Scans vaults/ for dirs with CLAUDE.md, shows table with domain, pages, sources, last activity, git status."
     },
     {
       "id": "US-003",
