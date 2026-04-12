@@ -72,8 +72,8 @@
         "Auto-commits vault changes via git with descriptive message"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": "Sub-skills for each source type created in US-005"
+      "passes": true,
+      "notes": "Completed 2026-04-13. 143-line router with source detection table, 9-step workflow, delegation to sub-skills."
     },
     {
       "id": "US-005",
@@ -90,8 +90,8 @@
         "Each sub-skill documents its dependency check and lazy install pattern"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": "Migrate existing read-tweet and read-gist skills into ingest-tweet and ingest-gist"
+      "passes": true,
+      "notes": "Completed 2026-04-13. 7 sub-skills created. Original read-tweet/read-gist skills kept as user-invocable utilities alongside new ingest-* versions."
     },
     {
       "id": "US-006",
@@ -107,8 +107,8 @@
         "When saving, updates index.md and log.md"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-13. 102-line skill with --save flag to file answers back into wiki."
     },
     {
       "id": "US-007",
@@ -123,8 +123,8 @@
         "Suggests new questions to investigate and new sources to find"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-13. 145-line skill with 8 check categories, --fix auto-repair, severity-grouped reporting."
     },
     {
       "id": "US-008",
@@ -141,8 +141,8 @@
         "Supports --to flag to specify target vault"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-13. 137-line skill with merge logic, promoted-from traceability, dual-vault commit."
     }
   ]
 }

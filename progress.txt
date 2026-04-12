@@ -9,7 +9,57 @@ Started: 2026-04-13
 - Every wiki page must have frontmatter AND link back to raw sources
 - Domain tags inherited from vault default, can be extended per-page
 - Commit messages use emoji conventional commit format
+- Sub-skills (ingest-*) use user-invocable: false — loaded by router, not user
+- Lazy dep install pattern: `which tool >/dev/null 2>&1 || { brew install tool; }`
+- Zero-dep skills preferred (curl only) when possible
+- Promote adds `promoted-from` frontmatter for cross-vault traceability
 
+---
+
+## [2026-04-13] - US-008: Create promote skill
+- Created .claude/skills/promote/SKILL.md (137 lines)
+- Graduates reusable knowledge from project vault → meta vault
+- Identifies promotable vs project-specific content
+- Creates/merges pages in target vault, updates both indexes and logs
+- Adds `promoted-from` frontmatter for traceability
+- Files changed: .claude/skills/promote/SKILL.md
+- **Learnings:** Dual-vault operations (reading/writing two vaults in one skill) need clear step-by-step commit instructions for both repos
+---
+
+## [2026-04-13] - US-007: Create lint skill
+- Created .claude/skills/lint/SKILL.md (145 lines)
+- 8 check categories: frontmatter, orphans, broken links, missing sources, missing domains, concepts without pages, stale content, index completeness
+- --fix flag auto-repairs: missing frontmatter, stub pages, domain tags, index entries
+- Severity-grouped report: Critical / Warning / Info
+- Files changed: .claude/skills/lint/SKILL.md
+- **Learnings:** Concrete bash commands for each check (grep, find) make the skill actionable, not vague
+---
+
+## [2026-04-13] - US-006: Create query skill
+- Created .claude/skills/query/SKILL.md (102 lines)
+- Reads index.md → identifies relevant pages → reads them → synthesizes answer
+- --save flag files answers back into wiki (queries compound knowledge)
+- Files changed: .claude/skills/query/SKILL.md
+- **Learnings:** The --save flag is the key Karpathy insight — explorations should enrich the wiki, not disappear into chat history
+---
+
+## [2026-04-13] - US-005: Create ingest sub-skills
+- Created 7 sub-skills: ingest-web, ingest-pdf, ingest-office, ingest-youtube, ingest-tweet, ingest-gist, ingest-text
+- All set user-invocable: false — loaded by ingest router
+- Each documents its own dependency check and lazy install
+- Zero-dep skills: tweet (FXTwitter API), gist (raw URL), text (direct), web (curl)
+- Lazy-dep skills: pdf (poppler), office (pandoc), youtube (yt-dlp)
+- Files changed: 7 SKILL.md files in .claude/skills/ingest-*/
+- **Learnings:** Keeping original read-tweet/read-gist as user-invocable utilities makes sense — sometimes you just want to read a tweet, not ingest it
+---
+
+## [2026-04-13] - US-004: Create ingest router skill
+- Created .claude/skills/ingest/SKILL.md (143 lines)
+- Source type detection table with extraction methods
+- 9-step workflow: parse → detect type → extract → save raw → read conventions → create wiki pages → update index → update log → commit
+- Documents delegation to sub-skills
+- Files changed: .claude/skills/ingest/SKILL.md
+- **Learnings:** The router pattern keeps the main skill focused on workflow while sub-skills handle extraction specifics
 ---
 
 ## [2026-04-13] - US-003: Create wiki-templates reference skill
