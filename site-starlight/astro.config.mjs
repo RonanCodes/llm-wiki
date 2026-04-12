@@ -12,12 +12,30 @@ export default defineConfig({
 		starlight({
 			title: 'LLM Wiki Docs',
 			head: [
-				{ tag: 'script', content: `document.addEventListener('DOMContentLoaded', () => { const a = document.querySelector('.site-title'); if (a) a.href = 'https://ronancodes.github.io/llm-wiki/'; });` },
+				{
+					tag: 'script',
+					content: `document.addEventListener('DOMContentLoaded', () => {
+						var landing = 'https://ronancodes.github.io/llm-wiki/';
+						if (location.hostname === 'localhost') landing = 'http://localhost:4321/llm-wiki/';
+						var t = document.querySelector('.site-title');
+						if (t) t.href = landing;
+						var s = document.querySelector('.social-icons');
+						if (s) {
+							var a = document.createElement('a');
+							a.href = landing;
+							a.title = 'Home';
+							a.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+							a.style.cssText = 'display:flex;align-items:center;color:var(--sl-color-text);opacity:0.65;';
+							a.onmouseover = function(){this.style.opacity='1'};
+							a.onmouseout = function(){this.style.opacity='0.65'};
+							s.prepend(a);
+						}
+					});`,
+				},
 			],
 			description: 'A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it.',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RonanCodes/llm-wiki' },
-				{ icon: 'external', label: 'Home', href: LANDING_URL },
 			],
 			customCss: ['./src/styles/custom.css'],
 			sidebar: [
