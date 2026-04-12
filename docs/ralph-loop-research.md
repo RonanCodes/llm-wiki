@@ -2,6 +2,27 @@
 
 ## What is the Ralph Loop?
 
+```mermaid
+graph TD
+    START["ralph.sh starts"] --> READ["Read prd.json<br/>+ progress.txt"]
+    READ --> PICK["Pick highest priority<br/>story where passes: false"]
+    PICK --> IMPL["Implement the story"]
+    IMPL --> VALIDATE["Validate<br/>(typecheck, lint, test)"]
+    VALIDATE -->|Pass| COMMIT["Git commit"]
+    VALIDATE -->|Fail| FIX["Fix issues"]
+    FIX --> VALIDATE
+    COMMIT --> UPDATE["Update prd.json<br/>(passes: true)"]
+    UPDATE --> PROGRESS["Append to progress.txt<br/>(learnings for next iteration)"]
+    PROGRESS --> CHECK{All stories done?}
+    CHECK -->|No| CLEAR["Clear context<br/>(fresh instance)"]
+    CLEAR --> READ
+    CHECK -->|Yes| DONE["All tasks complete!"]
+
+    style START fill:#e0af40,color:#000
+    style DONE fill:#7dcea0,color:#000
+    style CLEAR fill:#5bbcd6,color:#000
+```
+
 The Ralph Loop (aka Ralph Wiggum technique) is an autonomous AI coding pattern. Named after Ralph Wiggum from The Simpsons — lovable but forgetful, which mirrors how AI agents behave without persistent memory.
 
 **Core concept is shockingly simple:**

@@ -2,6 +2,20 @@
 
 How to clip web articles into your vault for ingestion.
 
+```mermaid
+graph LR
+    A["Browse article"] --> B["Click Web Clipper"]
+    B --> C["Saves to vault raw/"]
+    C --> D["Open in Obsidian"]
+    D --> E["Download images<br/>(Ctrl+Shift+D)"]
+    E --> F["/ingest raw/article.md<br/>--vault name"]
+    F --> G["Wiki pages created"]
+
+    style A fill:#e0af40,color:#000
+    style F fill:#5bbcd6,color:#000
+    style G fill:#7dcea0,color:#000
+```
+
 ## Install the Extension
 
 1. Install [Obsidian Web Clipper](https://obsidian.md/clipper) for your browser (Chrome, Firefox, Safari, Edge)

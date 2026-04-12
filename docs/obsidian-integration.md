@@ -4,8 +4,15 @@
 
 Claude Code reads and writes markdown files directly on your filesystem. Obsidian watches the same directory and renders changes in real time. No middleware, no server, no MCP.
 
-```
-Claude Code ──writes──> vaults/<name>/wiki/*.md ──renders──> Obsidian
+```mermaid
+graph LR
+    CC["Claude Code<br/>(terminal)"] -->|"reads/writes"| FS["vaults/name/wiki/*.md<br/>(filesystem)"]
+    FS -->|"file watcher"| OB["Obsidian<br/>(viewer)"]
+    CC -.->|"no MCP needed"| OB
+
+    style CC fill:#5bbcd6,color:#000
+    style FS fill:#e0af40,color:#000
+    style OB fill:#7dcea0,color:#000
 ```
 
 This is the same approach Karpathy describes: *"I have the LLM agent open on one side and Obsidian on the other. The LLM makes edits based on our conversation, and I browse the results in real time."*

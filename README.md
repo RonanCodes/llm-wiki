@@ -4,15 +4,44 @@ A personal knowledge base powered by LLMs. Claude Code builds and maintains your
 
 Inspired by [Andrej Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) (55K likes).
 
-```
-You (terminal)                    You (Obsidian)
-    |                                 |
-    |-- /ingest <source>              |-- Browse wiki pages
-    |-- /query "question"             |-- Graph view
-    |-- /lint                         |-- Backlinks
-    |-- /promote                      |-- Search
-    |                                 |
-    '-- Claude Code --writes--> vaults/<name>/wiki/*.md
+```mermaid
+graph LR
+    subgraph Sources
+        S1[Web Articles]
+        S2[PDFs]
+        S3[YouTube]
+        S4[Tweets]
+        S5[Gists]
+        S6[Office Docs]
+        S7[Notes]
+    end
+
+    subgraph Engine["Claude Code (Engine)"]
+        I["/ingest"]
+        Q["/query"]
+        L["/lint"]
+        P["/promote"]
+    end
+
+    subgraph Vault["Vault (Git Repo)"]
+        R["raw/"]
+        W["wiki/"]
+        IDX["index.md"]
+    end
+
+    subgraph Viewer["Obsidian"]
+        GV[Graph View]
+        BL[Backlinks]
+        SR[Search]
+    end
+
+    S1 & S2 & S3 & S4 & S5 & S6 & S7 --> I
+    I --> R & W & IDX
+    Q --> W
+    Q -.->|"--save"| W
+    L --> W
+    P -->|"meta vault"| W
+    W --> GV & BL & SR
 ```
 
 ## Why?

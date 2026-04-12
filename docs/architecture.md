@@ -2,6 +2,37 @@
 
 ## Three Layers (from Karpathy's pattern)
 
+```mermaid
+graph TB
+    subgraph Layer1["Layer 1: Raw Sources"]
+        RS["Articles, Papers, PDFs,<br/>Videos, Tweets, Gists"]
+    end
+
+    subgraph Layer2["Layer 2: The Wiki"]
+        SN["Source Notes"]
+        EN["Entity Pages"]
+        CN["Concept Pages"]
+        CM["Comparisons"]
+        IX["index.md"]
+        LG["log.md"]
+    end
+
+    subgraph Layer3["Layer 3: The Schema"]
+        CL["CLAUDE.md<br/>(conventions, workflows, rules)"]
+    end
+
+    RS -->|"LLM reads<br/>(never modifies)"| Layer2
+    CL -->|"governs"| Layer2
+    SN <--> EN
+    SN <--> CN
+    EN <--> CN
+    CN <--> CM
+
+    style Layer1 fill:#1a1a2e,stroke:#e0af40,color:#e8e6e0
+    style Layer2 fill:#1a1a2e,stroke:#5bbcd6,color:#e8e6e0
+    style Layer3 fill:#1a1a2e,stroke:#7dcea0,color:#e8e6e0
+```
+
 1. **Raw sources** — curated collection of source documents (articles, papers, images, data files). Immutable — LLM reads but never modifies. Source of truth.
 2. **The wiki** — LLM-generated markdown files. Summaries, entity pages, concept pages, comparisons, overview, synthesis. LLM owns this entirely.
 3. **The schema** — CLAUDE.md that tells the LLM how the wiki is structured, conventions, and workflows.
@@ -67,14 +98,60 @@ Vault-specific skills are possible but rare (1% of cases) — e.g., parsing lab 
 
 ## Four Core Operations
 
+```mermaid
+graph LR
+    subgraph Ingest
+        S["Source"] --> R["Save to raw/"]
+        R --> SN["Create source-note"]
+        SN --> EN["Create/update entities"]
+        SN --> CN["Create/update concepts"]
+        EN & CN --> IX["Update index.md"]
+        IX --> LG["Append to log.md"]
+        LG --> GC["Git commit"]
+    end
+```
+
 ### Ingest
 Drop a new source into raw/, tell the LLM to process it. Flow: LLM reads source, discusses key takeaways, writes summary page, updates index, updates relevant entity/concept pages, appends to log. A single source might touch 10-15 wiki pages.
+
+```mermaid
+graph LR
+    subgraph Query
+        Q["Question"] --> IX2["Read index.md"]
+        IX2 --> FP["Find relevant pages"]
+        FP --> RD["Read pages"]
+        RD --> SY["Synthesize answer"]
+        SY -.->|"--save"| WB["File back into wiki"]
+    end
+```
 
 ### Query
 Ask questions against the wiki. LLM reads index to find relevant pages, drills in, synthesizes answer with citations. Good answers get filed back into the wiki as new pages — explorations compound.
 
+```mermaid
+graph LR
+    subgraph Lint
+        SC["Scan all pages"] --> C1["Check frontmatter"]
+        SC --> C2["Find orphan pages"]
+        SC --> C3["Find broken links"]
+        SC --> C4["Flag contradictions"]
+        C1 & C2 & C3 & C4 --> RP["Report by severity"]
+        RP -.->|"--fix"| AF["Auto-fix"]
+    end
+```
+
 ### Lint
 Health-check the wiki. Find: contradictions between pages, stale claims, orphan pages, missing cross-references, data gaps. LLM suggests new questions and sources.
+
+```mermaid
+graph LR
+    subgraph Promote
+        PV["Project vault"] --> ID["Identify reusable knowledge"]
+        ID --> FI["File into meta vault"]
+        FI --> UI["Update both indexes"]
+        UI --> GC2["Commit both vaults"]
+    end
+```
 
 ### Promote
 Cross-vault knowledge transfer. After finishing a project, LLM reads the project vault, identifies reusable learnings, files them into the meta vault. When starting a new project, LLM reads meta's index first.

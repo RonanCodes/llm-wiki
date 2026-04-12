@@ -92,6 +92,8 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 - **Domain tags** are inherited from the vault default and can be extended per-page.
 - **Cross-references** use Obsidian-compatible wikilinks: `[[page-name]]`.
 - **Commit messages** use emoji conventional commit format: `✨ feat:`, `🐛 fix:`, `📝 docs:`, etc.
+- **Mermaid diagrams** in every doc that describes a flow, process, or architecture. See `.claude/skills/doc-standards/SKILL.md` for conventions and color theme.
+- **Observatory color theme** for diagrams: amber (#e0af40) for user/sources, cyan (#5bbcd6) for engine/skills, green (#7dcea0) for outputs/Obsidian.
 
 ## Pulling Engine Updates
 

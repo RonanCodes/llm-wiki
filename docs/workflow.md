@@ -2,6 +2,30 @@
 
 How to use the llm-wiki system day-to-day.
 
+```mermaid
+graph TD
+    A["Find a source<br/>(article, PDF, video, tweet)"] --> B["Clip / save to raw/"]
+    B --> C["/ingest source --vault name"]
+    C --> D["Claude creates wiki pages<br/>(source-note, entities, concepts)"]
+    D --> E["Browse in Obsidian<br/>(graph view, backlinks)"]
+    E --> F{Want to explore?}
+    F -->|Yes| G["/query 'question' --vault name"]
+    G --> H["Claude synthesizes answer"]
+    H --> I{"Worth saving?"}
+    I -->|"--save"| D
+    I -->|No| E
+    F -->|"Find more sources"| A
+    E --> J["/lint --vault name"]
+    J --> K["Fix issues, fill gaps"]
+    K --> A
+
+    style A fill:#e0af40,color:#000
+    style C fill:#5bbcd6,color:#000
+    style G fill:#5bbcd6,color:#000
+    style J fill:#5bbcd6,color:#000
+    style E fill:#7dcea0,color:#000
+```
+
 ## Setup (once per machine)
 
 1. Clone the repo: `git clone https://github.com/RonanCodes/llm-wiki.git`
