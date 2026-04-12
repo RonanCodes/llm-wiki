@@ -19,7 +19,7 @@ Install [Obsidian Web Clipper](https://obsidian.md/clipper) for your browser (Ch
 
 ### Image Download Hotkey
 
-1. Install the [Local Images Plus](https://github.com/catalystsquad/obsidian-local-images-plus) community plugin
+1. Install the [Local Images Plus](https://github.com/Sergei-Korneev/obsidian-local-images-plus) community plugin
 2. **Settings** → **Hotkeys** → search "Download all remote images"
 3. Bind to `Cmd+Shift+D`
 
