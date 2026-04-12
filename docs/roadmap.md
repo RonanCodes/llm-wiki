@@ -76,11 +76,11 @@ graph TB
     style P1H fill:#22c55e,color:#000
     style P15A fill:#22c55e,color:#000
     style P15B fill:#22c55e,color:#000
-    style P2A fill:#fbbf24,color:#000
-    style P2B fill:#fbbf24,color:#000
-    style P2C fill:#fbbf24,color:#000
-    style P2D fill:#fbbf24,color:#000
-    style P2E fill:#fbbf24,color:#000
+    style P2A fill:#22c55e,color:#000
+    style P2B fill:#22c55e,color:#000
+    style P2C fill:#22c55e,color:#000
+    style P2D fill:#22c55e,color:#000
+    style P2E fill:#22c55e,color:#000
     style P3A fill:#94a3b8,color:#000
     style P3B fill:#94a3b8,color:#000
     style P3C fill:#94a3b8,color:#000
@@ -154,17 +154,24 @@ Core vault system — all Claude Code skills. **Complete. 20 skills built.**
 
 ---
 
-## Phase 2: Tooling 📋 **Next up — completes the MVP**
+## Phase 2: Tooling ✅ **MVP Complete**
 
-Wire up ecosystem tools from Karpathy's recommendations. PRD: `prd.json` (US-009 through US-013).
+Ecosystem tools from Karpathy's recommendations. PRD: `archive/prd-phase-2-tooling.json`.
 
 | Item | Story | Status | Details |
 |------|-------|--------|---------|
-| qmd search | US-009 | 📋 | `/search` — hybrid BM25/vector search for wiki pages |
-| Obsidian Web Clipper | US-010 | 📋 | Workflow doc + integration for clipping articles → raw/ |
-| Marp slides | US-011 | 📋 | `/slides` — generate presentations from wiki content |
-| Image handling | US-012 | 📋 | Download images locally during ingest |
-| Dataview compat | US-013 | 📋 | Ensure frontmatter works with Dataview queries + example queries |
+| qmd search | US-009 | ✅ | `/search` — hybrid BM25/vector search + grep fallback + MCP server |
+| Obsidian Web Clipper | US-010 | ✅ | Full setup guide + daily workflow doc |
+| Marp slides | US-011 | ✅ | `/slides` — generate presentations from wiki content |
+| Image handling | US-012 | ✅ | Download images locally during ingest, replace URLs |
+| Dataview compat | US-013 | ✅ | 6 queries + dashboard template + 2 JS queries + field reference |
+
+**Also added in this phase:**
+| Item | Status | Details |
+|------|--------|---------|
+| Install script | ✅ | `install.sh` — interactive macOS installer using Homebrew |
+| Getting started page | ✅ | `docs/getting-started.html` — visual setup guide |
+| README | ✅ | Polished with commands, source types, doc links |
 
 ---
 
