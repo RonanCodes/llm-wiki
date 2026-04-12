@@ -86,10 +86,8 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 ├── .private/                         <- GITIGNORED — private skills, private docs
 ├── .reference/                       <- GITIGNORED — cloned repos for study
 ├── docs/                             <- GITIGNORED — build output (CI deploys this)
+├── .ralph/                           <- GITIGNORED — Ralph working files (prd.json, progress.txt, archive/)
 ├── .github/workflows/deploy.yml      <- GitHub Actions: build + deploy to Pages
-├── ralph.sh                          <- Ralph loop runner script
-├── prd.json                          <- current Ralph PRD
-├── progress.txt                      <- Ralph progress log
 └── CLAUDE.md                         <- this file
 ```
 

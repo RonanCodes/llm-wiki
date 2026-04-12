@@ -1,6 +1,6 @@
 ---
 name: ralph
-description: Run an autonomous Ralph loop to implement tasks from prd.json. Picks the highest priority incomplete story, implements it, validates, commits, and updates progress. Use when you want to start the Ralph loop, run ralph, or implement PRD tasks autonomously.
+description: Run an autonomous Ralph loop to implement tasks from .ralph/prd.json. Picks the highest priority incomplete story, implements it, validates, commits, and updates progress. Use when you want to start the Ralph loop, run ralph, or implement PRD tasks autonomously.
 argument-hint: [--plan-only | --single | --all]
 disable-model-invocation: true
 allowed-tools: Bash(git *) Read Write Edit Glob Grep
@@ -8,7 +8,7 @@ allowed-tools: Bash(git *) Read Write Edit Glob Grep
 
 # Ralph Loop
 
-Autonomous coding agent loop based on the Ralph Wiggum technique. Each iteration picks one task from `prd.json`, implements it, validates, commits, and updates progress.
+Autonomous coding agent loop based on the Ralph Wiggum technique. Each iteration picks one task from `.ralph/prd.json`, implements it, validates, commits, and updates progress.
 
 ## Quick Start
 
@@ -20,13 +20,13 @@ Autonomous coding agent loop based on the Ralph Wiggum technique. Each iteration
 
 ## How It Works
 
-1. Read `prd.json` — find the highest priority story where `passes: false`
-2. Read `progress.txt` — check Codebase Patterns section for learnings from prior iterations
+1. Read `.ralph/prd.json` — find the highest priority story where `passes: false`
+2. Read `.ralph/progress.txt` — check Codebase Patterns section for learnings from prior iterations
 3. Implement the story
 4. Validate (typecheck, lint, test — whatever the project requires)
 5. Commit with message: `feat: [Story ID] - [Story Title]`
-6. Update `prd.json` — set `passes: true` for completed story
-7. Append progress to `progress.txt` with learnings
+6. Update `.ralph/prd.json` — set `passes: true` for completed story
+7. Append progress to `.ralph/progress.txt` with learnings
 
 ## One Story Per Iteration
 
@@ -34,7 +34,7 @@ Work on ONE story at a time. After completing it, stop. The next `/ralph` invoca
 
 ## Progress Report Format
 
-APPEND to `progress.txt` (never replace):
+APPEND to `.ralph/progress.txt` (never replace):
 
 ```
 ## [Date/Time] - [Story ID]: [Story Title]
@@ -49,7 +49,7 @@ APPEND to `progress.txt` (never replace):
 
 ## Codebase Patterns
 
-If you discover a reusable pattern, add it to the `## Codebase Patterns` section at the TOP of `progress.txt` (create it if missing):
+If you discover a reusable pattern, add it to the `## Codebase Patterns` section at the TOP of `.ralph/progress.txt` (create it if missing):
 
 ```
 ## Codebase Patterns
@@ -70,7 +70,7 @@ If more remain and `--all` flag: continue to next story.
 
 If more remain and no `--all` flag: stop after the single story (default).
 
-## prd.json Format
+## .ralph/prd.json Format
 
 ```json
 {
