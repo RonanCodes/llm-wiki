@@ -13,9 +13,38 @@ Scaffold a new LLM Wiki vault as a separate git repo.
 ## Usage
 
 ```
-/vault-create my-research
-/vault-create my-research --domain ai-research
+/vault-create                                    # interactive — interviews you
+/vault-create my-research --domain ai-research   # direct — skips interview
 ```
+
+## Step 0: Interview (if no arguments provided)
+
+If the user runs `/vault-create` with no arguments, interview them to figure out the right vault setup. Use AskUserQuestion for each question.
+
+**Question 1: What's the vault for?**
+- Personal knowledge (health, goals, journal, self-improvement)
+- Research deep-dive (one topic over weeks/months)
+- Project knowledge (tech decisions, architecture, domain context for a specific project)
+- Reading a book (characters, themes, plot threads, chapter notes)
+- Business/competitive analysis (market research, competitor tracking)
+- Learning/courses (structured learning on a topic)
+- Other (ask them to describe)
+
+**Question 2: What domain or topic?**
+Ask for a short domain tag, e.g. `ai-research`, `personal`, `fintech-project`, `book-dune`, `go-to-market`.
+
+**Question 3: What's the vault name?**
+Suggest a kebab-case name based on their answers. Let them override.
+- Personal → `personal`
+- Research → `<topic>-research` (e.g. `llm-research`)
+- Project → `project-<name>` (e.g. `project-acme`)
+- Book → `book-<title>` (e.g. `book-dune`)
+
+**Question 4: Do you have existing files to import?**
+- Yes → suggest using `/vault-import` instead
+- No → proceed with empty vault
+
+After the interview, proceed to Step 1 with the gathered info.
 
 ## Steps
 
