@@ -26,9 +26,10 @@ Otherwise, check if the skills `ralph`, `frontend-design`, `create-skill`, `doc-
    - Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
    - Skills available in every project on this machine
 
-3. **Clone repo to ~/.claude/skills/** — One command, globally available:
-   - `git clone https://github.com/RonanCodes/skills.git ~/.claude/skills`
-   - Warning: this replaces anything already in ~/.claude/skills/
+3. **Clone repo + symlink to ~/.claude/skills/** — Ask where to clone, then:
+   - `git clone https://github.com/RonanCodes/skills.git <their-dev-folder>/skills`
+   - For each skill: `ln -s <their-dev-folder>/skills/skills/<name> ~/.claude/skills/<name>`
+   - Skills globally available, repo stays in their dev folder, `git pull` to update
 
 4. **Copy skills into this project** — Copy from the repo into `.claude/skills/` locally:
    - `npx skills add RonanCodes/skills/ralph`
