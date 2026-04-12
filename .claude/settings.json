@@ -1,8 +1,8 @@
 {
-  "extraKnownMarketplaces": [
-    {
-      "source": "github",
-      "repo": "RonanCodes/skills"
+    "extraKnownMarketplaces": {
+        "ronan-skills": {
+            "source": "github",
+            "repo": "RonanCodes/skills"
+        }
     }
-  ]
 }
