@@ -4,7 +4,7 @@ A personal knowledge base powered by LLMs. Claude Code builds and maintains your
 
 Inspired by [Andrej Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) (55K likes).
 
-![LLM Wiki — Obsidian vault with wiki pages and architecture diagram](docs/assets/preview-combined.png)
+![LLM Wiki — Landing page, Obsidian vault, and architecture diagram](docs/assets/linkedin-preview.png)
 
 ```mermaid
 graph LR
