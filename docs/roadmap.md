@@ -99,7 +99,9 @@ graph TB
     style P5E fill:#94a3b8,color:#000
 ```
 
-**Legend:** 🟢 Complete | 🟡 Next up | ⬜ Planned
+**Legend:** 🟢 Complete | 🟡 Next up (MVP) | ⬜ Future (optional)
+
+**MVP = Phase 0 + Phase 1 + Phase 2.** Everything after Phase 2 is optional future work.
 
 ---
 
@@ -152,63 +154,64 @@ Core vault system — all Claude Code skills. **Complete. 20 skills built.**
 
 ---
 
-## Phase 2: Tooling 📋 **Next up**
+## Phase 2: Tooling 📋 **Next up — completes the MVP**
 
-Wire up ecosystem tools from Karpathy's recommendations.
+Wire up ecosystem tools from Karpathy's recommendations. PRD: `prd.json` (US-009 through US-013).
 
-| Item | Status | Details |
-|------|--------|---------|
-| qmd search | 📋 | `/search` — hybrid BM25/vector search for wiki pages |
-| Obsidian Web Clipper | 📋 | Workflow doc for clipping articles → raw/ |
-| Marp slides | 📋 | `/slides` — generate presentations from wiki content |
-| Image handling | 📋 | Download images locally during ingest |
-| Dataview compat | 📋 | Ensure frontmatter works with Dataview queries |
+| Item | Story | Status | Details |
+|------|-------|--------|---------|
+| qmd search | US-009 | 📋 | `/search` — hybrid BM25/vector search for wiki pages |
+| Obsidian Web Clipper | US-010 | 📋 | Workflow doc + integration for clipping articles → raw/ |
+| Marp slides | US-011 | 📋 | `/slides` — generate presentations from wiki content |
+| Image handling | US-012 | 📋 | Download images locally during ingest |
+| Dataview compat | US-013 | 📋 | Ensure frontmatter works with Dataview queries + example queries |
 
 ---
 
-## Phase 3: Local Web App 📋
+## Future Phases (optional, not MVP)
 
-Next.js companion app for browser/mobile interaction with vaults.
+Everything below is stretch / future work. The system is fully usable after Phase 2.
 
-| Item | Status | Details |
-|------|--------|---------|
-| Next.js scaffold | 📋 | pnpm, TypeScript, Tailwind, shadcn/ui, Turbopack |
-| API routes | 📋 | `/api/ingest`, `/api/query`, `/api/vaults`, `/api/capture` |
-| Dashboard | 📋 | Vault overview, recent activity |
-| Chat interface | 📋 | Query vaults conversationally from browser |
-| PWA | 📋 | Installable on mobile, works offline |
+### Phase 3: Local Web App 📋
+
+Next.js companion app — a nice UI for vault management, chat interface, and mobile access. Not needed for power users on CLI + Obsidian, but great for DX and onboarding.
+
+| Item | Details |
+|------|---------|
+| Next.js scaffold | pnpm, TypeScript, Tailwind, shadcn/ui, Turbopack |
+| API routes | `/api/ingest`, `/api/query`, `/api/vaults`, `/api/capture` |
+| Dashboard | Vault overview, recent activity |
+| Chat interface | Query vaults conversationally from browser |
+| PWA | Installable on mobile, works offline |
+| Obsidian launcher | Button to open vault in Obsidian |
 
 **Tech stack:** Next.js App Router, shadcn/ui, Drizzle (SQLite local / Postgres SaaS), ESLint + Prettier, Vitest
 
----
-
-## Phase 4: Deployment 📋
+### Phase 4: Deployment 📋
 
 Self-hosted on Hetzner VPS with auto-deploy.
 
-| Item | Status | Details |
-|------|--------|---------|
-| Dockerfile | 📋 | Multi-stage build, Next.js standalone output |
-| docker-compose | 📋 | App + Caddy (auto HTTPS) + Watchtower (auto-deploy) |
-| GitHub Actions CI | 📋 | Build image → push to GHCR on main push |
-| Hetzner VPS | 📋 | Watchtower detects new image → auto-redeploys |
-| Backups | 📋 | restic/borgmatic → Backblaze B2 on cron |
-| Analytics | 📋 | Self-hosted Plausible or Umami |
-| Email | 📋 | Resend API for transactional email |
+| Item | Details |
+|------|---------|
+| Dockerfile | Multi-stage build, Next.js standalone output |
+| docker-compose | App + Caddy (auto HTTPS) + Watchtower (auto-deploy) |
+| GitHub Actions CI | Build image → push to GHCR on main push |
+| Hetzner VPS | Watchtower detects new image → auto-redeploys |
+| Backups | restic/borgmatic → Backblaze B2 on cron |
+| Analytics | Self-hosted Plausible or Umami |
+| Email | Resend API for transactional email |
 
----
-
-## Phase 5: SaaS 📋
+### Phase 5: SaaS 📋
 
 Multi-tenant hosted version. Same codebase, different deployment.
 
-| Item | Status | Details |
-|------|--------|---------|
-| Auth | 📋 | Clerk (speed) or Better Auth (ownership) — TBD |
-| Stripe billing | 📋 | BYO key ~$10/mo, all-in ~$30-50/mo |
-| Multi-tenant vaults | 📋 | Per-user storage (S3 or namespaced filesystem) |
-| GitHub sync | 📋 | Optional — user connects GitHub, vaults auto-push |
-| Vault export | 📋 | Always available — no lock-in (it's just markdown) |
+| Item | Details |
+|------|---------|
+| Auth | Clerk (speed) or Better Auth (ownership) — TBD |
+| Stripe billing | BYO key ~$10/mo, all-in ~$30-50/mo |
+| Multi-tenant vaults | Per-user storage (S3 or namespaced filesystem) |
+| GitHub sync | Optional — user connects GitHub, vaults auto-push |
+| Vault export | Always available — no lock-in (it's just markdown) |
 
 ---
 
