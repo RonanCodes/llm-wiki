@@ -1,3 +1,24 @@
 # Ralph Progress Log
 Started: 2026-04-13
+
+## Codebase Patterns
+- Skills use SKILL.md format inside named directories under .claude/skills/
+- YAML frontmatter fields: name, description, argument-hint, disable-model-invocation, allowed-tools, user-invocable
+- Vault CLAUDE.md files are thin config (conventions, not logic)
+- Use Obsidian-compatible wikilinks [[page-name]] for cross-references
+- Every wiki page must have frontmatter AND link back to raw sources
+- Domain tags inherited from vault default, can be extended per-page
+- Commit messages use emoji conventional commit format
+
+---
+
+## [2026-04-13] - US-001: Create vault-create skill
+- Created .claude/skills/vault-create/SKILL.md
+- Includes full templates for: directory structure, index.md (grouped by type with table columns), log.md (parseable format), CLAUDE.md (domain inheritance, frontmatter requirements, source linking rules, cross-reference conventions)
+- Supports --domain flag for default domain tagging
+- Files changed: .claude/skills/vault-create/SKILL.md
+- **Learnings for future iterations:**
+  - The SKILL.md template approach works well — embedding the full file templates inline means the skill is self-contained
+  - grep validation against acceptance criteria is a quick way to verify completeness
+  - raw/assets/ subdirectory needed for downloaded images during ingest
 ---

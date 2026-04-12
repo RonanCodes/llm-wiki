@@ -17,8 +17,8 @@
         "Skill accepts --domain argument (e.g. --domain ai-research) which sets the default domain tag for all pages in the vault"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-13. SKILL.md includes full templates for index.md, log.md, and CLAUDE.md with domain inheritance and source linking conventions."
     },
     {
       "id": "US-002",
