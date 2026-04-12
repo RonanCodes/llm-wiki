@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features — LLM Wiki</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav>
+    <div class="nav-inner">
+        <a href="index.html" class="nav-brand">LLM <span>Wiki</span></a>
+        <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="getting-started.html">Get Started</a>
+            <a href="features.html">Features</a>
+            <a href="architecture.html">Architecture</a>
+            <a href="https://github.com/RonanCodes/llm-wiki" target="_blank" class="gh">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+            <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">&#9790; Dark</button>
+        </div>
+    </div>
+</nav>
+
+<div class="page">
+<main>
+    <section style="padding: 100px 0 40px; text-align: center;">
+        <div class="container">
+            <div class="eyebrow">Capabilities</div>
+            <h1 style="font-size: clamp(2.4rem, 6vw, 3.5rem); margin: 16px 0 12px;">Features</h1>
+            <p class="text-dim" style="max-width: 500px; margin: 0 auto;">25 skills that turn Claude Code into a knowledge engine. Every operation is a slash command.</p>
+        </div>
+    </section>
+
+    <!-- Ingest -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Ingest</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--cyan);">Process any source into wiki pages</h3>
+                    <p>Drop in a URL, PDF, YouTube video, tweet, gist, Office doc, or pasted text. Claude reads it, extracts key information, creates source notes, entity pages, and concept pages. Updates the index, appends to the log, and auto-commits.</p>
+                    <p>A single source typically creates 3-7 wiki pages. All with YAML frontmatter, wikilinks, and source provenance.</p>
+                    <p style="color: var(--text-dim); font-size: 0.85rem;">7 source types. Dependencies auto-install on first use.</p>
+                </div>
+                <div>
+                    <div class="specimen">
+                        <div class="specimen-bar"><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-title">ingest</span></div>
+                        <div class="specimen-body"><span class="prompt">&gt;</span> <span class="t-cmd">/ingest</span> https://article.com <span class="t-dim">--vault research</span>
+
+<span class="t-dim">Reading source...</span>
+<span class="t-dim">Creating pages:</span>
+  <span class="t-cmd">+</span> wiki/sources/article-name.md
+  <span class="t-cmd">+</span> wiki/entities/author-name.md
+  <span class="t-cmd">+</span> wiki/concepts/key-idea.md
+  <span class="t-amber">~</span> wiki/index.md <span class="t-dim">(updated)</span>
+  <span class="t-amber">~</span> log.md <span class="t-dim">(appended)</span>
+<span class="t-dim">Committed:</span> <span class="t-engine">ingest article-name</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Query -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Query</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--green);">Ask questions, get cited answers</h3>
+                    <p>Claude reads your wiki's index to find relevant pages, reads them, and synthesizes a comprehensive answer with citations to specific wiki pages.</p>
+                    <p>The key insight: <strong style="color: var(--text-bright);">good answers can be filed back into the wiki.</strong> Add <code>--save</code> and the answer becomes a new wiki page. Your explorations compound just like ingested sources.</p>
+                </div>
+                <div>
+                    <div class="specimen">
+                        <div class="specimen-bar"><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-title">query</span></div>
+                        <div class="specimen-body"><span class="prompt">&gt;</span> <span class="t-cmd">/query</span> "Compare RAG vs wiki" <span class="t-dim">--save</span>
+
+<span class="t-dim">Reading index... found 4 relevant pages</span>
+<span class="t-dim">Synthesizing answer...</span>
+
+RAG re-derives each query. A persistent
+wiki compiles once, keeps current.
+See <span class="t-engine">[[rag-vs-persistent-wiki]]</span>
+
+<span class="t-dim">Answer saved to:</span>
+  <span class="t-cmd">+</span> wiki/comparisons/rag-vs-wiki.md</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lint -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Lint</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--rose);">Health-check your knowledge</h3>
+                    <p>8 automated checks: orphan pages, broken wikilinks, missing frontmatter, empty source links, missing domain tags, concepts without pages, stale content, index completeness.</p>
+                    <p>Reports are grouped by severity. Add <code>--fix</code> to auto-repair what's fixable &mdash; missing frontmatter, stub pages for broken links, domain tags from vault defaults.</p>
+                </div>
+                <div>
+                    <div class="specimen">
+                        <div class="specimen-bar"><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-title">lint</span></div>
+                        <div class="specimen-body"><span class="prompt">&gt;</span> <span class="t-cmd">/lint</span> <span class="t-dim">--vault research --fix</span>
+
+<span class="t-dim">Scanning 42 pages...</span>
+
+<span style="color: var(--rose);">Critical:</span>
+  <span style="color: var(--rose);">x</span> [[missing-page]] referenced but missing
+<span class="t-amber">Warning:</span>
+  <span class="t-amber">!</span> old-tool.md — orphan (0 inlinks)
+  <span class="t-amber">!</span> some-idea.md — no domain tag
+<span class="t-cmd">Info:</span>
+  <span class="t-cmd">i</span> "machine learning" — 8 mentions, no page
+
+<span class="t-dim">Auto-fixed: 2 issues</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promote -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Promote</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3 style="color: var(--amber);">Graduate knowledge between vaults</h3>
+                    <p>When finishing a project, promote reusable learnings to your meta vault. Tech patterns, strategy insights, vendor evaluations &mdash; anything useful across projects.</p>
+                    <p>Claude reads the project vault, identifies what's reusable vs project-specific, creates or merges pages in the target vault, and updates both indexes. A <code>promoted-from</code> frontmatter field tracks provenance.</p>
+                </div>
+                <div>
+                    <div class="specimen">
+                        <div class="specimen-bar"><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-title">promote</span></div>
+                        <div class="specimen-body"><span class="prompt">&gt;</span> <span class="t-cmd">/promote</span> project-alpha <span class="t-dim">--to meta</span>
+
+<span class="t-dim">Scanning project-alpha vault...</span>
+<span class="t-dim">Identified 5 promotable pages:</span>
+
+<span class="t-cmd">Promoted:</span>
+  <span class="t-cmd">+</span> meta/concepts/nextjs-deploy.md
+  <span class="t-cmd">+</span> meta/entities/vercel.md
+  <span class="t-amber">~</span> meta/concepts/auth-patterns.md <span class="t-dim">(merged)</span>
+<span class="t-dim">Skipped:</span>
+  <span class="t-dim">-</span> client-api-schema.md <span class="t-dim">(project-specific)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Search</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3>Full-text search at scale</h3>
+                    <p>At small scale (~100 pages), the index.md catalog is all you need. When your wiki grows, add qmd for hybrid BM25 + vector search with LLM re-ranking. All local, no API keys.</p>
+                    <p>Falls back to grep-based search if qmd isn't installed. Can also run as an MCP server for native tool access.</p>
+                </div>
+                <div>
+                    <div class="specimen">
+                        <div class="specimen-bar"><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-title">search</span></div>
+                        <div class="specimen-body"><span class="prompt">&gt;</span> <span class="t-cmd">/search</span> "deployment patterns" <span class="t-dim">--vault meta</span>
+
+<span class="t-dim">Results (qmd hybrid search):</span>
+
+<span class="t-amber">1.</span> <span class="t-engine">[[nextjs-deploy]]</span> <span class="t-dim">concept</span>
+   ...ISR, SSR, and edge deployment...
+<span class="t-amber">2.</span> <span class="t-engine">[[vercel]]</span> <span class="t-dim">entity</span>
+   ...Fluid Compute, auto-scaling...
+<span class="t-amber">3.</span> <span class="t-engine">[[docker-patterns]]</span> <span class="t-dim">concept</span>
+   ...multi-stage builds, Watchtower...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slides -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">Slides</span></div>
+            <div class="feature">
+                <div class="feature-text">
+                    <h3>Presentations from your wiki</h3>
+                    <p>Generate Marp-format slide decks from wiki content. Claude reads relevant pages, synthesizes a focused presentation, and saves it as a wiki page you can view in Obsidian or export to PDF/HTML.</p>
+                    <p>Slides are wiki pages too &mdash; they get frontmatter, appear in the index, and compound.</p>
+                </div>
+                <div>
+                    <div class="specimen">
+                        <div class="specimen-bar"><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-dot"></span><span class="specimen-title">slides</span></div>
+                        <div class="specimen-body"><span class="prompt">&gt;</span> <span class="t-cmd">/slides</span> "LLM Knowledge Bases" <span class="t-dim">--vault research</span>
+
+<span class="t-dim">Reading 6 relevant pages...</span>
+<span class="t-dim">Generating 12-slide deck...</span>
+
+<span class="t-cmd">+</span> wiki/slides-llm-knowledge-bases.md
+<span class="t-dim">View in Obsidian (Marp plugin) or export:</span>
+  <span class="t-dim">npx @marp-team/marp-cli slides.md --pdf</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- All Commands -->
+    <section>
+        <div class="container">
+            <div class="chapter"><span class="chapter-label">All Commands</span></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>/vault-create &lt;name&gt;</code></td><td>Create a new vault (interactive interview or direct)</td></tr>
+                        <tr><td><code>/vault-import &lt;path&gt;</code></td><td>Import existing Obsidian vault or markdown folder</td></tr>
+                        <tr><td><code>/vault-status</code></td><td>Show all vaults with page counts and status</td></tr>
+                        <tr><td><code>/vault-archive &lt;name&gt;</code></td><td>Archive a completed vault</td></tr>
+                        <tr><td><code>/ingest &lt;source&gt;</code></td><td>Process any source into wiki pages</td></tr>
+                        <tr><td><code>/query "question"</code></td><td>Ask questions, get answers with citations</td></tr>
+                        <tr><td><code>/search "terms"</code></td><td>Full-text search across wiki pages</td></tr>
+                        <tr><td><code>/lint</code></td><td>Health-check wiki for issues</td></tr>
+                        <tr><td><code>/promote &lt;vault&gt;</code></td><td>Graduate knowledge to another vault</td></tr>
+                        <tr><td><code>/slides "topic"</code></td><td>Generate Marp presentation</td></tr>
+                        <tr><td><code>/setup</code></td><td>First-time machine setup</td></tr>
+                        <tr><td><code>/read-tweet &lt;url&gt;</code></td><td>Read X/Twitter post</td></tr>
+                        <tr><td><code>/read-gist &lt;url&gt;</code></td><td>Read GitHub gist</td></tr>
+                        <tr><td><code>/yt-transcript &lt;url&gt;</code></td><td>Extract YouTube transcript</td></tr>
+                        <tr><td><code>/ralph</code></td><td>Autonomous build loop</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section style="text-align: center; padding: 48px 0;">
+        <div class="container">
+            <div class="cta-group" style="justify-content: center;">
+                <a href="getting-started.html" class="btn btn-primary">Get Started &rarr;</a>
+                <a href="architecture.html" class="btn btn-secondary">How it works &rarr;</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-links">
+            <a href="https://github.com/RonanCodes/llm-wiki" target="_blank">GitHub</a>
+            <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f" target="_blank">Karpathy's Gist</a>
+            <a href="index.html">Home</a>
+            <a href="getting-started.html">Get Started</a>
+            <a href="architecture.html">Architecture</a>
+        </div>
+        <div class="credit">Built with Claude Code. MIT License.</div>
+    </div>
+</footer>
+</div>
+
+<script src="site.js"></script>
+</body>
+</html>

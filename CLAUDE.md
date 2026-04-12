@@ -41,13 +41,21 @@ You (terminal)                    You (Obsidian)
 
 ## Key Documents
 
-- `docs/vision.md` — what we're building, why, core concept
-- `docs/architecture.md` — technical architecture, vault structure
-- `docs/workflow.md` — daily usage guide (what's manual vs automated)
-- `docs/dependencies.md` — all tools with install methods
-- `docs/decisions.md` — decisions made, open questions
-- `docs/karpathy-research.md` — Karpathy's gist, tweets, community findings
-- `docs/ralph-loop-research.md` — Ralph Wiggum autonomous coding technique
+### Reference docs (markdown, in `reference/`)
+- `reference/vision.md` — what we're building, why, core concept
+- `reference/architecture.md` — technical architecture, vault structure
+- `reference/workflow.md` — daily usage guide (what's manual vs automated)
+- `reference/dependencies.md` — all tools with install methods
+- `reference/decisions.md` — decisions made, open questions
+- `reference/roadmap.md` — project roadmap with mermaid diagrams
+- `reference/karpathy-research.md` — Karpathy's gist, tweets, community findings
+- `reference/ralph-loop-research.md` — Ralph Wiggum autonomous coding technique
+
+### Website (HTML, in `docs/` — served via GitHub Pages)
+- `docs/index.html` — landing page (ronancodes.github.io/llm-wiki)
+- `docs/getting-started.html` — setup guide
+- `docs/features.html` — features deep-dive
+- `docs/architecture.html` — how it works
 
 ## Repo Structure
 
@@ -74,7 +82,8 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 │   └── .claude/skills/              <- private skills loaded via --add-dir
 ├── vaults/                           <- GITIGNORED — each vault is its own git repo
 ├── .reference/                       <- GITIGNORED — cloned repos for study
-├── docs/                             <- research, architecture, decisions
+├── reference/                        <- markdown docs (architecture, research, roadmap)
+├── docs/                             <- HTML website (GitHub Pages)
 ├── ralph.sh                          <- Ralph loop runner script
 ├── prd.json                          <- current Ralph PRD
 ├── progress.txt                      <- Ralph progress log
