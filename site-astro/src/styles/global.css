@@ -286,8 +286,8 @@ code {
     color: var(--cyan);
     transition: background 0.3s;
 }
-/* In light mode, inline code uses a light style */
-[data-theme="light"] code {
+/* In light mode, inline code uses a light style — but NOT inside pre blocks */
+[data-theme="light"] code:not(pre code) {
     background: var(--surface-raised);
     color: var(--cyan);
 }
