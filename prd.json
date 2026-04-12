@@ -9,12 +9,12 @@
       "description": "As a user, I want to create a new vault with /vault-create <name> so that I have a properly structured wiki ready for ingestion",
       "acceptanceCriteria": [
         "Create .claude/skills/vault-create/SKILL.md with proper frontmatter",
-        "Skill creates vaults/<name>/ with subdirectories: raw/, wiki/, wiki/concepts/, wiki/entities/, wiki/sources/, wiki/comparisons/",
-        "Skill creates wiki/index.md with empty catalog structure",
-        "Skill creates log.md with header",
-        "Skill generates CLAUDE.md from template with vault name and domain conventions",
+        "Skill creates vaults/<name>/ with subdirectories: raw/, raw/assets/, wiki/, wiki/concepts/, wiki/entities/, wiki/sources/, wiki/comparisons/",
+        "Skill creates wiki/index.md with catalog structure grouped by page type (sources, entities, concepts, comparisons) with columns: page link, one-line summary, domain tags, date added",
+        "Skill creates log.md with header and parseable entry format: ## [YYYY-MM-DD] type | Title",
+        "Skill generates CLAUDE.md from template including: vault name, domain, frontmatter conventions, domain tag that all pages in this vault inherit, link-back convention (every wiki page must link to its raw source)",
         "Skill runs git init in the new vault directory",
-        "Skill accepts an optional --domain argument for tagging"
+        "Skill accepts --domain argument (e.g. --domain ai-research) which sets the default domain tag for all pages in the vault"
       ],
       "priority": 1,
       "passes": false,
@@ -40,10 +40,13 @@
       "acceptanceCriteria": [
         "Create .claude/skills/wiki-templates/SKILL.md with user-invocable: false",
         "Define page types: summary, entity, concept, comparison, source-note",
-        "Each type has YAML frontmatter template (title, date, sources, domain, page-type, tags)",
-        "Each type has structural conventions (sections, what to include)",
-        "Templates use Obsidian-compatible wikilinks [[page]] syntax",
-        "Include example of each page type"
+        "Every page type has YAML frontmatter with: title, date-created, date-modified, page-type, domain (inherited from vault + additional), tags, sources (list of raw file paths and/or URLs), related (list of wikilinks to related pages)",
+        "source-note type additionally has: source-url, source-type (article/paper/video/tweet/gist/pdf/etc), author, date-accessed, raw-file (path to file in raw/)",
+        "entity type additionally has: entity-type (person/org/tool/framework/etc), aliases",
+        "Each type has structural conventions (what sections to include, what to link)",
+        "All templates use Obsidian-compatible wikilinks [[page]] for cross-references",
+        "Every wiki page must include a Sources section linking back to raw/ files and/or original URLs",
+        "Include a complete example of each page type with filled-in frontmatter"
       ],
       "priority": 3,
       "passes": false,
@@ -57,10 +60,16 @@
         "Create .claude/skills/ingest/SKILL.md with proper frontmatter",
         "Detects source types: URL (web), file path (PDF, Office, markdown), YouTube URL, X/Twitter URL, GitHub gist URL, pasted text",
         "Documents the delegation pattern to sub-skills",
-        "After content extraction: instructs Claude to create/update wiki pages using wiki-templates",
-        "Updates wiki/index.md with new entries",
-        "Appends to log.md with timestamp and source info",
-        "Auto-commits vault changes via git"
+        "After content extraction: saves raw source to raw/ (or raw/assets/ for images) with descriptive filename",
+        "Creates source-note page in wiki/sources/ with full provenance: source URL, author, date accessed, raw file path, source type",
+        "Creates/updates entity pages in wiki/entities/ for people, orgs, tools mentioned",
+        "Creates/updates concept pages in wiki/concepts/ for key ideas, patterns, techniques",
+        "All created pages use wiki-templates with complete frontmatter including domain tags (inherited from vault default + source-specific)",
+        "Every wiki page links back to its raw source via frontmatter sources field AND inline Sources section",
+        "Cross-references between pages use wikilinks [[page-name]]",
+        "Updates wiki/index.md catalog with new entries (grouped by type)",
+        "Appends to log.md: ## [YYYY-MM-DD] ingest | Source Title — with list of pages created/updated",
+        "Auto-commits vault changes via git with descriptive message"
       ],
       "priority": 4,
       "passes": false,
@@ -107,10 +116,10 @@
       "description": "As a user, I want to health-check my wiki with /lint so I can find and fix issues",
       "acceptanceCriteria": [
         "Create .claude/skills/lint/SKILL.md with proper frontmatter",
-        "Checks for: orphan pages (no inbound links), missing cross-references, pages without frontmatter, broken wikilinks, concepts mentioned without own page",
-        "Reports issues in a clear markdown format",
+        "Checks for: orphan pages (no inbound links), missing cross-references, pages without frontmatter, broken wikilinks, concepts mentioned without own page, pages missing source links (no link back to raw/), missing or empty domain tags, stale date-modified fields",
+        "Reports issues in a clear markdown format grouped by severity",
         "Supports --vault flag to target specific vault",
-        "Supports --fix flag to auto-fix what's fixable (add missing frontmatter, create stub pages for missing concepts)",
+        "Supports --fix flag to auto-fix what's fixable (add missing frontmatter, create stub pages for missing concepts, add missing domain tags from vault default)",
         "Suggests new questions to investigate and new sources to find"
       ],
       "priority": 7,
