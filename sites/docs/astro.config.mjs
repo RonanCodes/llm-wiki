@@ -7,7 +7,7 @@ const LANDING_URL = 'https://ronancodes.github.io/llm-wiki/';
 export default defineConfig({
 	site: 'https://ronancodes.github.io',
 	base: '/llm-wiki/docs',
-	outDir: '../docs/docs',
+	outDir: '../../docs/docs',
 	integrations: [
 		starlight({
 			title: 'LLM Wiki Docs',

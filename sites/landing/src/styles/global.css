@@ -3,7 +3,7 @@
    Dark = ink on deep paper. Light = broadsheet clarity.
    ═══════════════════════════════════════════════════════ */
 
-@import '../../../shared/tokens.css';
+@import '../../../../shared/tokens.css';
 
 /* ── Animations ── */
 @keyframes fadeUp {

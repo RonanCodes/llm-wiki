@@ -1,7 +1,7 @@
 /* LLM Wiki — Starlight theme overrides
    Imports shared tokens and maps to Starlight's CSS variables */
 
-@import '../../../shared/tokens.css';
+@import '../../../../shared/tokens.css';
 
 /* Map tokens to Starlight variables */
 :root {
