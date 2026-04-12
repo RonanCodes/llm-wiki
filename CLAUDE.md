@@ -6,17 +6,40 @@ A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wi
 
 ## Recommended Plugin
 
-This project uses shared skills from the `RonanCodes/skills` repo. On every new session, check if the skills `ralph`, `frontend-design`, `create-skill`, `doc-standards` are available (check if they appear in the skill list). If ANY are missing, use AskUserQuestion to ask:
+This project uses shared skills from the `RonanCodes/skills` repo (ralph, frontend-design, create-skill, doc-standards).
 
-**Question:** "This project recommends the ronan-skills plugin (ralph, frontend-design, create-skill, doc-standards). How would you like to proceed?"
+On every new session, first check if `.claude/skip-plugin-check` exists — if so, skip this entirely.
 
-**Options:**
-1. **Install via marketplace** — run `/plugin marketplace add RonanCodes/skills` then `/plugin install ronan-skills@ronan-skills`
-2. **Clone the repo** — ask where to clone, run `git clone https://github.com/RonanCodes/skills.git <path>`, add to `additionalDirectories` in `~/.claude/settings.json`
-3. **Skip for now** — continue without shared skills
-4. **Don't ask again** — create a `.claude/skip-plugin-check` file so this prompt is suppressed in future sessions
+Otherwise, check if the skills `ralph`, `frontend-design`, `create-skill`, `doc-standards` are available (check the skill list). If ANY are missing, use AskUserQuestion to prompt:
 
-If the file `.claude/skip-plugin-check` exists, skip this check entirely.
+**Question:** "This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) that aren't installed yet. How would you like to set them up?"
+
+**Options (prioritized from simplest to most involved):**
+
+1. **Install the plugin** (recommended) — Run these two commands:
+   - `/plugin marketplace add RonanCodes/skills`
+   - `/plugin install ronan-skills@ronan-skills`
+   - Then `/reload-plugins` to activate
+
+2. **Clone repo + use additionalDirectories** — Ask the user where to clone, then:
+   - `git clone https://github.com/RonanCodes/skills.git <their-chosen-path>`
+   - Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
+   - Skills available in every project on this machine
+
+3. **Clone repo to ~/.claude/skills/** — One command, globally available:
+   - `git clone https://github.com/RonanCodes/skills.git ~/.claude/skills`
+   - Warning: this replaces anything already in ~/.claude/skills/
+
+4. **Copy skills into this project** — Copy from the repo into `.claude/skills/` locally:
+   - `npx skills add RonanCodes/skills/ralph`
+   - `npx skills add RonanCodes/skills/frontend-design`
+   - `npx skills add RonanCodes/skills/create-skill`
+   - `npx skills add RonanCodes/skills/doc-standards`
+   - Skills only available in this project
+
+5. **Skip for now** — Continue without shared skills
+
+6. **Don't ask again** — Create `.claude/skip-plugin-check` file to suppress this prompt in future sessions
 
 ## Quick Start (new session)
 
