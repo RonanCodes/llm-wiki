@@ -1,8 +1,10 @@
 {
     "extraKnownMarketplaces": {
         "ronan-skills": {
-            "source": "github",
-            "repo": "RonanCodes/skills"
+            "source": {
+                "source": "github",
+                "repo": "RonanCodes/skills"
+            }
         }
     }
 }
