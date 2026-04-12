@@ -22,7 +22,7 @@
             50% { box-shadow: 0 0 40px rgba(224,175,64,0.12); }
         }
 
-        :root {
+        :root, [data-theme="dark"] {
             --void: #06060e;
             --deep: #0c0c1a;
             --surface: #111128;
@@ -41,6 +41,34 @@
             --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
             --serif: Baskerville, 'Libre Baskerville', 'Times New Roman', serif;
             --sans: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --starfield-opacity: 1;
+            --grain-opacity: 0.03;
+            --term-dot-1: #ff5f57;
+            --term-dot-2: #ffbd2e;
+            --term-dot-3: #28c840;
+        }
+
+        [data-theme="light"] {
+            --void: #f5f3ee;
+            --deep: #eae7e0;
+            --surface: #ffffff;
+            --surface-raised: #f0ede6;
+            --border: #d5d0c4;
+            --border-glow: #b8b0a0;
+            --text: #2c2a25;
+            --text-dim: #6b665a;
+            --text-bright: #1a1815;
+            --amber: #b8860b;
+            --amber-dim: #8b6508;
+            --amber-glow: rgba(184,134,11,0.1);
+            --cyan: #2e7d8c;
+            --green: #3a7d5c;
+            --rose: #a84040;
+            --starfield-opacity: 0;
+            --grain-opacity: 0;
+            --term-dot-1: #ff5f57;
+            --term-dot-2: #ffbd2e;
+            --term-dot-3: #28c840;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,6 +79,10 @@
             font-family: var(--sans);
             line-height: 1.65;
             overflow-x: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        *, *::before, *::after {
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         /* Starfield background */
@@ -78,6 +110,8 @@
             pointer-events: none;
             z-index: 0;
             animation: drift 8s ease-in-out infinite;
+            opacity: var(--starfield-opacity);
+            transition: opacity 0.4s ease;
         }
 
         .page { position: relative; z-index: 1; }
@@ -90,6 +124,8 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
             pointer-events: none;
             z-index: 100;
+            opacity: var(--grain-opacity);
+            transition: opacity 0.4s ease;
         }
 
         .container {
@@ -181,9 +217,31 @@
             border-bottom: 1px solid var(--border);
         }
         .terminal-dot { width: 11px; height: 11px; border-radius: 50%; }
-        .terminal-dot:nth-child(1) { background: #ff5f57; }
-        .terminal-dot:nth-child(2) { background: #ffbd2e; }
-        .terminal-dot:nth-child(3) { background: #28c840; }
+        .terminal-dot:nth-child(1) { background: var(--term-dot-1); }
+        .terminal-dot:nth-child(2) { background: var(--term-dot-2); }
+        .terminal-dot:nth-child(3) { background: var(--term-dot-3); }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 200;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .theme-toggle:hover { border-color: var(--amber); color: var(--text); }
+        .theme-toggle .icon { font-size: 1rem; }
         .terminal-title {
             flex: 1;
             text-align: center;
@@ -477,6 +535,11 @@
     </style>
 </head>
 <body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="icon" id="theme-icon">&#9790;</span>
+    <span id="theme-label">Light</span>
+</button>
+
 <div class="page">
     <div class="container">
 
@@ -700,5 +763,33 @@
     </footer>
 
 </div>
+
+<script>
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('llm-wiki-theme', next);
+    updateToggleUI(next);
+}
+
+function updateToggleUI(theme) {
+    document.getElementById('theme-icon').innerHTML = theme === 'dark' ? '&#9790;' : '&#9728;';
+    document.getElementById('theme-label').textContent = theme === 'dark' ? 'Light' : 'Dark';
+}
+
+// Load saved preference or respect system preference
+(function() {
+    const saved = localStorage.getItem('llm-wiki-theme');
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        updateToggleUI(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.setAttribute('data-theme', 'light');
+        updateToggleUI('light');
+    }
+})();
+</script>
 </body>
 </html>
