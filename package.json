@@ -10,6 +10,7 @@
     "build": "pnpm run build:site && pnpm run build:docs",
     "build:site": "pnpm --dir site-astro build",
     "build:docs": "pnpm --dir site-starlight build",
+    "docs:prod": "pnpm run build:docs && pnpm --dir site-starlight preview --port 4322",
     "preview": "concurrently -n astro,starlight,open -c cyan,yellow,green \"pnpm --dir site-astro dev --port 4321\" \"pnpm --dir site-starlight dev --port 4322\" \"sleep 3 && open http://localhost:4321/llm-wiki/\"",
     "install:all": "pnpm --dir site-astro install && pnpm --dir site-starlight install"
   },
