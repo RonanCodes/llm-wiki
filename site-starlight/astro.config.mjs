@@ -2,21 +2,23 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+const LANDING_URL = 'https://ronancodes.github.io/llm-wiki/';
+
 export default defineConfig({
 	site: 'https://ronancodes.github.io',
 	base: '/llm-wiki/docs',
 	outDir: '../docs/docs',
 	integrations: [
 		starlight({
-			title: 'LLM Wiki',
+			title: 'LLM Wiki Docs',
 			description: 'A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it.',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RonanCodes/llm-wiki' },
-				{ icon: 'rocket', label: 'Landing Page', href: 'https://ronancodes.github.io/llm-wiki/' },
+				{ icon: 'external', label: 'Home', href: LANDING_URL },
 			],
 			customCss: ['./src/styles/custom.css'],
 			sidebar: [
-				{ label: 'Back to Landing Page', link: '/llm-wiki/', attrs: { style: 'font-style: italic;' } },
+				{ label: '← Back to Home', link: LANDING_URL },
 				{ label: 'Docs Home', slug: '' },
 				{
 					label: 'Getting Started',
