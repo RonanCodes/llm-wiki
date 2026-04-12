@@ -16,7 +16,49 @@ Started: 2026-04-13
 
 ---
 
-## [2026-04-13] - US-008: Create promote skill
+## [2026-04-12] - US-013: Dataview compatibility
+- Created docs/dataview-queries.md (197 lines)
+- 6 basic Dataview queries + dashboard template + 2 advanced JS queries
+- Complete frontmatter field reference for all page types
+- Files changed: docs/dataview-queries.md
+- **Learnings:** Dataview JavaScript queries unlock powerful views (tag clouds, entity networks) but require enabling JS queries in Dataview settings
+---
+
+## [2026-04-12] - US-012: Image handling in ingest
+- Updated ingest-web and ingest router skills
+- Images downloaded to raw/assets/, remote URLs replaced with local paths
+- Skips tracking pixels and data URIs
+- Records image count in raw file frontmatter
+- Files changed: .claude/skills/ingest-web/SKILL.md, .claude/skills/ingest/SKILL.md
+- **Learnings:** Image handling is an update to existing skills, not a new skill — keeps the skill tree clean
+---
+
+## [2026-04-12] - US-011: Create slides skill
+- Created .claude/skills/slides/SKILL.md (168 lines)
+- Marp-format slide generation from wiki content
+- PDF/HTML export, Obsidian Marp plugin integration
+- Slides are wiki pages with frontmatter, added to index
+- Files changed: .claude/skills/slides/SKILL.md
+- **Learnings:** Slide decks as wiki pages is elegant — they compound and show up in graph view
+---
+
+## [2026-04-12] - US-010: Obsidian Web Clipper workflow
+- Created docs/obsidian-web-clipper.md (85 lines)
+- Step-by-step setup: extension, Obsidian settings, clipper config
+- Daily workflow: clip → download images → /ingest
+- Files changed: docs/obsidian-web-clipper.md
+- **Learnings:** This is a doc, not a skill — the workflow is manual (clip in browser, ingest in Claude Code)
+---
+
+## [2026-04-12] - US-009: Create search skill
+- Created .claude/skills/search/SKILL.md (142 lines)
+- qmd primary (hybrid BM25/vector), grep fallback
+- Documents MCP server setup for native tool access
+- Files changed: .claude/skills/search/SKILL.md
+- **Learnings:** qmd's MCP server mode is the most seamless integration — avoids the skill entirely
+---
+
+## [2026-04-12] - US-008: Create promote skill
 - Created .claude/skills/promote/SKILL.md (137 lines)
 - Graduates reusable knowledge from project vault → meta vault
 - Identifies promotable vs project-specific content

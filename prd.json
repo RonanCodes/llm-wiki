@@ -18,8 +18,8 @@
         "Falls back to grep-based search if qmd is not available"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": "qmd provides hybrid BM25/vector search. CLI and MCP server modes."
+      "passes": true,
+      "notes": "Completed 2026-04-12. 142-line skill with qmd primary + grep fallback + MCP server docs."
     },
     {
       "id": "US-010",
@@ -34,8 +34,8 @@
         "Test that clipped articles in raw/ are ingestible by the /ingest skill"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": "Obsidian Web Clipper is a browser extension that converts web articles to markdown"
+      "passes": true,
+      "notes": "Completed 2026-04-12. Full setup guide with settings, hotkeys, plugin recommendations, daily workflow."
     },
     {
       "id": "US-011",
@@ -52,8 +52,8 @@
         "Slide deck is saved to wiki/ and added to index.md"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": "Marp is a markdown-to-slides tool. Obsidian has a Marp plugin for viewing."
+      "passes": true,
+      "notes": "Completed 2026-04-12. 168-line skill with Marp generation, export, Obsidian plugin setup."
     },
     {
       "id": "US-012",
@@ -69,8 +69,8 @@
         "Note in source-note frontmatter how many images were downloaded"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": "Karpathy recommends downloading images locally so LLM can view them directly"
+      "passes": true,
+      "notes": "Completed 2026-04-12. Added to ingest-web + ingest router. Downloads to raw/assets/, replaces URLs, tracks count."
     },
     {
       "id": "US-013",
@@ -85,8 +85,8 @@
         "Include a sample Dataview JS query for more complex views"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": "Dataview is an Obsidian plugin that runs queries over page frontmatter"
+      "passes": true,
+      "notes": "Completed 2026-04-12. Full guide with 6 basic queries, dashboard template, 2 JS queries, field reference."
     }
   ]
 }
