@@ -60,6 +60,13 @@ const { title, description = 'A compounding knowledge base built by LLMs.', acti
 </footer>
 </div>
 
+<script>
+import mediumZoom from 'medium-zoom';
+document.addEventListener('DOMContentLoaded', () => {
+    mediumZoom('img.preview-img', { background: 'var(--void)' });
+});
+</script>
+
 <script is:inline>
 var themeOrder = ['dark', 'light', 'auto'];
 var themeLabels = { dark: '&#9790; Dark', light: '&#9728; Light', auto: '&#9881; Auto' };

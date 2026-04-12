@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightImageZoom from 'starlight-image-zoom';
 
 const LANDING_URL = 'https://ronancodes.github.io/llm-wiki/';
 
@@ -10,6 +11,7 @@ export default defineConfig({
 	outDir: '../../docs/docs',
 	integrations: [
 		starlight({
+			plugins: [starlightImageZoom()],
 			title: 'LLM Wiki Docs',
 			head: [
 				{
