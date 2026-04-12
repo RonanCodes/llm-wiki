@@ -129,19 +129,48 @@ And check any extra `tools` defined:
 which ollama 2>/dev/null && echo "  ✓ ollama" || echo "  → ollama — not installed"
 ```
 
-## Step 6: Check Obsidian
+## Step 6: Check Shared Skills Repo
+
+This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) from a separate repo. Check if it's installed:
+
+```bash
+if [ -d "$HOME/Dev/skills" ]; then
+  echo "✓ Shared skills repo found at ~/Dev/skills"
+  # Check if additionalDirectories is configured
+  grep -q "Dev/skills" "$HOME/.claude/settings.json" 2>/dev/null && \
+    echo "✓ additionalDirectories configured" || \
+    echo "→ Add to ~/.claude/settings.json: \"additionalDirectories\": [\"/Users/$USER/Dev/skills\"]"
+else
+  echo "→ Shared skills repo not found"
+  echo ""
+  echo "  This project uses shared skills (ralph, frontend-design, etc.)"
+  echo "  from a separate repo. Install with two steps:"
+  echo ""
+  echo "  Step 1: Clone the repo"
+  echo "    git clone https://github.com/RonanCodes/skills.git ~/Dev/skills"
+  echo ""
+  echo "  Step 2: Add to Claude Code settings"
+  echo "    Add to ~/.claude/settings.json:"
+  echo '    "additionalDirectories": ["/Users/'$USER'/Dev/skills"]'
+  echo ""
+  echo "  Or install individual skills with:"
+  echo "    npx skills add RonanCodes/skills/ralph -g"
+fi
+```
+
+## Step 7: Check Obsidian
 
 ```bash
 [ -d "/Applications/Obsidian.app" ] && echo "✓ Obsidian installed" || echo "→ Obsidian not found — download from https://obsidian.md"
 ```
 
-## Step 7: Check .private/ Directory
+## Step 8: Check .private/ Directory
 
 ```bash
 [ -d ".private" ] && echo "✓ .private/ directory exists" || echo "→ No .private/ directory (create one for private skills — see .private/README.md pattern)"
 ```
 
-## Step 8: Report Summary
+## Step 9: Report Summary
 
 Print a summary:
 
@@ -153,6 +182,7 @@ Print a summary:
   Required tools:    3/3 installed
   Optional tools:    2/5 installed (rest auto-install on use)
   Bundled skills:    24/24 present
+  Shared skills:     installed (~/Dev/skills)
   Recommended:       1/3 installed
   Obsidian:          installed
   Private overlay:   not configured
