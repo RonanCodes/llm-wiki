@@ -10,10 +10,14 @@ export default defineConfig({
 		starlight({
 			title: 'LLM Wiki',
 			description: 'A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it.',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/RonanCodes/llm-wiki' }],
+			social: [
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RonanCodes/llm-wiki' },
+				{ icon: 'rocket', label: 'Landing Page', href: 'https://ronancodes.github.io/llm-wiki/' },
+			],
 			customCss: ['./src/styles/custom.css'],
 			sidebar: [
-				{ label: 'Home', slug: '' },
+				{ label: 'Back to Landing Page', link: '/llm-wiki/', attrs: { style: 'font-style: italic;' } },
+				{ label: 'Docs Home', slug: '' },
 				{
 					label: 'Getting Started',
 					items: [
