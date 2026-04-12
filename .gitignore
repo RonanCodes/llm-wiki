@@ -8,6 +8,9 @@ vaults/*
 # Personal skills config (copy from skills.local.example.jsonc)
 skills.local.jsonc
 
+# Claude Code local settings (contains machine-specific paths)
+.claude/settings.local.json
+
 # Reference repos (cloned for study)
 /.reference/
 

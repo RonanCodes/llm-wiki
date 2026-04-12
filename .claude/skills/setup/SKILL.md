@@ -119,7 +119,7 @@ Also check the `private` array for .private/ overlay skills:
 
 ```bash
 # For each skill in skills.local.jsonc → private:
-[ -f ".private/.claude/skills/aviva-workflows/SKILL.md" ] && echo "  ✓ aviva-workflows" || echo "  → aviva-workflows — not in .private/"
+[ -f ".private/.claude/skills/my-company-workflows/SKILL.md" ] && echo "  ✓ my-company-workflows" || echo "  → my-company-workflows — not in .private/"
 ```
 
 And check any extra `tools` defined:

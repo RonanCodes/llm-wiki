@@ -33,9 +33,9 @@
   // These are project-specific but private (e.g. employer/client skills).
   "private": [
     // {
-    //   "name": "aviva-workflows",
-    //   "path": ".private/.claude/skills/aviva-workflows",
-    //   "description": "Aviva-specific ingestion and reporting workflows"
+    //   "name": "my-company-workflows",
+    //   "path": ".private/.claude/skills/my-company-workflows",
+    //   "description": "Company-specific ingestion and reporting workflows"
     // }
   ],
 
