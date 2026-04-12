@@ -1,13 +1,13 @@
 ---
 name: setup
-description: First-time setup for the llm-wiki system. Checks tools, verifies skills, recommends missing ones from skills.json. Use when setting up llm-wiki on a new machine or after cloning.
+description: First-time setup for the llm-wiki system. Checks tools, skills, shared marketplace, and Obsidian. Use when setting up llm-wiki on a new machine.
 disable-model-invocation: true
-allowed-tools: Bash(brew *) Bash(which *) Bash(npm *) Bash(pnpm *) Bash(ls *) Bash(cat *) Read Glob
+allowed-tools: Bash(brew *) Bash(which *) Bash(npm *) Bash(pnpm *) Bash(ls *) Read Glob
 ---
 
 # LLM Wiki Setup
 
-First-time bootstrap for a new machine. Reads `skills.json`, checks your environment, installs core deps, and recommends missing skills.
+First-time bootstrap. Checks your environment and guides you through setup.
 
 ## Usage
 
@@ -15,165 +15,75 @@ First-time bootstrap for a new machine. Reads `skills.json`, checks your environ
 /setup
 ```
 
-Or run the install script directly: `./install.sh`
+## Step 1: Check Required Tools
 
-## Step 1: Read Skills Manifests
-
-Read both manifests:
+Read `tools.json` and check each required tool:
 
 ```bash
-cat skills.json                    # project manifest (committed)
-cat skills.local.jsonc 2>/dev/null  # personal manifest (gitignored, optional)
+git --version 2>/dev/null    || echo "MISSING: git — brew install git"
+node --version 2>/dev/null   || echo "MISSING: node — brew install node"
+claude --version 2>/dev/null || echo "MISSING: claude — npm i -g @anthropic-ai/claude-code"
 ```
 
-- `skills.json` — project-level: bundled skills, recommended externals, tool deps
-- `skills.local.jsonc` — personal: your extra skills, private overlay skills, tool additions
+Offer to install any missing tools.
 
-If `skills.local.jsonc` doesn't exist, mention: "Copy `skills.local.example.jsonc` to `skills.local.jsonc` to add your personal skills."
+## Step 2: Check Optional Tools
 
-## Step 2: Check Required Tools
-
-For each tool in `skills.json → tools.required`, run the check command:
+From `tools.json`, check optional tools (these lazy-install on first use):
 
 ```bash
-# For each required tool:
-git --version 2>/dev/null    || echo "MISSING: git"
-node --version 2>/dev/null   || echo "MISSING: node"
-claude --version 2>/dev/null || echo "MISSING: claude"
+which yt-dlp 2>/dev/null     && echo "✓ yt-dlp" || echo "→ yt-dlp: installs on first YouTube ingest"
+which pdftotext 2>/dev/null  && echo "✓ poppler" || echo "→ poppler: installs on first PDF ingest"
+which pandoc 2>/dev/null     && echo "✓ pandoc" || echo "→ pandoc: installs on first Office doc ingest"
+which qmd 2>/dev/null        && echo "✓ qmd" || echo "→ qmd: installs when wiki exceeds ~200 pages"
 ```
 
-If any are missing, offer to install them using the install command from skills.json.
+## Step 3: Check Bundled Skills
 
-## Step 3: Check Optional Tools
-
-For each tool in `skills.json → tools.optional`, check if installed:
+Verify skills exist in `.claude/skills/`:
 
 ```bash
-which yt-dlp 2>/dev/null     && echo "yt-dlp: installed" || echo "yt-dlp: not installed (auto-installs when needed by ingest-youtube)"
-which pdftotext 2>/dev/null  && echo "poppler: installed" || echo "poppler: not installed (auto-installs when needed by ingest-pdf)"
-which pandoc 2>/dev/null     && echo "pandoc: installed" || echo "pandoc: not installed (auto-installs when needed by ingest-office)"
-which qmd 2>/dev/null        && echo "qmd: installed" || echo "qmd: not installed (auto-installs when needed by search)"
-which marp 2>/dev/null       && echo "marp: not installed (auto-installs when needed by slides)"
+ls .claude/skills/ | wc -l
 ```
 
-Don't install these — just report status. They lazy-install on first use.
+Report count and list any expected skills that are missing.
 
-## Step 4: Check Bundled Skills
+## Step 4: Check Shared Skills (RonanCodes/skills)
 
-Verify all skills listed in `skills.json → bundled.skills` exist in `.claude/skills/`:
+This project uses shared skills (ralph, frontend-design, etc.) from a separate repo. The marketplace is auto-registered via `.claude/settings.json`.
 
-```bash
-for skill in vault-create vault-import vault-status ingest query search lint promote slides ralph setup create-skill read-tweet read-gist yt-transcript frontend-design wiki-templates ingest-web ingest-pdf ingest-office ingest-youtube ingest-tweet ingest-gist ingest-text; do
-  if [ -f ".claude/skills/$skill/SKILL.md" ]; then
-    echo "  ✓ $skill"
-  else
-    echo "  ✗ $skill — MISSING"
-  fi
-done
+Check if the shared skills are available (via marketplace plugin, additionalDirectories, or ~/.claude/skills/):
+
+If not found, offer the user these options:
+
+**Option A: Plugin marketplace (one command)**
+```
+/plugin install ronan-skills@ronan-skills
 ```
 
-If any bundled skills are missing, something went wrong with the clone. Suggest `git checkout -- .claude/skills/`.
+**Option B: Clone + additionalDirectories**
+1. Ask the user where they'd like to clone it
+2. `git clone https://github.com/RonanCodes/skills.git <their-path>`
+3. Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
 
-## Step 5: Check Recommended External Skills
-
-For each skill in `skills.json → recommended.skills`, check if it exists in `~/.claude/skills/`:
-
-```bash
-for skill in write-a-prd grill-me tdd; do
-  if [ -d "$HOME/.claude/skills/$skill" ]; then
-    echo "  ✓ $skill (installed in ~/.claude/skills/)"
-  else
-    echo "  → $skill — not installed (optional)"
-  fi
-done
-```
-
-For any missing recommended skills, show:
-- What it does (from skills.json description)
-- Where it comes from (from skills.json source)
-- How to install it
-
-Example output:
-```
-Recommended skills not installed:
-  → write-a-prd (github:mattpocock/skills)
-    Create PRDs through user interview and codebase exploration
-    Install: git clone the skill to ~/.claude/skills/write-a-prd
-
-  → tdd (github:mattpocock/skills)
-    Test-driven development workflow
-    Install: git clone the skill to ~/.claude/skills/tdd
-```
-
-## Step 5b: Check Personal Skills (from skills.local.jsonc)
-
-If `skills.local.jsonc` exists, read the `personal` array and check each:
-
-```bash
-# For each skill in skills.local.jsonc → personal:
-# Check if the path exists (expand ~ to $HOME)
-[ -d "$HOME/.claude/skills/write-a-prd" ] && echo "  ✓ write-a-prd" || echo "  → write-a-prd — not installed"
-```
-
-Also check the `private` array for .private/ overlay skills:
-
-```bash
-# For each skill in skills.local.jsonc → private:
-[ -f ".private/.claude/skills/my-company-workflows/SKILL.md" ] && echo "  ✓ my-company-workflows" || echo "  → my-company-workflows — not in .private/"
-```
-
-And check any extra `tools` defined:
-
-```bash
-# For each tool in skills.local.jsonc → tools:
-which ollama 2>/dev/null && echo "  ✓ ollama" || echo "  → ollama — not installed"
-```
-
-## Step 6: Check Shared Skills Repo
-
-This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) from a separate repo.
-
-First, check if `additionalDirectories` in `~/.claude/settings.json` already points to a clone of `RonanCodes/skills`:
-
-```bash
-grep -q "skills" "$HOME/.claude/settings.json" 2>/dev/null
-```
-
-If found, check the path exists and contains the skills. If not found:
-
-1. **Ask the user** where they'd like to clone it (suggest a sensible default based on the current project's parent directory)
-2. Clone it:
-   ```bash
-   git clone https://github.com/RonanCodes/skills.git <their-chosen-path>
-   ```
-3. Add the absolute path to `~/.claude/settings.json` under `additionalDirectories`:
-   ```json
-   {
-       "additionalDirectories": ["<absolute-path-to-clone>"]
-   }
-   ```
-4. Confirm the skills are now available
-
-Alternatively, they can install individual skills with:
+**Option C: npx (works with any AI agent)**
 ```bash
 npx skills add RonanCodes/skills/ralph -g
 ```
 
-## Step 7: Check Obsidian
+## Step 5: Check Obsidian
 
 ```bash
-[ -d "/Applications/Obsidian.app" ] && echo "✓ Obsidian installed" || echo "→ Obsidian not found — download from https://obsidian.md"
+[ -d "/Applications/Obsidian.app" ] && echo "✓ Obsidian" || echo "→ Obsidian: download from https://obsidian.md"
 ```
 
-## Step 8: Check .private/ Directory
+## Step 6: Check .private/ Directory
 
 ```bash
-[ -d ".private" ] && echo "✓ .private/ directory exists" || echo "→ No .private/ directory (create one for private skills — see .private/README.md pattern)"
+[ -d ".private" ] && echo "✓ .private/" || echo "→ No .private/ (optional — for private skills, add .local to skill name to auto-gitignore)"
 ```
 
-## Step 9: Report Summary
-
-Print a summary:
+## Step 7: Report
 
 ```
 ═══════════════════════════════════════
@@ -182,22 +92,22 @@ Print a summary:
 
   Required tools:    3/3 installed
   Optional tools:    2/5 installed (rest auto-install on use)
-  Bundled skills:    24/24 present
-  Shared skills:     installed (~/Dev/skills)
-  Recommended:       1/3 installed
+  Bundled skills:    22 present
+  Shared skills:     installed via marketplace
   Obsidian:          installed
   Private overlay:   not configured
 
   Next steps:
   1. Create a vault:  /vault-create my-research --domain ai-research
-  2. Open in Obsidian: Open folder → vaults/my-research
-  3. Ingest a source: /ingest <url> --vault my-research
+  2. Open in Obsidian: Open folder → vaults/llm-wiki-my-research
+  3. Ingest a source: /ingest <url> --vault llm-wiki-my-research
 ═══════════════════════════════════════
 ```
 
-## Reference
+## Private Skills Convention
 
-- Full dependency docs: `docs/dependencies.md`
-- Getting started guide: `open docs/getting-started.html`
-- Daily workflow: `docs/workflow.md`
-- Skills manifest: `skills.json`
+Skills with `.local` in the name are gitignored automatically:
+- `.claude/skills/my-company-workflow.local/SKILL.md` — gitignored
+- `.claude/skills/ingest/SKILL.md` — committed (bundled)
+
+This lets you add private skills to the project without them leaking to the public repo.

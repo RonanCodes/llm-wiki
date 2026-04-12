@@ -1,0 +1,15 @@
+{
+    "description": "External tools used by LLM Wiki skills. The /setup skill reads this to check your environment.",
+    "required": [
+        { "name": "git", "check": "git --version", "install": "brew install git" },
+        { "name": "node", "check": "node --version", "install": "brew install node" },
+        { "name": "claude", "check": "claude --version", "install": "npm i -g @anthropic-ai/claude-code" }
+    ],
+    "optional": [
+        { "name": "yt-dlp", "check": "which yt-dlp", "install": "brew install yt-dlp", "usedBy": "ingest-youtube" },
+        { "name": "pdftotext", "check": "which pdftotext", "install": "brew install poppler", "usedBy": "ingest-pdf" },
+        { "name": "pandoc", "check": "which pandoc", "install": "brew install pandoc", "usedBy": "ingest-office" },
+        { "name": "qmd", "check": "which qmd", "install": "brew install qmd", "usedBy": "search" },
+        { "name": "marp", "check": "which marp", "install": "pnpm add -g @marp-team/marp-cli", "usedBy": "slides" }
+    ]
+}
