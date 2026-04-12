@@ -4,9 +4,25 @@
 
 A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). The LLM incrementally builds and maintains a persistent wiki of interlinked markdown files — not RAG, not re-deriving knowledge each query, but a compounding artifact that gets richer over time.
 
+## Quick Start (new session)
+
+If this is a fresh Claude Code session, here's what you can do:
+
+1. **First time on this machine?** Run `/setup` to check/install dependencies.
+2. **Create a vault:** `/vault-create my-research --domain ai-research`
+3. **Import existing vault:** `/vault-import ~/path/to/obsidian-vault --name my-vault`
+4. **Check vault status:** `/vault-status`
+5. **Ingest a source:** `/ingest https://some-article.com --vault my-research`
+6. **Ask a question:** `/query "What do we know about X?" --vault my-research`
+7. **Health-check:** `/lint --vault my-research`
+8. **Graduate knowledge:** `/promote my-research --to meta`
+
+For the full daily workflow, read `docs/workflow.md`.
+For the project roadmap and what's built vs planned, read `docs/roadmap.md`.
+
 ## Project Status
 
-**Phase 1 complete.** Core vault engine built — 20 skills covering vault management, ingestion (7 source types), query, lint, and promote.
+**Phase 1 complete.** Core vault engine built — 20 skills covering vault management, ingestion (7 source types), query, lint, and promote. See `docs/roadmap.md` for full phase breakdown.
 
 ## How It Works
 
