@@ -6,19 +6,17 @@ A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wi
 
 ## Recommended Plugin
 
-This project uses shared skills from the `RonanCodes/skills` repo. On every new session, check if these skills are available. If not, inform the user:
+This project uses shared skills from the `RonanCodes/skills` repo. On every new session, check if the skills `ralph`, `frontend-design`, `create-skill`, `doc-standards` are available (check if they appear in the skill list). If ANY are missing, use AskUserQuestion to ask:
 
-```
-This project recommends the ronan-skills plugin (ralph, frontend-design, create-skill, doc-standards).
+**Question:** "This project recommends the ronan-skills plugin (ralph, frontend-design, create-skill, doc-standards). How would you like to proceed?"
 
-Install via marketplace:
-  /plugin marketplace add RonanCodes/skills
-  /plugin install ronan-skills@ronan-skills
+**Options:**
+1. **Install via marketplace** — run `/plugin marketplace add RonanCodes/skills` then `/plugin install ronan-skills@ronan-skills`
+2. **Clone the repo** — ask where to clone, run `git clone https://github.com/RonanCodes/skills.git <path>`, add to `additionalDirectories` in `~/.claude/settings.json`
+3. **Skip for now** — continue without shared skills
+4. **Don't ask again** — create a `.claude/skip-plugin-check` file so this prompt is suppressed in future sessions
 
-Or clone the repo:
-  git clone https://github.com/RonanCodes/skills.git <your-path>
-  Add to ~/.claude/settings.json: "additionalDirectories": ["<your-path>"]
-```
+If the file `.claude/skip-plugin-check` exists, skip this check entirely.
 
 ## Quick Start (new session)
 
