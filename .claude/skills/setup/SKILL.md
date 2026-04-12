@@ -131,31 +131,32 @@ which ollama 2>/dev/null && echo "  ✓ ollama" || echo "  → ollama — not in
 
 ## Step 6: Check Shared Skills Repo
 
-This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) from a separate repo. Check if it's installed:
+This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) from a separate repo.
+
+First, check if `additionalDirectories` in `~/.claude/settings.json` already points to a clone of `RonanCodes/skills`:
 
 ```bash
-if [ -d "$HOME/Dev/skills" ]; then
-  echo "✓ Shared skills repo found at ~/Dev/skills"
-  # Check if additionalDirectories is configured
-  grep -q "Dev/skills" "$HOME/.claude/settings.json" 2>/dev/null && \
-    echo "✓ additionalDirectories configured" || \
-    echo "→ Add to ~/.claude/settings.json: \"additionalDirectories\": [\"/Users/$USER/Dev/skills\"]"
-else
-  echo "→ Shared skills repo not found"
-  echo ""
-  echo "  This project uses shared skills (ralph, frontend-design, etc.)"
-  echo "  from a separate repo. Install with two steps:"
-  echo ""
-  echo "  Step 1: Clone the repo"
-  echo "    git clone https://github.com/RonanCodes/skills.git ~/Dev/skills"
-  echo ""
-  echo "  Step 2: Add to Claude Code settings"
-  echo "    Add to ~/.claude/settings.json:"
-  echo '    "additionalDirectories": ["/Users/'$USER'/Dev/skills"]'
-  echo ""
-  echo "  Or install individual skills with:"
-  echo "    npx skills add RonanCodes/skills/ralph -g"
-fi
+grep -q "skills" "$HOME/.claude/settings.json" 2>/dev/null
+```
+
+If found, check the path exists and contains the skills. If not found:
+
+1. **Ask the user** where they'd like to clone it (suggest a sensible default based on the current project's parent directory)
+2. Clone it:
+   ```bash
+   git clone https://github.com/RonanCodes/skills.git <their-chosen-path>
+   ```
+3. Add the absolute path to `~/.claude/settings.json` under `additionalDirectories`:
+   ```json
+   {
+       "additionalDirectories": ["<absolute-path-to-clone>"]
+   }
+   ```
+4. Confirm the skills are now available
+
+Alternatively, they can install individual skills with:
+```bash
+npx skills add RonanCodes/skills/ralph -g
 ```
 
 ## Step 7: Check Obsidian
