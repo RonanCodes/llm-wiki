@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Wiki — Getting Started</title>
+    <style>
+        @keyframes drift {
+            0%, 100% { opacity: 0.3; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-2px); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes termBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(224,175,64,0.05); }
+            50% { box-shadow: 0 0 40px rgba(224,175,64,0.12); }
+        }
+
+        :root, [data-theme="dark"] {
+            --void: #06060e;
+            --deep: #0c0c1a;
+            --surface: #111128;
+            --surface-raised: #16163a;
+            --border: #1e1e4a;
+            --border-glow: #2a2a6a;
+            --text: #d4d0c8;
+            --text-dim: #7a7790;
+            --text-bright: #eae8e0;
+            --amber: #e0af40;
+            --amber-dim: #b8922e;
+            --amber-glow: rgba(224,175,64,0.15);
+            --cyan: #5bbcd6;
+            --green: #7dcea0;
+            --rose: #d4726a;
+            --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+            --serif: Baskerville, 'Libre Baskerville', 'Times New Roman', serif;
+            --sans: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --starfield-opacity: 1;
+            --grain-opacity: 0.03;
+            --term-dot-1: #ff5f57;
+            --term-dot-2: #ffbd2e;
+            --term-dot-3: #28c840;
+        }
+
+        [data-theme="light"] {
+            --void: #f5f3ee;
+            --deep: #eae7e0;
+            --surface: #ffffff;
+            --surface-raised: #f0ede6;
+            --border: #d5d0c4;
+            --border-glow: #b8b0a0;
+            --text: #2c2a25;
+            --text-dim: #6b665a;
+            --text-bright: #1a1815;
+            --amber: #b8860b;
+            --amber-dim: #8b6508;
+            --amber-glow: rgba(184,134,11,0.1);
+            --cyan: #2e7d8c;
+            --green: #3a7d5c;
+            --rose: #a84040;
+            --starfield-opacity: 0;
+            --grain-opacity: 0;
+            --term-dot-1: #ff5f57;
+            --term-dot-2: #ffbd2e;
+            --term-dot-3: #28c840;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--void);
+            color: var(--text);
+            font-family: var(--sans);
+            line-height: 1.65;
+            overflow-x: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        *, *::before, *::after {
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Starfield background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(1px 1px at 10% 20%, rgba(224,175,64,0.4), transparent),
+                radial-gradient(1px 1px at 30% 60%, rgba(91,188,214,0.3), transparent),
+                radial-gradient(1px 1px at 50% 10%, rgba(224,175,64,0.3), transparent),
+                radial-gradient(1px 1px at 70% 40%, rgba(125,206,160,0.2), transparent),
+                radial-gradient(1px 1px at 90% 80%, rgba(224,175,64,0.4), transparent),
+                radial-gradient(1px 1px at 15% 85%, rgba(91,188,214,0.2), transparent),
+                radial-gradient(1px 1px at 45% 50%, rgba(212,114,106,0.2), transparent),
+                radial-gradient(1px 1px at 80% 15%, rgba(224,175,64,0.3), transparent),
+                radial-gradient(1.5px 1.5px at 25% 35%, rgba(224,175,64,0.6), transparent),
+                radial-gradient(1.5px 1.5px at 60% 70%, rgba(91,188,214,0.4), transparent),
+                radial-gradient(1px 1px at 5% 45%, rgba(224,175,64,0.2), transparent),
+                radial-gradient(1px 1px at 95% 55%, rgba(125,206,160,0.3), transparent),
+                radial-gradient(1px 1px at 40% 90%, rgba(224,175,64,0.3), transparent),
+                radial-gradient(1px 1px at 75% 5%, rgba(91,188,214,0.2), transparent),
+                radial-gradient(1.5px 1.5px at 55% 30%, rgba(224,175,64,0.5), transparent),
+                radial-gradient(1px 1px at 85% 65%, rgba(212,114,106,0.2), transparent);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 8s ease-in-out infinite;
+            opacity: var(--starfield-opacity);
+            transition: opacity 0.4s ease;
+        }
+
+        .page { position: relative; z-index: 1; }
+
+        /* Grain overlay */
+        .page::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: var(--grain-opacity);
+            transition: opacity 0.4s ease;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 100px 0 60px;
+            text-align: center;
+            animation: fadeUp 0.8s ease both;
+        }
+        .hero-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .hero-eyebrow::before, .hero-eyebrow::after {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
+        }
+        .hero h1 {
+            font-family: var(--serif);
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-bright);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        .hero h1 span {
+            color: var(--amber);
+            font-style: normal;
+        }
+        .hero-sub {
+            font-size: 1.15rem;
+            color: var(--text-dim);
+            max-width: 540px;
+            margin: 0 auto 28px;
+            line-height: 1.7;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            padding: 7px 18px;
+            border-radius: 100px;
+            background: var(--deep);
+        }
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            background: var(--amber);
+            border-radius: 50%;
+            animation: drift 3s ease-in-out infinite;
+        }
+
+        /* ── Terminal Diagram ── */
+        .terminal {
+            background: var(--deep);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin: 48px 0;
+            overflow: hidden;
+            animation: fadeUp 0.8s ease 0.15s both;
+            animation: glowPulse 4s ease-in-out infinite;
+        }
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        .terminal-dot { width: 11px; height: 11px; border-radius: 50%; }
+        .terminal-dot:nth-child(1) { background: var(--term-dot-1); }
+        .terminal-dot:nth-child(2) { background: var(--term-dot-2); }
+        .terminal-dot:nth-child(3) { background: var(--term-dot-3); }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 200;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .theme-toggle:hover { border-color: var(--amber); color: var(--text); }
+        .theme-toggle .icon { font-size: 1rem; }
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-right: 50px;
+        }
+        .terminal-body {
+            padding: 28px 32px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            line-height: 1.9;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--text-dim);
+        }
+        .terminal-body .t-you { color: var(--amber); font-weight: 600; }
+        .terminal-body .t-cmd { color: var(--green); }
+        .terminal-body .t-engine { color: var(--cyan); }
+        .terminal-body .t-dim { color: #4a4a6a; }
+
+        /* ── Sections ── */
+        section {
+            padding: 48px 0;
+            animation: fadeUp 0.6s ease both;
+        }
+        .section-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--amber-dim);
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--text-bright);
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+        .section-desc {
+            color: var(--text-dim);
+            margin-bottom: 28px;
+            max-width: 580px;
+        }
+
+        /* ── Install Block ── */
+        .install-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 28px 32px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .install-block pre {
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            line-height: 2;
+            color: var(--text-bright);
+        }
+        .install-block .prompt { color: var(--amber); user-select: none; }
+        .install-block .comment { color: var(--text-dim); }
+        .install-block::before {
+            content: 'terminal';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            background: var(--surface);
+            padding: 0 8px;
+        }
+
+        /* ── Tool Cards ── */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 14px;
+        }
+        .tool-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: transparent;
+            transition: background 0.25s;
+        }
+        .tool-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+        }
+        .tool-card:hover::before {
+            background: linear-gradient(90deg, var(--amber), var(--cyan));
+        }
+        .tool-card h4 {
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tool-card p {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            line-height: 1.55;
+            margin-bottom: 12px;
+        }
+        .tool-card code {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--green);
+            background: rgba(125,206,160,0.08);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .tool-card a {
+            font-size: 0.82rem;
+            color: var(--amber);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .tool-card a:hover { border-bottom-color: var(--amber); }
+        .tag {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 3px;
+        }
+        .tag-req { background: rgba(212,114,106,0.12); color: var(--rose); }
+        .tag-auto { background: rgba(125,206,160,0.1); color: var(--green); }
+        .tag-opt { background: rgba(224,175,64,0.1); color: var(--amber-dim); }
+
+        /* ── Steps ── */
+        .steps { counter-reset: step; margin-top: 8px; }
+        .step {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 20px;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: start;
+        }
+        .step:last-child { border-bottom: none; }
+        .step-num {
+            counter-increment: step;
+            width: 42px; height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--amber);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .step-num::after { content: counter(step); }
+        .step-content h3 {
+            font-family: var(--sans);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            margin-bottom: 6px;
+        }
+        .step-content p {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            margin: 4px 0;
+        }
+        .step-content pre {
+            background: var(--deep);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 16px;
+            margin: 8px 0;
+            font-family: var(--mono);
+            font-size: 0.84rem;
+            color: var(--cyan);
+            overflow-x: auto;
+        }
+
+        /* ── Tables ── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--deep);
+        }
+        td {
+            padding: 11px 16px;
+            border-bottom: 1px solid rgba(30,30,74,0.5);
+            font-size: 0.88rem;
+            color: var(--text);
+        }
+        td code {
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            color: var(--cyan);
+            background: rgba(91,188,214,0.06);
+            padding: 2px 7px;
+            border-radius: 3px;
+        }
+        tr:hover td { background: rgba(17,17,40,0.5); }
+        .dep-none { color: var(--text-dim); }
+        .dep-auto { color: var(--green); }
+
+        /* ── Divider ── */
+        .divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 20px 0;
+        }
+
+        /* ── Footer ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 0 64px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        footer nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 16px;
+        }
+        footer a {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        footer a:hover { color: var(--amber); }
+        footer .credit {
+            font-size: 0.78rem;
+            color: #3a3a55;
+            margin-top: 8px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .container { padding: 0 18px; }
+            .hero { padding: 60px 0 40px; }
+            .hero h1 { font-size: 2.5rem; }
+            .terminal-body { font-size: 0.72rem; padding: 16px; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .step { grid-template-columns: 36px 1fr; gap: 14px; }
+            .step-num { width: 36px; height: 36px; font-size: 0.9rem; }
+            footer nav { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="icon" id="theme-icon">&#9790;</span>
+    <span id="theme-label">Light</span>
+</button>
+
+<div class="page">
+    <div class="container">
+
+        <!-- Hero -->
+        <header class="hero">
+            <div class="hero-eyebrow">Personal Knowledge Engine</div>
+            <h1>LLM <span>Wiki</span></h1>
+            <p class="hero-sub">A compounding knowledge base built by LLMs. Claude Code writes your wiki. Obsidian is where you read it. Your knowledge grows with every source and every question.</p>
+            <span class="hero-badge"><span class="dot"></span> Inspired by Karpathy's LLM Wiki pattern</span>
+        </header>
+
+        <!-- Terminal Diagram -->
+        <div class="terminal">
+            <div class="terminal-bar">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-title">llm-wiki</span>
+            </div>
+            <div class="terminal-body"><span class="t-you">You</span> (terminal)                    <span class="t-you">You</span> (Obsidian)
+<span class="t-dim">    |                                 |</span>
+<span class="t-dim">    |--</span> <span class="t-cmd">/ingest</span> &lt;source&gt;              <span class="t-dim">|--</span> Browse wiki pages
+<span class="t-dim">    |--</span> <span class="t-cmd">/query</span>  "question"            <span class="t-dim">|--</span> Graph view
+<span class="t-dim">    |--</span> <span class="t-cmd">/lint</span>                         <span class="t-dim">|--</span> Backlinks
+<span class="t-dim">    |--</span> <span class="t-cmd">/promote</span>                      <span class="t-dim">|--</span> Search
+<span class="t-dim">    |                                 |</span>
+<span class="t-dim">    '--</span> <span class="t-engine">Claude Code</span> <span class="t-dim">--writes--&gt;</span> vaults/&lt;name&gt;/wiki/*.md</div>
+        </div>
+
+        <!-- Quick Install -->
+        <section>
+            <div class="section-label">01</div>
+            <h2>Quick Install</h2>
+            <p class="section-desc">Three commands. The install script checks your environment and offers to install anything missing via Homebrew.</p>
+            <div class="install-block">
+                <pre><span class="prompt">$</span> git clone https://github.com/RonanCodes/llm-wiki.git
+<span class="prompt">$</span> cd llm-wiki
+<span class="prompt">$</span> ./install.sh  <span class="comment"># interactive — asks before installing each tool</span></pre>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- What You Need -->
+        <section>
+            <div class="section-label">02</div>
+            <h2>What You Need</h2>
+            <p class="section-desc">Core tools are required. Everything else installs automatically the first time you need it.</p>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h4>Claude Code <span class="tag tag-req">required</span></h4>
+                    <p>The AI engine. Reads sources, writes wiki pages, answers questions, maintains cross-references.</p>
+                    <code>npm i -g @anthropic-ai/claude-code</code>
+                    <br><br><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">Documentation &rarr;</a>
+                </div>
+                <div class="tool-card">
+                    <h4>Obsidian <span class="tag tag-req">required</span></h4>
+                    <p>Your wiki viewer. Browse pages, graph view, backlinks, full-text search.</p>
+                    <code>brew install --cask obsidian</code>
+                    <br><br><a href="https://obsidian.md/download" target="_blank">Download &rarr;</a>
+                </div>
+                <div class="tool-card">
+                    <h4>Git <span class="tag tag-req">required</span></h4>
+                    <p>Version control. Each vault is its own git repo with full history.</p>
+                    <code>brew install git</code>
+                </div>
+                <div class="tool-card">
+                    <h4>Node.js <span class="tag tag-req">required</span></h4>
+                    <p>Runtime for Claude Code and npm packages.</p>
+                    <code>brew install node</code>
+                    <br><br><a href="https://nodejs.org" target="_blank">Download &rarr;</a>
+                </div>
+                <div class="tool-card">
+                    <h4>yt-dlp <span class="tag tag-auto">auto</span></h4>
+                    <p>YouTube transcript extraction. Installs automatically on first YouTube ingest.</p>
+                    <code>brew install yt-dlp</code>
+                </div>
+                <div class="tool-card">
+                    <h4>Poppler <span class="tag tag-auto">auto</span></h4>
+                    <p>PDF text extraction. Installs automatically on first PDF ingest.</p>
+                    <code>brew install poppler</code>
+                </div>
+                <div class="tool-card">
+                    <h4>Pandoc <span class="tag tag-auto">auto</span></h4>
+                    <p>Word, Excel, PowerPoint to text. Installs automatically on first use.</p>
+                    <code>brew install pandoc</code>
+                </div>
+                <div class="tool-card">
+                    <h4>Web Clipper <span class="tag tag-opt">optional</span></h4>
+                    <p>Browser extension to save articles as markdown directly into your vault.</p>
+                    <a href="https://obsidian.md/clipper" target="_blank">Install extension &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- Getting Started -->
+        <section>
+            <div class="section-label">03</div>
+            <h2>Getting Started</h2>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Run the installer</h3>
+                        <pre>./install.sh</pre>
+                        <p>Checks your environment and installs anything missing. Interactive&mdash;asks before each tool.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Open Claude Code</h3>
+                        <pre>claude</pre>
+                        <p>Launch in the llm-wiki directory. It reads CLAUDE.md and discovers all available skills.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Create your first vault</h3>
+                        <pre>/vault-create my-research --domain ai-research</pre>
+                        <p>Scaffolds a vault at <code>vaults/my-research/</code> with full wiki structure and git init.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Open in Obsidian</h3>
+                        <p>Open Obsidian &rarr; <strong>Open folder as vault</strong> &rarr; select <code>vaults/my-research</code>.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Ingest your first source</h3>
+                        <pre>/ingest https://some-article.com --vault my-research</pre>
+                        <p>Claude reads it, creates wiki pages, updates the index, and auto-commits. Watch pages appear in Obsidian in real time.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num"></div>
+                    <div class="step-content">
+                        <h3>Ask questions</h3>
+                        <pre>/query "What are the key takeaways?" --vault my-research</pre>
+                        <p>Synthesized answers with citations. Add <code>--save</code> to file the answer back into the wiki.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- Commands -->
+        <section>
+            <div class="section-label">04</div>
+            <h2>Commands</h2>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Command</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>/vault-create &lt;name&gt;</code></td><td>Create a new vault with full wiki structure</td></tr>
+                        <tr><td><code>/vault-import &lt;path&gt;</code></td><td>Import an existing Obsidian vault or markdown folder</td></tr>
+                        <tr><td><code>/vault-status</code></td><td>Show all vaults with page counts and status</td></tr>
+                        <tr><td><code>/ingest &lt;source&gt;</code></td><td>Process any source into wiki pages</td></tr>
+                        <tr><td><code>/query "question"</code></td><td>Ask questions, get answers with citations</td></tr>
+                        <tr><td><code>/search "terms"</code></td><td>Full-text search across wiki pages</td></tr>
+                        <tr><td><code>/lint</code></td><td>Health-check wiki for issues</td></tr>
+                        <tr><td><code>/promote &lt;vault&gt;</code></td><td>Graduate knowledge to another vault</td></tr>
+                        <tr><td><code>/slides "topic"</code></td><td>Generate Marp presentation from wiki content</td></tr>
+                        <tr><td><code>/setup</code></td><td>First-time machine setup</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- Sources -->
+        <section>
+            <div class="section-label">05</div>
+            <h2>Supported Sources</h2>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Source</th><th>Example</th><th>Dependencies</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Web articles</td><td><code>https://blog.example.com/post</code></td><td class="dep-none">None</td></tr>
+                        <tr><td>PDFs</td><td><code>path/to/paper.pdf</code></td><td class="dep-auto">poppler (auto)</td></tr>
+                        <tr><td>Office docs</td><td><code>path/to/report.docx</code></td><td class="dep-auto">pandoc (auto)</td></tr>
+                        <tr><td>YouTube</td><td><code>https://youtube.com/watch?v=...</code></td><td class="dep-auto">yt-dlp (auto)</td></tr>
+                        <tr><td>Tweets</td><td><code>https://x.com/user/status/...</code></td><td class="dep-none">None</td></tr>
+                        <tr><td>GitHub Gists</td><td><code>https://gist.github.com/...</code></td><td class="dep-none">None</td></tr>
+                        <tr><td>Text / notes</td><td>Pasted text or local <code>.md</code> files</td><td class="dep-none">None</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <nav>
+                <a href="https://github.com/RonanCodes/llm-wiki" target="_blank">GitHub</a>
+                <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f" target="_blank">Karpathy's Gist</a>
+                <a href="roadmap.md">Roadmap</a>
+                <a href="workflow.md">Workflow</a>
+            </nav>
+            <div class="credit">Built with Claude Code using the Ralph Wiggum technique. MIT License.</div>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('llm-wiki-theme', next);
+    updateToggleUI(next);
+}
+
+function updateToggleUI(theme) {
+    document.getElementById('theme-icon').innerHTML = theme === 'dark' ? '&#9790;' : '&#9728;';
+    document.getElementById('theme-label').textContent = theme === 'dark' ? 'Light' : 'Dark';
+}
+
+// Load saved preference or respect system preference
+(function() {
+    const saved = localStorage.getItem('llm-wiki-theme');
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        updateToggleUI(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.setAttribute('data-theme', 'light');
+        updateToggleUI('light');
+    }
+})();
+</script>
+</body>
+</html>
