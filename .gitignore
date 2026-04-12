@@ -1,0 +1,22 @@
+# Vaults (each is its own repo)
+vaults/*
+!vaults/.gitkeep
+
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+
+# Docker
+.docker/
+/.reference/
