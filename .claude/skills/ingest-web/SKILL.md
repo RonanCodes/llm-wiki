@@ -27,7 +27,7 @@ curl -sL -H "User-Agent: Mozilla/5.0" "<url>"
    - Lists and blockquotes
    - Links (convert to markdown format)
    - Code blocks
-   - Images (note URLs for potential local download)
+   - Image references (see Image Handling below)
 
 4. Save to vault's `raw/<descriptive-slug>.md` with a YAML header:
 ```yaml
@@ -36,8 +36,46 @@ source-url: <original-url>
 title: <extracted-title>
 author: <extracted-author>
 date-fetched: <today>
+images-downloaded: <count>
 ---
 ```
+
+## Image Handling
+
+After extracting the article content, download referenced images locally:
+
+1. **Find image URLs** in the extracted markdown:
+   - `![alt](https://...)` markdown image syntax
+   - Common formats: `.jpg`, `.jpeg`, `.png`, `.gif`, `.svg`, `.webp`
+
+2. **Download each image** to vault's `raw/assets/`:
+```bash
+VAULT="vaults/<vault-name>"
+mkdir -p "$VAULT/raw/assets"
+
+# For each image URL:
+FILENAME="<descriptive-name>-<hash>.<ext>"
+curl -sL -o "$VAULT/raw/assets/$FILENAME" "<image-url>"
+```
+
+Use a descriptive filename derived from the article slug + image position:
+`karpathy-llm-wiki-img-01.png`, `karpathy-llm-wiki-img-02.jpg`
+
+3. **Replace remote URLs** with local paths in the raw markdown:
+```markdown
+# Before:
+![diagram](https://remote-server.com/images/arch.png)
+
+# After:
+![diagram](assets/karpathy-llm-wiki-img-01.png)
+```
+
+4. **Skip images that are:**
+   - Already local paths
+   - Tracking pixels or tiny icons (< 1KB or 1x1 dimensions in the URL)
+   - Data URIs (base64 embedded)
+
+5. **Record count** in the raw file's frontmatter: `images-downloaded: 3`
 
 ## Fallback
 

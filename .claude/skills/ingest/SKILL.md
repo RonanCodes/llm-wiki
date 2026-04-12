@@ -50,10 +50,10 @@ Save the source material to the vault's `raw/` directory:
 VAULT="vaults/<vault-name>"
 ```
 
-- **For URLs**: Save the extracted content as markdown to `$VAULT/raw/<descriptive-name>.md`
+- **For URLs**: Save the extracted content as markdown to `$VAULT/raw/<descriptive-name>.md`. Download referenced images to `$VAULT/raw/assets/` and replace remote URLs with local paths (see ingest-web skill for image handling details).
 - **For files**: Copy the file to `$VAULT/raw/` if not already there
 - **For text**: Save to `$VAULT/raw/<topic-slug>-notes.md`
-- **For images**: Save to `$VAULT/raw/assets/`
+- **For images in any source**: Download to `$VAULT/raw/assets/` with descriptive filenames. This lets the LLM view images directly for additional context.
 
 Use descriptive, kebab-case filenames: `karpathy-llm-wiki-gist.md`, `react-server-components-paper.pdf`
 
