@@ -4,11 +4,27 @@
 
 A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). The LLM incrementally builds and maintains a persistent wiki of interlinked markdown files — not RAG, not re-deriving knowledge each query, but a compounding artifact that gets richer over time.
 
+## Recommended Plugin
+
+This project uses shared skills from the `RonanCodes/skills` repo. On every new session, check if these skills are available. If not, inform the user:
+
+```
+This project recommends the ronan-skills plugin (ralph, frontend-design, create-skill, doc-standards).
+
+Install via marketplace:
+  /plugin marketplace add RonanCodes/skills
+  /plugin install ronan-skills@ronan-skills
+
+Or clone the repo:
+  git clone https://github.com/RonanCodes/skills.git <your-path>
+  Add to ~/.claude/settings.json: "additionalDirectories": ["<your-path>"]
+```
+
 ## Quick Start (new session)
 
 If this is a fresh Claude Code session, here's what you can do:
 
-1. **First time on this machine?** Run `/setup` — checks tools, verifies skills, and prompts to install shared skills (ralph, frontend-design, etc.) from the `RonanCodes/skills` marketplace.
+1. **First time on this machine?** Run `/setup` — checks tools, verifies skills, and installs dependencies.
 2. **Create a vault:** `/vault-create my-research --domain ai-research`
 3. **Import existing vault:** `/vault-import ~/path/to/obsidian-vault --name my-vault`
 4. **Check vault status:** `/vault-status`
