@@ -47,7 +47,7 @@ A summary of one ingested source. One source-note per source.
 **Additional frontmatter:**
 ```yaml
 source-url: https://original-url.com
-source-type: article | paper | video | tweet | gist | pdf | book | podcast | presentation
+source-type: article | paper | video | tweet | gist | discussion | pdf | book | podcast | presentation
 author: "Author Name"
 date-accessed: YYYY-MM-DD
 raw-file: raw/filename.md
