@@ -1,0 +1,25 @@
+{
+  "name": "llm-wiki-videos",
+  "version": "1.0.0",
+  "description": "Programmatic videos for LLM Wiki — marketing promos and app demos",
+  "scripts": {
+    "dev": "npx remotion studio",
+    "render:marketing": "npx remotion render src/index.ts MarketingPromo out/marketing-promo.mp4",
+    "render:demo": "npx remotion render src/index.ts AppDemo out/app-demo.mp4",
+    "render:all": "npm run render:marketing && npm run render:demo"
+  },
+  "keywords": [],
+  "author": "Ronan Connolly",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@remotion/cli": "^4.0.448",
+    "@remotion/tailwind-v4": "^4.0.448",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "remotion": "^4.0.448"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "typescript": "^6.0.2"
+  }
+}
