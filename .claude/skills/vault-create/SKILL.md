@@ -75,7 +75,9 @@ vaults/<name>/
 │   ├── sources/            # Source summaries (one per ingested source)
 │   └── comparisons/        # Comparison and synthesis pages
 ├── log.md                  # Chronological activity log
-└── CLAUDE.md               # Vault conventions (thin config)
+├── CLAUDE.md               # Vault conventions (thin config)
+├── README.md               # Overview for GitHub (what's inside, stats, purpose)
+└── .gitignore              # Ignore Obsidian ephemeral state, .DS_Store
 ```
 
 3. **Create `wiki/index.md`** with this template:
@@ -159,7 +161,52 @@ When mentioning an entity or concept that has its own page, always link it.
 Filenames: kebab-case, descriptive. Example: `wiki/entities/andrej-karpathy.md`
 ```
 
-6. **Initialize git repo**:
+6. **Create `README.md`** with this template:
+
+```markdown
+# <Vault Display Name>
+
+<One-line description of what this vault is about.>
+
+## What's Inside
+
+| Folder | Contents |
+|--------|----------|
+| `wiki/sources/` | Source summaries |
+| `wiki/entities/` | People, tools, frameworks |
+| `wiki/concepts/` | Ideas, patterns, techniques |
+| `wiki/comparisons/` | Side-by-side analyses |
+| `raw/` | Immutable source documents |
+
+## Stats
+
+- **Domain**: <domain>
+- **Created**: <today's date>
+- **Pages**: 0
+
+## How This Works
+
+This vault is powered by [LLM Wiki](https://github.com/RonanCodes/llm-wiki) — Claude Code is the engine, Obsidian is the viewer. Pages are created via `/ingest`, queried via `/query`, and health-checked via `/lint`.
+
+See the [engine repo](https://github.com/RonanCodes/llm-wiki) for setup and usage.
+```
+
+7. **Create `.gitignore`**:
+
+```
+# macOS
+.DS_Store
+
+# Obsidian — keep config, ignore ephemeral state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/.obsidian-git-backup-*
+.obsidian/plugins/
+.obsidian/themes/
+.trash/
+```
+
+8. **Initialize git repo**:
 
 ```bash
 cd vaults/<name>
@@ -168,7 +215,7 @@ git add .
 git commit -m "✨ feat: initialize <name> vault"
 ```
 
-7. **Register in Obsidian** (ask user first):
+9. **Register in Obsidian** (ask user first):
 
 Register the vault in Obsidian's vault registry so it appears in the vault switcher:
 
@@ -193,6 +240,6 @@ open "obsidian://open?vault=<name>"
 
 Works on macOS. **Important:** Tell the user they need to fully quit Obsidian (Cmd+Q, not just close the window) and reopen it for the new vault to appear in the vault switcher. Obsidian only reads its config on startup.
 
-8. **Report success** with next steps:
+10. **Report success** with next steps:
    - Vault is open in Obsidian (or tell them to open it)
    - Ingest first source: `/ingest <source> --vault <name>`
