@@ -168,13 +168,30 @@ git add .
 git commit -m "✨ feat: initialize <name> vault"
 ```
 
-7. **Open in Obsidian** (ask user first):
+7. **Register in Obsidian** (ask user first):
+
+Register the vault in Obsidian's vault registry so it appears in the vault switcher:
 
 ```bash
-open "obsidian://open?path=$(pwd)/vaults/<name>"
+python3 -c "
+import json, time, hashlib
+path = '$HOME/Library/Application Support/obsidian/obsidian.json'
+with open(path) as f:
+    data = json.load(f)
+vault_path = '$(pwd)/vaults/<name>'
+vault_id = hashlib.md5(vault_path.encode()).hexdigest()[:16]
+data['vaults'][vault_id] = {'path': vault_path, 'ts': int(time.time() * 1000)}
+with open(path, 'w') as f:
+    json.dump(data, f)
+"
 ```
 
-This opens the vault directly in Obsidian via URI scheme. Works on macOS. No MCP needed.
+Then open it:
+```bash
+open "obsidian://open?vault=<name>"
+```
+
+Works on macOS. User may need to restart Obsidian or switch vaults for it to appear.
 
 8. **Report success** with next steps:
    - Vault is open in Obsidian (or tell them to open it)
