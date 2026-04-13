@@ -31,10 +31,15 @@ node_modules/
 .next/
 out/
 
-# Environment
+# Environment (project-level and per-skill)
 .env
 .env.local
 .env.production
+**/.env
+**/.env.local
+
+# Tasks/questions (local working state)
+TASKS.md
 
 # OS
 .DS_Store
