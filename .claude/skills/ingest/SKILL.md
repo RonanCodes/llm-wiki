@@ -40,6 +40,7 @@ Identify the source type and delegate to the appropriate extraction method:
 | `https://www.reddit.com/r/.../comments/...` or `https://old.reddit.com/...` | Reddit | Append `.json` to URL, parse post + comment tree. See `ingest-reddit` skill. |
 | `https://github.com/.../discussions/...` | GitHub Discussion | Fetch via `gh api graphql`. See `ingest-github-discussions` skill. |
 | `https://linkedin.com/...` or `https://www.linkedin.com/...` | LinkedIn | Extract post content via cookie auth or pasted text. See `ingest-linkedin` skill. |
+| `https://dev.to/...` | Dev.to Article | Fetch via dev.to public API: `curl -s "https://dev.to/api/articles/{username}/{slug}"` — returns `body_markdown`, `title`, `tags`, `user`, `published_at`. See `ingest-devto` skill. |
 | `https://...` (other URLs) | Web Article | Fetch with `curl -sL`, extract readable content. For better extraction, use `@mozilla/readability` if available. See `ingest-web` skill. |
 | `*.mp4`, `*.mkv`, `*.mov`, `*.avi`, `*.webm` (file path) | Video | Transcribe audio, extract keyframes. Requires FFmpeg + whisper/API key. See `ingest-video` skill. |
 | `*.pdf` (file path) | PDF | Extract text with `pdftotext`. Check `which pdftotext` first, install with `brew install poppler` if missing. See `ingest-pdf` skill. |
