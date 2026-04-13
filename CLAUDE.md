@@ -4,9 +4,9 @@
 
 A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). The LLM incrementally builds and maintains a persistent wiki of interlinked markdown files — not RAG, not re-deriving knowledge each query, but a compounding artifact that gets richer over time.
 
-## Recommended Plugin
+## Shared Skills
 
-This project uses shared skills from the `RonanCodes/ronan-skills` repo (ralph, frontend-design, create-skill, doc-standards).
+This project works best with shared skills from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills): ralph, frontend-design, create-skill, doc-standards.
 
 On every new session, first check if `.claude/skip-plugin-check` exists — if so, skip this entirely.
 
@@ -14,33 +14,25 @@ Otherwise, check if the skills `ralph`, `frontend-design`, `create-skill`, `doc-
 
 **Question:** "This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) that aren't installed yet. How would you like to set them up?"
 
-**Options (prioritized from simplest to most involved):**
+**Options:**
 
-1. **Install the plugin** (recommended) — Run these two commands:
-   - `/plugin marketplace add RonanCodes/ronan-skills`
-   - `/plugin install ronan-skills@ronan-skills`
-   - Then `/reload-plugins` to activate
+1. **Install globally via npx** (recommended) — One-time install, available everywhere:
+   - `npx skills add RonanCodes/ronan-skills/src/ralph -g`
+   - `npx skills add RonanCodes/ronan-skills/src/frontend-design -g`
+   - `npx skills add RonanCodes/ronan-skills/src/create-skill -g`
+   - `npx skills add RonanCodes/ronan-skills/src/doc-standards -g`
 
-2. **Clone repo + use additionalDirectories** — Ask the user where to clone, then:
-   - `git clone https://github.com/RonanCodes/ronan-skills.git <their-chosen-path>`
-   - Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
-   - Skills available in every project on this machine
+2. **Install into this project only** — Same command without `-g`:
+   - `npx skills add RonanCodes/ronan-skills/src/ralph`
+   - (repeat for each skill)
 
-3. **Clone repo + symlink to ~/.claude/skills/** — Ask where to clone, then:
-   - `git clone https://github.com/RonanCodes/ronan-skills.git <their-dev-folder>/skills`
-   - For each skill: `ln -s <their-dev-folder>/skills/skills/<name> ~/.claude/skills/<name>`
-   - Skills globally available, repo stays in their dev folder, `git pull` to update
+3. **Clone + symlink** (stays up to date) — For contributors who want `git pull` updates:
+   - `git clone https://github.com/RonanCodes/ronan-skills.git <dev-folder>/ronan-skills`
+   - For each skill: `ln -s <dev-folder>/ronan-skills/src/<name> ~/.claude/skills/<name>`
 
-4. **Copy skills into this project** — Copy from the repo into `.claude/skills/` locally:
-   - `npx skills add RonanCodes/ronan-skills/ralph`
-   - `npx skills add RonanCodes/ronan-skills/frontend-design`
-   - `npx skills add RonanCodes/ronan-skills/create-skill`
-   - `npx skills add RonanCodes/ronan-skills/doc-standards`
-   - Skills only available in this project
+4. **Skip for now** — Continue without shared skills
 
-5. **Skip for now** — Continue without shared skills
-
-6. **Don't ask again** — Create `.claude/skip-plugin-check` file to suppress this prompt in future sessions
+5. **Don't ask again** — Create `.claude/skip-plugin-check` file to suppress this prompt
 
 ## Quick Start (new session)
 
@@ -135,7 +127,7 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 - **Each vault is its own git repo**, gitignored from this repo. All vault names prefixed with `llm-wiki-` (e.g. `llm-wiki-research`, `llm-wiki-personal`).
 - **Vault-specific conventions** go in each vault's own CLAUDE.md (thin config, not skills).
 - **Private skills**: either use `.private/` overlay OR add `.local` to the skill name (e.g. `my-company.local/SKILL.md`) — both are gitignored.
-- **Shared skills** (ralph, frontend-design, etc.) come from the `RonanCodes/ronan-skills` marketplace. Install via `/plugin install ronan-skills@ronan-skills`.
+- **Shared skills** (ralph, frontend-design, etc.) come from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills). Install via `npx skills add` or clone + symlink.
 - **Tool dependencies** are listed in `tools.json` — the `/setup` skill reads this.
 - **Every wiki page** must have YAML frontmatter with: title, dates, page-type, domain, tags, sources, related.
 - **Every wiki page** must link back to its raw source via frontmatter `sources` field AND inline `## Sources` section.

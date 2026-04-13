@@ -1,6 +1,6 @@
 ---
 name: setup
-description: First-time setup for the llm-wiki system. Checks tools, skills, shared marketplace, and Obsidian. Use when setting up llm-wiki on a new machine.
+description: First-time setup for the llm-wiki system. Checks tools, skills, and Obsidian. Use when setting up llm-wiki on a new machine.
 disable-model-invocation: true
 allowed-tools: Bash(brew *) Bash(which *) Bash(npm *) Bash(pnpm *) Bash(ls *) Read Glob
 ---
@@ -50,26 +50,32 @@ Report count and list any expected skills that are missing.
 
 ## Step 4: Check Shared Skills (RonanCodes/ronan-skills)
 
-This project uses shared skills (ralph, frontend-design, etc.) from a separate repo. The marketplace is auto-registered via `.claude/settings.json`.
+This project uses shared skills (ralph, frontend-design, create-skill, doc-standards) from a separate repo.
 
-Check if the shared skills are available (via marketplace plugin, additionalDirectories, or ~/.claude/skills/):
+Check if the shared skills are available (via ~/.claude/skills/ or .claude/skills/):
 
 If not found, offer the user these options:
 
-**Option A: Plugin marketplace (one command)**
-```
-/plugin install ronan-skills@ronan-skills
-```
-
-**Option B: Clone + additionalDirectories**
-1. Ask the user where they'd like to clone it
-2. `git clone https://github.com/RonanCodes/ronan-skills.git <their-path>`
-3. Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
-
-**Option C: npx (works with any AI agent)**
+**Option A: Install globally via npx (recommended)**
 ```bash
-npx skills add RonanCodes/ronan-skills/ralph -g
+npx skills add RonanCodes/ronan-skills/src/ralph -g
+npx skills add RonanCodes/ronan-skills/src/frontend-design -g
+npx skills add RonanCodes/ronan-skills/src/create-skill -g
+npx skills add RonanCodes/ronan-skills/src/doc-standards -g
 ```
+
+**Option B: Install into this project only**
+```bash
+npx skills add RonanCodes/ronan-skills/src/ralph
+npx skills add RonanCodes/ronan-skills/src/frontend-design
+npx skills add RonanCodes/ronan-skills/src/create-skill
+npx skills add RonanCodes/ronan-skills/src/doc-standards
+```
+
+**Option C: Clone + symlink (stays up to date)**
+1. Ask the user where they'd like to clone it
+2. `git clone https://github.com/RonanCodes/ronan-skills.git <their-path>/ronan-skills`
+3. For each skill: `ln -s <their-path>/ronan-skills/src/<name> ~/.claude/skills/<name>`
 
 ## Step 5: Check Obsidian
 
