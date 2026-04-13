@@ -121,6 +121,18 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 └── CLAUDE.md                         <- this file
 ```
 
+## Vault Routing
+
+When the user discusses topics, route content to the correct vault:
+
+| Topic | Vault | Why |
+|-------|-------|-----|
+| Skill ideas, skill design, skill provenance, patterns, workflows, hooks, source profiles | `llm-wiki-skill-lab` | Tracks skill lifecycle from idea to implementation |
+| Tech stack decisions, tool evaluations, framework comparisons, deployment strategies, general research | `llm-wiki-research` | General-purpose research and decision-making |
+| LLM Wiki project knowledge, architecture decisions, development context | `llm-wiki` (project vault) | Project-specific knowledge |
+
+**Rule of thumb:** If it's about *building or designing a Claude Code skill*, it goes in `skill-lab`. If it's about *evaluating a tool or making a tech decision*, it goes in `research`. If it's about *this project specifically*, it goes in the project vault.
+
 ## Conventions
 
 - **Vaults are data, not applications.** Keep logic centralized in `.claude/skills/`.
