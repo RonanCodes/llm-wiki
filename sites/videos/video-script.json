@@ -1,0 +1,138 @@
+{
+  "promo": {
+    "title": "LLM Wiki — Marketing Promo",
+    "duration": "60s",
+    "fps": 30,
+    "totalFrames": 1800,
+    "scenes": [
+      {
+        "id": "hook",
+        "name": "Hook",
+        "duration": "4s",
+        "frames": [0, 120],
+        "visual": "Bold headline with spring-in animation. Dark background, amber text. Subtle particle/glow effect.",
+        "transition": "fade"
+      },
+      {
+        "id": "problem",
+        "name": "Problem",
+        "duration": "6s",
+        "frames": [120, 300],
+        "visual": "Pain point text, word-by-word reveal. Icons of scattered notes, browser tabs, chat windows fading in and out.",
+        "transition": "slide-from-right"
+      },
+      {
+        "id": "solution",
+        "name": "Solution Reveal",
+        "duration": "5s",
+        "frames": [300, 450],
+        "visual": "LLM Wiki logo + tagline spring in. Show the architecture: terminal -> Claude -> Obsidian with connecting lines animating.",
+        "transition": "wipe-from-bottom"
+      },
+      {
+        "id": "demo-ingest",
+        "name": "Feature 1 — Ingest",
+        "duration": "8s",
+        "frames": [450, 690],
+        "visual": "Terminal mockup showing /ingest command with typewriter effect. Then wipe to Obsidian wiki page screenshot with Ken Burns zoom.",
+        "transition": "fade"
+      },
+      {
+        "id": "demo-query",
+        "name": "Feature 2 — Query",
+        "duration": "8s",
+        "frames": [690, 930],
+        "visual": "Terminal showing /query with typewriter. Then cut to answer with cross-references highlighted. Show graph view screenshot.",
+        "transition": "slide-from-right"
+      },
+      {
+        "id": "demo-compound",
+        "name": "Feature 3 — Compounding",
+        "duration": "8s",
+        "frames": [930, 1170],
+        "visual": "Split screen: left shows page count growing (5, 12, 47, 200+), right shows Obsidian graph view expanding with animated nodes.",
+        "transition": "fade"
+      },
+      {
+        "id": "stack",
+        "name": "Tech Stack",
+        "duration": "6s",
+        "frames": [1170, 1350],
+        "visual": "Three icons staggered in: Claude logo + 'Engine', Terminal icon + 'Interface', Obsidian logo + 'Viewer'. Clean, minimal.",
+        "transition": "wipe-from-bottom"
+      },
+      {
+        "id": "cta",
+        "name": "CTA",
+        "duration": "5s",
+        "frames": [1350, 1500],
+        "visual": "GitHub URL with spring-in. Subtle amber glow pulse. Clean exit.",
+        "transition": "fade"
+      }
+    ]
+  },
+  "demo": {
+    "title": "LLM Wiki — App Demo",
+    "duration": "120s",
+    "fps": 30,
+    "totalFrames": 3600,
+    "scenes": [
+      {
+        "id": "intro",
+        "name": "Intro",
+        "duration": "5s",
+        "frames": [0, 150],
+        "visual": "Title with spring animation. Subtitle fades in after."
+      },
+      {
+        "id": "vault-create",
+        "name": "Step 1 — Create a Vault",
+        "duration": "18s",
+        "frames": [150, 690],
+        "visual": "Terminal typewriter: /vault-create my-research --domain ai. Then show directory tree animating in. Then Obsidian vault screenshot."
+      },
+      {
+        "id": "ingest",
+        "name": "Step 2 — Ingest Sources",
+        "duration": "20s",
+        "frames": [690, 1290],
+        "visual": "Show 3 rapid ingest commands (web, YouTube, PDF). Each followed by the generated wiki page. Staggered source type icons."
+      },
+      {
+        "id": "query",
+        "name": "Step 3 — Query Your Wiki",
+        "duration": "18s",
+        "frames": [1290, 1830],
+        "visual": "Terminal: /query 'What do we know about X?'. Answer appears with [[wikilinks]] highlighted. Show graph view."
+      },
+      {
+        "id": "lint",
+        "name": "Step 4 — Health Check",
+        "duration": "15s",
+        "frames": [1830, 2280],
+        "visual": "Terminal: /lint. Show checklist items appearing with green checks. Fix count displayed."
+      },
+      {
+        "id": "promote",
+        "name": "Step 5 — Promote Knowledge",
+        "duration": "15s",
+        "frames": [2280, 2730],
+        "visual": "Diagram: research vault -> meta vault with arrow animation. Pages flying between vaults."
+      },
+      {
+        "id": "graph",
+        "name": "The Compound Effect",
+        "duration": "15s",
+        "frames": [2730, 3180],
+        "visual": "Animated graph growing from 1 node to hundreds. Connections forming. Counter showing pages, cross-references, sources."
+      },
+      {
+        "id": "outro",
+        "name": "Outro",
+        "duration": "7s",
+        "frames": [3180, 3390],
+        "visual": "Start building. GitHub URL. Tech stack icons."
+      }
+    ]
+  }
+}

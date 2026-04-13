@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1600, height=1000">
+<title>Obsidian Graph View Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #1e1e1e;
+    color: #dcddde;
+    width: 1600px;
+    height: 1000px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Title bar ── */
+  .titlebar {
+    height: 36px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid #2a2a2a;
+    flex-shrink: 0;
+  }
+  .traffic-lights {
+    display: flex;
+    gap: 8px;
+    margin-right: 16px;
+  }
+  .traffic-lights span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .tl-close { background: #ff5f57; }
+  .tl-min { background: #febc2e; }
+  .tl-max { background: #28c840; }
+  .title-text {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* ── Tab bar ── */
+  .tab-bar {
+    height: 36px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #2a2a2a;
+    flex-shrink: 0;
+  }
+  .tab {
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 12px;
+    color: #888;
+    border-right: 1px solid #2a2a2a;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: #1e1e1e;
+    color: #dcddde;
+    border-bottom: 2px solid #7f6df2;
+  }
+
+  /* ── Main layout ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Graph controls sidebar ── */
+  .graph-controls {
+    width: 240px;
+    background: #1a1a1a;
+    border-right: 1px solid #2a2a2a;
+    padding: 16px;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+  .gc-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+  }
+  .gc-section {
+    margin-bottom: 20px;
+  }
+  .gc-label {
+    color: #999;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .gc-slider {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    position: relative;
+    margin: 8px 0;
+  }
+  .gc-slider-fill {
+    height: 100%;
+    background: #7f6df2;
+    border-radius: 2px;
+  }
+  .gc-slider-thumb {
+    width: 12px;
+    height: 12px;
+    background: #dcddde;
+    border-radius: 50%;
+    position: absolute;
+    top: -4px;
+    transform: translateX(-50%);
+  }
+  .gc-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    color: #b0b0b0;
+  }
+  .gc-toggle-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    display: inline-block;
+  }
+  .gc-checkbox {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #555;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f6df2;
+    font-size: 10px;
+  }
+  .gc-checkbox.checked { background: #7f6df2; border-color: #7f6df2; color: #fff; }
+
+  /* Legend */
+  .legend {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #2a2a2a;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    color: #999;
+    font-size: 12px;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Graph area ── */
+  .graph-area {
+    flex: 1;
+    position: relative;
+    background: #1e1e1e;
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(30, 30, 30, 1) 0%, rgba(18, 18, 18, 1) 100%);
+    overflow: hidden;
+  }
+
+  .graph-area svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Node labels */
+  .node-label {
+    font-family: 'Inter', sans-serif;
+    fill: #b0b0b0;
+    font-size: 11px;
+    text-anchor: middle;
+    pointer-events: none;
+    font-weight: 400;
+  }
+  .node-label-large {
+    font-size: 14px;
+    fill: #e0e0e0;
+    font-weight: 600;
+  }
+
+  /* ── Status bar ── */
+  .statusbar {
+    height: 24px;
+    background: #1a1a1a;
+    border-top: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 11px;
+    color: #666;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .statusbar .spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- Title bar -->
+<div class="titlebar">
+  <div class="traffic-lights">
+    <span class="tl-close"></span>
+    <span class="tl-min"></span>
+    <span class="tl-max"></span>
+  </div>
+  <div class="title-text">llm-wiki-research — Obsidian v1.7.7</div>
+</div>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <div class="tab">
+    <span>📄 andrej-karpathy</span>
+  </div>
+  <div class="tab active">
+    <span>🔗 Graph view</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Graph controls sidebar -->
+  <div class="graph-controls">
+    <div class="gc-header">Filters</div>
+
+    <div class="gc-section">
+      <div class="gc-label">Search files...</div>
+      <div style="background: #252525; border: 1px solid #333; border-radius: 4px; padding: 6px 10px; color: #666; font-size: 12px; margin-bottom: 12px;">
+        Filter by name...
+      </div>
+    </div>
+
+    <div class="gc-section">
+      <div class="gc-toggle">
+        <span>Tags</span>
+        <div class="gc-checkbox checked">✓</div>
+      </div>
+      <div class="gc-toggle">
+        <span>Attachments</span>
+        <div class="gc-checkbox"></div>
+      </div>
+      <div class="gc-toggle">
+        <span>Existing files only</span>
+        <div class="gc-checkbox checked">✓</div>
+      </div>
+      <div class="gc-toggle">
+        <span>Orphans</span>
+        <div class="gc-checkbox"></div>
+      </div>
+    </div>
+
+    <div class="gc-header">Display</div>
+    <div class="gc-section">
+      <div class="gc-toggle">
+        <span>Arrows</span>
+        <div class="gc-checkbox"></div>
+      </div>
+      <div class="gc-toggle">
+        <span>Text labels</span>
+        <div class="gc-checkbox checked">✓</div>
+      </div>
+    </div>
+
+    <div class="gc-header" style="margin-top: 8px;">Groups</div>
+    <div class="gc-section">
+      <div class="gc-toggle">
+        <span><span class="gc-toggle-dot" style="background: #5bbcd6;"></span>Sources</span>
+        <div class="gc-checkbox checked" style="background: #5bbcd6; border-color: #5bbcd6;">✓</div>
+      </div>
+      <div class="gc-toggle">
+        <span><span class="gc-toggle-dot" style="background: #7dcea0;"></span>Entities</span>
+        <div class="gc-checkbox checked" style="background: #7dcea0; border-color: #7dcea0;">✓</div>
+      </div>
+      <div class="gc-toggle">
+        <span><span class="gc-toggle-dot" style="background: #e0af40;"></span>Concepts</span>
+        <div class="gc-checkbox checked" style="background: #e0af40; border-color: #e0af40;">✓</div>
+      </div>
+      <div class="gc-toggle">
+        <span><span class="gc-toggle-dot" style="background: #7f6df2;"></span>Core</span>
+        <div class="gc-checkbox checked" style="background: #7f6df2; border-color: #7f6df2;">✓</div>
+      </div>
+    </div>
+
+    <div class="gc-header">Forces</div>
+    <div class="gc-section">
+      <div class="gc-label">Center force</div>
+      <div class="gc-slider">
+        <div class="gc-slider-fill" style="width: 50%;"></div>
+        <div class="gc-slider-thumb" style="left: 50%;"></div>
+      </div>
+      <div class="gc-label">Repel force</div>
+      <div class="gc-slider">
+        <div class="gc-slider-fill" style="width: 65%;"></div>
+        <div class="gc-slider-thumb" style="left: 65%;"></div>
+      </div>
+      <div class="gc-label">Link force</div>
+      <div class="gc-slider">
+        <div class="gc-slider-fill" style="width: 40%;"></div>
+        <div class="gc-slider-thumb" style="left: 40%;"></div>
+      </div>
+      <div class="gc-label">Link distance</div>
+      <div class="gc-slider">
+        <div class="gc-slider-fill" style="width: 55%;"></div>
+        <div class="gc-slider-thumb" style="left: 55%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graph area -->
+  <div class="graph-area">
+    <svg viewBox="0 0 1360 928" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Glow filters -->
+        <filter id="glow-amber" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feFlood flood-color="#e0af40" flood-opacity="0.3"/>
+          <feComposite in2="blur" operator="in"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feFlood flood-color="#5bbcd6" flood-opacity="0.25"/>
+          <feComposite in2="blur" operator="in"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feFlood flood-color="#7dcea0" flood-opacity="0.25"/>
+          <feComposite in2="blur" operator="in"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="glow-purple" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feFlood flood-color="#7f6df2" flood-opacity="0.3"/>
+          <feComposite in2="blur" operator="in"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- ── Edges (drawn first, behind nodes) ── -->
+      <g stroke="#3a3a3a" stroke-width="1" opacity="0.5">
+        <!-- LLM Wiki (center) connections -->
+        <line x1="680" y1="464" x2="460" y2="310"/><!-- karpathy-blog -->
+        <line x1="680" y1="464" x2="900" y2="300"/><!-- attention-paper -->
+        <line x1="680" y1="464" x2="520" y2="560"/><!-- andrej-karpathy -->
+        <line x1="680" y1="464" x2="840" y2="580"/><!-- transformer -->
+        <line x1="680" y1="464" x2="680" y2="280"/><!-- attention-mechanisms -->
+        <line x1="680" y1="464" x2="860" y2="440"/><!-- gpt-4 -->
+        <line x1="680" y1="464" x2="500" y2="440"/><!-- openai -->
+
+        <!-- karpathy-blog connections -->
+        <line x1="460" y1="310" x2="520" y2="560"/><!-- andrej-karpathy -->
+        <line x1="460" y1="310" x2="680" y2="280"/><!-- attention-mechanisms -->
+        <line x1="460" y1="310" x2="340" y2="420"/><!-- rlhf-overview -->
+
+        <!-- attention-paper connections -->
+        <line x1="900" y1="300" x2="680" y2="280"/><!-- attention-mechanisms -->
+        <line x1="900" y1="300" x2="840" y2="580"/><!-- transformer -->
+
+        <!-- andrej-karpathy connections -->
+        <line x1="520" y1="560" x2="500" y2="440"/><!-- openai -->
+        <line x1="520" y1="560" x2="840" y2="580"/><!-- transformer -->
+        <line x1="520" y1="560" x2="680" y2="280"/><!-- attention-mechanisms -->
+
+        <!-- transformer connections -->
+        <line x1="840" y1="580" x2="680" y2="280"/><!-- attention-mechanisms -->
+        <line x1="840" y1="580" x2="860" y2="440"/><!-- gpt-4 -->
+
+        <!-- openai connections -->
+        <line x1="500" y1="440" x2="860" y2="440"/><!-- gpt-4 -->
+
+        <!-- dpo-paper connections -->
+        <line x1="1000" y1="480" x2="960" y2="640"/><!-- dpo -->
+        <line x1="1000" y1="480" x2="840" y2="580"/><!-- transformer -->
+
+        <!-- rlhf-overview connections -->
+        <line x1="340" y1="420" x2="380" y2="620"/><!-- rlhf -->
+        <line x1="340" y1="420" x2="960" y2="640"/><!-- dpo -->
+
+        <!-- rlhf connections -->
+        <line x1="380" y1="620" x2="960" y2="640"/><!-- dpo -->
+        <line x1="380" y1="620" x2="580" y2="710"/><!-- fine-tuning -->
+
+        <!-- dpo connections -->
+        <line x1="960" y1="640" x2="580" y2="710"/><!-- fine-tuning -->
+
+        <!-- fine-tuning connections -->
+        <line x1="580" y1="710" x2="840" y2="580"/><!-- transformer -->
+
+        <!-- index connection -->
+        <line x1="680" y1="464" x2="780" y2="740"/><!-- index -->
+      </g>
+
+      <!-- ── Nodes ── -->
+
+      <!-- CENTRAL: LLM Wiki (large, purple/core) -->
+      <circle cx="680" cy="464" r="22" fill="#7f6df2" filter="url(#glow-purple)" opacity="0.9"/>
+      <text x="680" y="500" class="node-label node-label-large" fill="#c4b8ff">LLM Wiki</text>
+
+      <!-- SOURCES (cyan) -->
+      <circle cx="460" cy="310" r="11" fill="#5bbcd6" filter="url(#glow-cyan)" opacity="0.85"/>
+      <text x="460" y="335" class="node-label" fill="#8fd4e6">karpathy-blog</text>
+
+      <circle cx="900" cy="300" r="10" fill="#5bbcd6" filter="url(#glow-cyan)" opacity="0.85"/>
+      <text x="900" y="325" class="node-label" fill="#8fd4e6">attention-paper</text>
+
+      <circle cx="1000" cy="480" r="10" fill="#5bbcd6" filter="url(#glow-cyan)" opacity="0.85"/>
+      <text x="1000" y="505" class="node-label" fill="#8fd4e6">dpo-paper</text>
+
+      <circle cx="340" cy="420" r="10" fill="#5bbcd6" filter="url(#glow-cyan)" opacity="0.85"/>
+      <text x="340" y="445" class="node-label" fill="#8fd4e6">rlhf-overview</text>
+
+      <!-- ENTITIES (green) -->
+      <circle cx="520" cy="560" r="13" fill="#7dcea0" filter="url(#glow-green)" opacity="0.85"/>
+      <text x="520" y="588" class="node-label" fill="#a3ddb8">andrej-karpathy</text>
+
+      <circle cx="500" cy="440" r="11" fill="#7dcea0" filter="url(#glow-green)" opacity="0.85"/>
+      <text x="500" y="465" class="node-label" fill="#a3ddb8">openai</text>
+
+      <circle cx="840" cy="580" r="13" fill="#7dcea0" filter="url(#glow-green)" opacity="0.85"/>
+      <text x="840" y="608" class="node-label" fill="#a3ddb8">transformer</text>
+
+      <circle cx="860" cy="440" r="12" fill="#7dcea0" filter="url(#glow-green)" opacity="0.85"/>
+      <text x="860" y="465" class="node-label" fill="#a3ddb8">gpt-4</text>
+
+      <!-- CONCEPTS (amber) -->
+      <circle cx="680" cy="280" r="12" fill="#e0af40" filter="url(#glow-amber)" opacity="0.85"/>
+      <text x="680" y="260" class="node-label" fill="#edc76b">attention-mechanisms</text>
+
+      <circle cx="380" cy="620" r="11" fill="#e0af40" filter="url(#glow-amber)" opacity="0.85"/>
+      <text x="380" y="645" class="node-label" fill="#edc76b">rlhf</text>
+
+      <circle cx="960" cy="640" r="11" fill="#e0af40" filter="url(#glow-amber)" opacity="0.85"/>
+      <text x="960" y="665" class="node-label" fill="#edc76b">dpo</text>
+
+      <circle cx="580" cy="710" r="10" fill="#e0af40" filter="url(#glow-amber)" opacity="0.85"/>
+      <text x="580" y="735" class="node-label" fill="#edc76b">fine-tuning</text>
+
+      <!-- Additional nodes for density -->
+      <!-- Source: stanford-cs231n -->
+      <circle cx="320" cy="260" r="8" fill="#5bbcd6" filter="url(#glow-cyan)" opacity="0.7"/>
+      <text x="320" y="282" class="node-label" fill="#8fd4e6" font-size="10">stanford-cs231n</text>
+      <line x1="320" y1="260" x2="460" y2="310" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+      <line x1="320" y1="260" x2="520" y2="560" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+
+      <!-- Entity: tesla -->
+      <circle cx="380" cy="720" r="9" fill="#7dcea0" filter="url(#glow-green)" opacity="0.7"/>
+      <text x="380" y="745" class="node-label" fill="#a3ddb8" font-size="10">tesla</text>
+      <line x1="380" y1="720" x2="520" y2="560" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+
+      <!-- Concept: embeddings -->
+      <circle cx="800" cy="200" r="9" fill="#e0af40" filter="url(#glow-amber)" opacity="0.7"/>
+      <text x="800" y="224" class="node-label" fill="#edc76b" font-size="10">embeddings</text>
+      <line x1="800" y1="200" x2="680" y2="280" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+      <line x1="800" y1="200" x2="840" y2="580" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+
+      <!-- Concept: tokenization -->
+      <circle cx="560" cy="200" r="8" fill="#e0af40" filter="url(#glow-amber)" opacity="0.7"/>
+      <text x="560" y="224" class="node-label" fill="#edc76b" font-size="10">tokenization</text>
+      <line x1="560" y1="200" x2="680" y2="280" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+
+      <!-- Entity: llm-operating-system -->
+      <circle cx="1080" cy="360" r="9" fill="#7dcea0" filter="url(#glow-green)" opacity="0.7"/>
+      <text x="1080" y="384" class="node-label" fill="#a3ddb8" font-size="10">llm-operating-system</text>
+      <line x1="1080" y1="360" x2="860" y2="440" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+      <line x1="1080" y1="360" x2="680" y2="464" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+
+      <!-- Source: nanoGPT -->
+      <circle cx="1100" cy="560" r="8" fill="#5bbcd6" filter="url(#glow-cyan)" opacity="0.7"/>
+      <text x="1100" y="584" class="node-label" fill="#8fd4e6" font-size="10">nanogpt-repo</text>
+      <line x1="1100" y1="560" x2="840" y2="580" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+      <line x1="1100" y1="560" x2="520" y2="560" stroke="#3a3a3a" stroke-width="1" opacity="0.35"/>
+
+      <!-- Core: index -->
+      <circle cx="780" cy="740" r="9" fill="#7f6df2" filter="url(#glow-purple)" opacity="0.7"/>
+      <text x="780" y="764" class="node-label" fill="#b0a3f5" font-size="10">index</text>
+
+      <!-- Subtle background grid dots -->
+      <g fill="#2a2a2a" opacity="0.3">
+        <circle cx="100" cy="100" r="1"/>
+        <circle cx="200" cy="100" r="1"/>
+        <circle cx="300" cy="100" r="1"/>
+        <circle cx="100" cy="200" r="1"/>
+        <circle cx="200" cy="200" r="1"/>
+        <circle cx="1200" cy="800" r="1"/>
+        <circle cx="1100" cy="700" r="1"/>
+        <circle cx="1200" cy="700" r="1"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- Status bar -->
+<div class="statusbar">
+  <span>Graph view</span>
+  <span class="spacer"></span>
+  <span>20 nodes · 31 edges</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal — Query</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0d0d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  }
+  .terminal {
+    width: 1400px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  .title-bar {
+    background: #2a2a2a;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #febc2e; }
+  .dot.green { background: #28c840; }
+  .title-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #888;
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+  .body {
+    padding: 24px;
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .prompt { color: #5bbcd6; }
+  .cmd { color: #f0f0f0; font-weight: 600; }
+  .info { color: #e0af40; }
+  .success { color: #7dcea0; }
+  .muted { color: #888; }
+  .text { color: #d4d4d4; }
+  .link { color: #5bbcd6; }
+  .blank { height: 8px; }
+  .line { white-space: pre; }
+</style>
+</head>
+<body>
+<div class="terminal">
+  <div class="title-bar">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+    <span class="title-text">llm-wiki — zsh — 120×40</span>
+  </div>
+  <div class="body">
+    <div class="line"><span class="prompt">~/wiki $</span> <span class="cmd">/query "How does RLHF compare to DPO?"</span></div>
+    <div class="blank"></div>
+    <div class="line"><span class="muted">Searching 47 wiki pages...</span></div>
+    <div class="line"><span class="muted">Found 4 relevant sources.</span></div>
+    <div class="blank"></div>
+    <div class="line"><span class="text">Based on your wiki:</span></div>
+    <div class="blank"></div>
+    <div class="line"><span class="info">→ RLHF (Reinforcement Learning from Human Feedback) requires</span></div>
+    <div class="line"><span class="info">  training a separate reward model on human preferences, then</span></div>
+    <div class="line"><span class="info">  using PPO to optimize the policy against it.</span></div>
+    <div class="blank"></div>
+    <div class="line"><span class="info">→ DPO (Direct Preference Optimization) simplifies this by</span></div>
+    <div class="line"><span class="info">  directly optimizing the policy on preference pairs — no</span></div>
+    <div class="line"><span class="info">  reward model needed, reducing compute by ~40%.</span></div>
+    <div class="blank"></div>
+    <div class="line"><span class="info">→ Both require preference data, but DPO's closed-form loss</span></div>
+    <div class="line"><span class="info">  makes it more stable and easier to implement.</span></div>
+    <div class="blank"></div>
+    <div class="line"><span class="text">Sources:</span></div>
+    <div class="line"><span class="text">  </span><span class="link">[[rlhf-overview]]</span><span class="text"> · </span><span class="link">[[dpo-paper-summary]]</span></div>
+    <div class="line"><span class="text">  </span><span class="link">[[preference-learning]]</span><span class="text"> · </span><span class="link">[[llm-training-survey]]</span></div>
+  </div>
+</div>
+</body>
+</html>
