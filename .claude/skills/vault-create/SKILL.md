@@ -2,7 +2,6 @@
 name: vault-create
 description: Create a new LLM Wiki vault with proper directory structure, index, log, and conventions. Use when user wants to create a vault, start a new wiki, or set up a new knowledge base.
 argument-hint: <vault-name> [--domain <domain>]
-disable-model-invocation: true
 allowed-tools: Bash(mkdir *) Bash(git init *) Bash(git add *) Bash(git commit *) Write
 ---
 
