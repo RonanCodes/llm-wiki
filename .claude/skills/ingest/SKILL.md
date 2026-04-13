@@ -39,7 +39,9 @@ Identify the source type and delegate to the appropriate extraction method:
 | `https://news.ycombinator.com/item?id=...` | Hacker News | Fetch thread via Algolia API: `curl -s "https://hn.algolia.com/api/v1/items/{id}"`. See `ingest-hackernews` skill. |
 | `https://www.reddit.com/r/.../comments/...` or `https://old.reddit.com/...` | Reddit | Append `.json` to URL, parse post + comment tree. See `ingest-reddit` skill. |
 | `https://github.com/.../discussions/...` | GitHub Discussion | Fetch via `gh api graphql`. See `ingest-github-discussions` skill. |
+| `https://linkedin.com/...` or `https://www.linkedin.com/...` | LinkedIn | Extract post content via cookie auth or pasted text. See `ingest-linkedin` skill. |
 | `https://...` (other URLs) | Web Article | Fetch with `curl -sL`, extract readable content. For better extraction, use `@mozilla/readability` if available. See `ingest-web` skill. |
+| `*.mp4`, `*.mkv`, `*.mov`, `*.avi`, `*.webm` (file path) | Video | Transcribe audio, extract keyframes. Requires FFmpeg + whisper/API key. See `ingest-video` skill. |
 | `*.pdf` (file path) | PDF | Extract text with `pdftotext`. Check `which pdftotext` first, install with `brew install poppler` if missing. See `ingest-pdf` skill. |
 | `*.docx`, `*.xlsx`, `*.pptx` (file path) | Office | Convert with `pandoc`. Check `which pandoc` first, install with `brew install pandoc` if missing. See `ingest-office` skill. |
 | `*.md` (file path) | Markdown | Read the file directly. |
