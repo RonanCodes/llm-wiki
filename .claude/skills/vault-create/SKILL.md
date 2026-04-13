@@ -191,7 +191,7 @@ Then open it:
 open "obsidian://open?vault=<name>"
 ```
 
-Works on macOS. User may need to restart Obsidian or switch vaults for it to appear.
+Works on macOS. **Important:** Tell the user they need to fully quit Obsidian (Cmd+Q, not just close the window) and reopen it for the new vault to appear in the vault switcher. Obsidian only reads its config on startup.
 
 8. **Report success** with next steps:
    - Vault is open in Obsidian (or tell them to open it)
