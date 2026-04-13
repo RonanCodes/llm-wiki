@@ -2,7 +2,6 @@
 name: ingest
 description: Ingest a source into an LLM Wiki vault. Detects source type (URL, PDF, YouTube, tweet, gist, text), extracts content, creates wiki pages, updates index and log. Use when user wants to ingest, add, import, or process a source into their wiki.
 argument-hint: <source> [--vault <name>]
-disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(curl *) Bash(mkdir *) Read Write Edit Glob Grep
 ---
 
@@ -36,6 +35,9 @@ Identify the source type and delegate to the appropriate extraction method:
 | `https://x.com/...` or `https://twitter.com/...` | Tweet | Use FXTwitter API: `curl -s "https://api.fxtwitter.com/{user}/status/{id}"` — parse JSON for `tweet.text`, `tweet.author`, `tweet.created_at`. See `ingest-tweet` skill. |
 | `https://youtube.com/...` or `https://youtu.be/...` | YouTube | Extract transcript via yt-dlp subtitles. Check `which yt-dlp` first, install with `brew install yt-dlp` if missing. See `ingest-youtube` skill. |
 | `https://gist.github.com/...` | Gist | Fetch raw content: `curl -sL "https://gist.githubusercontent.com/{user}/{id}/raw/"`. See `ingest-gist` skill. |
+| `https://news.ycombinator.com/item?id=...` | Hacker News | Fetch thread via Algolia API: `curl -s "https://hn.algolia.com/api/v1/items/{id}"`. See `ingest-hackernews` skill. |
+| `https://www.reddit.com/r/.../comments/...` or `https://old.reddit.com/...` | Reddit | Append `.json` to URL, parse post + comment tree. See `ingest-reddit` skill. |
+| `https://github.com/.../discussions/...` | GitHub Discussion | Fetch via `gh api graphql`. See `ingest-github-discussions` skill. |
 | `https://...` (other URLs) | Web Article | Fetch with `curl -sL`, extract readable content. For better extraction, use `@mozilla/readability` if available. See `ingest-web` skill. |
 | `*.pdf` (file path) | PDF | Extract text with `pdftotext`. Check `which pdftotext` first, install with `brew install poppler` if missing. See `ingest-pdf` skill. |
 | `*.docx`, `*.xlsx`, `*.pptx` (file path) | Office | Convert with `pandoc`. Check `which pandoc` first, install with `brew install pandoc` if missing. See `ingest-office` skill. |
