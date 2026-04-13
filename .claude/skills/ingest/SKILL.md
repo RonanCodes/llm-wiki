@@ -17,6 +17,7 @@ Process any source into wiki pages. This is the main entry point for adding know
 /ingest https://youtube.com/watch?v=abc123 --vault my-research
 /ingest https://x.com/user/status/123 --vault my-research
 /ingest https://gist.github.com/user/abc123 --vault my-research
+/ingest https://github.com/owner/repo/discussions/123 --vault my-research
 /ingest "Some pasted text or notes" --vault my-research
 ```
 
