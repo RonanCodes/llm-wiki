@@ -9,6 +9,9 @@ vaults/*
 .claude/skills/*.local/
 .claude/skills/*.local.*
 
+# Skip plugin check (created by "don't ask again" option)
+.claude/skip-plugin-check
+
 # Claude Code local settings (contains machine-specific paths)
 .claude/settings.local.json
 

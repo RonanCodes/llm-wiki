@@ -3,7 +3,7 @@
         "ronan-skills": {
             "source": {
                 "source": "github",
-                "repo": "RonanCodes/skills"
+                "repo": "RonanCodes/ronan-skills"
             }
         }
     }

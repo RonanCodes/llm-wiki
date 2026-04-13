@@ -48,7 +48,7 @@ ls .claude/skills/ | wc -l
 
 Report count and list any expected skills that are missing.
 
-## Step 4: Check Shared Skills (RonanCodes/skills)
+## Step 4: Check Shared Skills (RonanCodes/ronan-skills)
 
 This project uses shared skills (ralph, frontend-design, etc.) from a separate repo. The marketplace is auto-registered via `.claude/settings.json`.
 
@@ -63,12 +63,12 @@ If not found, offer the user these options:
 
 **Option B: Clone + additionalDirectories**
 1. Ask the user where they'd like to clone it
-2. `git clone https://github.com/RonanCodes/skills.git <their-path>`
+2. `git clone https://github.com/RonanCodes/ronan-skills.git <their-path>`
 3. Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
 
 **Option C: npx (works with any AI agent)**
 ```bash
-npx skills add RonanCodes/skills/ralph -g
+npx skills add RonanCodes/ronan-skills/ralph -g
 ```
 
 ## Step 5: Check Obsidian

@@ -6,7 +6,7 @@ A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wi
 
 ## Recommended Plugin
 
-This project uses shared skills from the `RonanCodes/skills` repo (ralph, frontend-design, create-skill, doc-standards).
+This project uses shared skills from the `RonanCodes/ronan-skills` repo (ralph, frontend-design, create-skill, doc-standards).
 
 On every new session, first check if `.claude/skip-plugin-check` exists — if so, skip this entirely.
 
@@ -17,25 +17,25 @@ Otherwise, check if the skills `ralph`, `frontend-design`, `create-skill`, `doc-
 **Options (prioritized from simplest to most involved):**
 
 1. **Install the plugin** (recommended) — Run these two commands:
-   - `/plugin marketplace add RonanCodes/skills`
+   - `/plugin marketplace add RonanCodes/ronan-skills`
    - `/plugin install ronan-skills@ronan-skills`
    - Then `/reload-plugins` to activate
 
 2. **Clone repo + use additionalDirectories** — Ask the user where to clone, then:
-   - `git clone https://github.com/RonanCodes/skills.git <their-chosen-path>`
+   - `git clone https://github.com/RonanCodes/ronan-skills.git <their-chosen-path>`
    - Add to `~/.claude/settings.json`: `"additionalDirectories": ["<absolute-path>"]`
    - Skills available in every project on this machine
 
 3. **Clone repo + symlink to ~/.claude/skills/** — Ask where to clone, then:
-   - `git clone https://github.com/RonanCodes/skills.git <their-dev-folder>/skills`
+   - `git clone https://github.com/RonanCodes/ronan-skills.git <their-dev-folder>/skills`
    - For each skill: `ln -s <their-dev-folder>/skills/skills/<name> ~/.claude/skills/<name>`
    - Skills globally available, repo stays in their dev folder, `git pull` to update
 
 4. **Copy skills into this project** — Copy from the repo into `.claude/skills/` locally:
-   - `npx skills add RonanCodes/skills/ralph`
-   - `npx skills add RonanCodes/skills/frontend-design`
-   - `npx skills add RonanCodes/skills/create-skill`
-   - `npx skills add RonanCodes/skills/doc-standards`
+   - `npx skills add RonanCodes/ronan-skills/ralph`
+   - `npx skills add RonanCodes/ronan-skills/frontend-design`
+   - `npx skills add RonanCodes/ronan-skills/create-skill`
+   - `npx skills add RonanCodes/ronan-skills/doc-standards`
    - Skills only available in this project
 
 5. **Skip for now** — Continue without shared skills
@@ -135,7 +135,7 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 - **Each vault is its own git repo**, gitignored from this repo. All vault names prefixed with `llm-wiki-` (e.g. `llm-wiki-research`, `llm-wiki-personal`).
 - **Vault-specific conventions** go in each vault's own CLAUDE.md (thin config, not skills).
 - **Private skills**: either use `.private/` overlay OR add `.local` to the skill name (e.g. `my-company.local/SKILL.md`) — both are gitignored.
-- **Shared skills** (ralph, frontend-design, etc.) come from the `RonanCodes/skills` marketplace. Install via `/plugin install ronan-skills@ronan-skills`.
+- **Shared skills** (ralph, frontend-design, etc.) come from the `RonanCodes/ronan-skills` marketplace. Install via `/plugin install ronan-skills@ronan-skills`.
 - **Tool dependencies** are listed in `tools.json` — the `/setup` skill reads this.
 - **Every wiki page** must have YAML frontmatter with: title, dates, page-type, domain, tags, sources, related.
 - **Every wiki page** must link back to its raw source via frontmatter `sources` field AND inline `## Sources` section.
