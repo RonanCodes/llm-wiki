@@ -24,33 +24,15 @@ Where `<topic>` is one of:
 
 ## Step 1: Dependency Check
 
-```bash
-which pandoc >/dev/null 2>&1 || {
-  echo "Installing pandoc for PDF rendering..."
-  if command -v brew >/dev/null 2>&1; then
-    brew install pandoc
-  else
-    echo "ERROR: Homebrew not found. Install pandoc manually:"
-    echo "  macOS:   https://pandoc.org/installing.html"
-    echo "  Linux:   apt install pandoc texlive-xetex  (Debian/Ubuntu)"
-    exit 1
-  fi
-}
-```
-
-Pandoc's PDF backend needs a LaTeX engine. Prefer XeLaTeX (unicode-friendly):
+Source the shared helper. It lazy-installs pandoc (via brew / apt) and picks a LaTeX engine, exporting `PDF_ENGINE` and `USE_HTML_FALLBACK`:
 
 ```bash
-which xelatex >/dev/null 2>&1 || {
-  echo "Installing BasicTeX for PDF engine (~100MB)..."
-  brew install --cask basictex || {
-    echo "Fallback: will render HTML first, then try wkhtmltopdf."
-    USE_HTML_FALLBACK=1
-  }
-}
+source .claude/skills/generate/lib/ensure-pandoc.sh
+ensure_pandoc || exit 1
+ensure_latex_engine   # sets PDF_ENGINE=xelatex|pdflatex, or USE_HTML_FALLBACK=1
 ```
 
-If both engines are missing, render to HTML and tell the user to install a LaTeX engine for PDF output.
+Do NOT duplicate install/probe logic in the handler body — the shared helper is the single source of truth.
 
 ## Step 2: Resolve Vault + Topic
 
@@ -124,55 +106,25 @@ Write a temporary combined markdown file (`/tmp/generate-book-<slug>-<pid>.md`) 
 
 ## Step 5: Render with Pandoc
 
+Delegate to the shared render helper. It picks engine/fallback based on the env vars set by `ensure_latex_engine` in Step 1, handles error tail + fix hints, and supports template override:
+
 ```bash
 OUT="$VAULT_DIR/artifacts/book/<slug>-<YYYY-MM-DD>.pdf"
-mkdir -p "$(dirname "$OUT")"
 
-TEMPLATE_ARG=""
+RENDER_ARGS=(--toc)                            # drop --toc if --no-toc was passed
 if [ -f ".claude/skills/generate-book/templates/book.tex" ]; then
-  TEMPLATE_ARG="--template=.claude/skills/generate-book/templates/book.tex"
+  RENDER_ARGS+=(--template ".claude/skills/generate-book/templates/book.tex")
 fi
 
-pandoc "$BUNDLE" \
-  --pdf-engine=xelatex \
-  $TEMPLATE_ARG \
-  --toc \
-  --toc-depth=3 \
-  -V mainfont="Helvetica" \
-  -V sansfont="Helvetica" \
-  -V monofont="Menlo" \
-  -V geometry:margin=1in \
-  -o "$OUT" 2> /tmp/pandoc-err.log
+.claude/skills/generate/lib/render-pdf.sh "$BUNDLE" "$OUT" "${RENDER_ARGS[@]}"
 ```
 
-If `--no-toc` was passed, drop `--toc` and `--toc-depth`.
+The helper:
 
-### Pandoc Error Handling
-
-Pandoc writes LaTeX errors to stderr. Capture them and surface a friendly summary:
-
-```bash
-if [ $? -ne 0 ]; then
-  echo "Pandoc failed. Last 20 lines of /tmp/pandoc-err.log:"
-  tail -20 /tmp/pandoc-err.log
-  echo ""
-  echo "Common fixes:"
-  echo "  - Missing LaTeX package:   tlmgr install <package>"
-  echo "  - Unicode error:           ensure --pdf-engine=xelatex"
-  echo "  - Image not found:         check relative paths in wiki pages"
-  exit 2
-fi
-```
-
-### HTML Fallback
-
-If `USE_HTML_FALLBACK=1` (no LaTeX engine available), swap `-o $OUT.html` and tell the user:
-
-```
-Pandoc rendered HTML because no LaTeX engine is installed.
-Install one with:  brew install --cask basictex
-Then re-run /generate book <topic> to get PDF output.
-```
+- Uses `$PDF_ENGINE` (xelatex / pdflatex) when set.
+- Falls back to HTML output when `USE_HTML_FALLBACK=1` — writes `$OUT.html` and tells the user how to install a LaTeX engine.
+- Tails the last 20 lines of pandoc stderr on failure and suggests the common fixes (missing LaTeX package → `tlmgr install`, unicode → `--pdf-engine=xelatex`, image-path issues, font issues).
+- Exits 0 on success, 2 on render failure, 3 on bad arguments, 4 if pandoc is absent.
 
 ## Step 6: Write the Sidecar
 

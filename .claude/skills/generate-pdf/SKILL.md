@@ -1,0 +1,187 @@
+---
+name: generate-pdf
+description: Render a shareable PDF from a single wiki page or a folder of pages. Minimal print stylesheet — no title page, no TOC unless --toc passed. Reuses the shared pandoc + source-hash helpers. Used by /generate pdf. Not user-invocable directly — go through /generate.
+user-invocable: false
+allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Read Write Glob Grep
+---
+
+# Generate PDF
+
+Produce a quick, shareable PDF from a **single wiki page** or a **folder of pages** — without the book ceremony (no title page, no TOC by default).
+
+Think of it as "print this page" rather than "compile a book."
+
+## Usage (via /generate router)
+
+```
+/generate pdf <path> [--vault <name>] [--toc] [--template <name>]
+```
+
+Where `<path>` is:
+
+- A **single page** relative to the wiki: `wiki/concepts/attention.md` or `concepts/attention.md`.
+- A **folder** relative to the wiki: `concepts/rag/` — every `.md` inside, concatenated in filename order.
+
+No tag-based selection (that's `/generate book`). No `all` target.
+
+## Step 1: Dependency Check
+
+Source the shared helper — same one `generate-book` uses. DRY.
+
+```bash
+source .claude/skills/generate/lib/ensure-pandoc.sh
+ensure_pandoc || exit 1
+ensure_latex_engine
+```
+
+## Step 2: Resolve Vault + Path
+
+- `VAULT_DIR="vaults/<name>"`, `WIKI_DIR="$VAULT_DIR/wiki"`.
+- Slugify the leaf of the path for output filename:
+  - `wiki/concepts/attention.md` → `attention`
+  - `concepts/rag/` → `rag`
+
+Resolve the path to a list of source files:
+
+| Input | Selection |
+|-------|-----------|
+| A `.md` file | That single file. |
+| A folder | `find $PATH -maxdepth 1 -name '*.md'` — filename-order sort. Non-recursive by default (keeps output scope predictable). Pass `--recursive` for recursive descent. |
+
+If the path doesn't exist or the folder contains no `.md` files, exit with a clear error showing the resolved absolute path.
+
+## Step 3: Compute Source Hash
+
+Always the shared helper — never a bespoke hash:
+
+```bash
+HASH=$(.claude/skills/generate/lib/source-hash.sh "${PAGES[@]}")
+```
+
+## Step 4: Build the Markdown Bundle
+
+Minimal bundle — no title page, no chapter framing. The goal is to feel like "printed the page as-is."
+
+For each source file (in the order from Step 2):
+
+1. Strip the page's own YAML frontmatter.
+2. Resolve wikilinks (same sed pass as `generate-book`):
+   ```bash
+   sed -E 's/\[\[([^|\]]+)\|([^\]]+)\]\]/*\2*/g; s/\[\[([^\]]+)\]\]/*\1*/g'
+   ```
+3. Rewrite relative image paths to absolute (so Pandoc can find them).
+4. Concatenate. If more than one page, insert `\newpage` between them.
+
+Prepend a tiny Pandoc YAML block. Unlike `generate-book`, don't set `documentclass: book` — use the default `article`:
+
+```yaml
+---
+title: "<leaf-of-path as Title Case>"
+date: "<YYYY-MM-DD>"
+geometry: margin=1in
+fontsize: 11pt
+---
+```
+
+If only a single page, and its first non-frontmatter line is a `# H1`, use that H1 as the title and drop the YAML `title:` to avoid duplicate headings.
+
+## Step 5: Render with Pandoc
+
+```bash
+OUT="$VAULT_DIR/artifacts/pdf/<slug>-<YYYY-MM-DD>.pdf"
+
+RENDER_ARGS=()
+if [ "$TOC_FLAG" = "1" ]; then
+  RENDER_ARGS+=(--toc)
+fi
+if [ -f ".claude/skills/generate-pdf/templates/print.tex" ]; then
+  RENDER_ARGS+=(--template ".claude/skills/generate-pdf/templates/print.tex")
+fi
+
+.claude/skills/generate/lib/render-pdf.sh "$BUNDLE" "$OUT" "${RENDER_ARGS[@]}"
+```
+
+The shared `render-pdf.sh` handles:
+
+- Engine selection (xelatex / pdflatex / HTML fallback via `$PDF_ENGINE`, `$USE_HTML_FALLBACK`).
+- Pandoc error tail + common-fix hints.
+- Template override lookup.
+
+`generate-pdf` does not roll its own pandoc invocation. If the shared helper doesn't support a pandoc flag you need, **extend the helper** rather than bypassing it.
+
+## Step 6: Write the Sidecar
+
+```bash
+META="${OUT%.pdf}.meta.yaml"
+cat > "$META" <<EOF
+generator: generate-pdf@0.1.0
+generated-at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+template: pdf-default
+topic: "<raw path argument>"
+flags:
+  toc: ${TOC_FLAG:-false}
+  recursive: ${RECURSIVE_FLAG:-false}
+generated-from:
+$(for p in "${PAGES[@]}"; do echo "  - $p"; done)
+source-hash: $HASH
+EOF
+```
+
+Same schema as `generate-book` — see `sites/docs/src/content/docs/reference/artifacts.md`.
+
+## Step 7: Commit to Vault Repo
+
+Defensive — `artifacts/` is gitignored by default. No-op is fine:
+
+```bash
+cd "$VAULT_DIR"
+git add "artifacts/pdf/<slug>-<YYYY-MM-DD>.pdf" "artifacts/pdf/<slug>-<YYYY-MM-DD>.meta.yaml" 2>/dev/null
+git diff --cached --quiet || git commit -m "📄 pdf: generate <slug> ($(date +%Y-%m-%d))"
+```
+
+## Step 8: Report to User
+
+```
+✅ PDF generated
+   Input:       <path>
+   Pages:       <N>
+   Source hash: <first 12 chars>
+   Output:      vaults/<vault>/artifacts/pdf/<slug>-<date>.pdf
+   Sidecar:     vaults/<vault>/artifacts/pdf/<slug>-<date>.meta.yaml
+   Open with:   open <absolute path>
+```
+
+## Difference from /generate book
+
+| Aspect | `generate-pdf` | `generate-book` |
+|--------|----------------|-----------------|
+| Input | one page, or one folder | tag, folder, file, or `all` |
+| Title page | none | yes |
+| Table of contents | opt-in via `--toc` | default on; opt out with `--no-toc` |
+| Pandoc `documentclass` | `article` | `book` |
+| Wikilinks | italic inline | italic inline |
+| Mermaid | fenced code blocks (2A) | fenced code blocks (2A) |
+| Per-page page break | only if multi-file | always (chapter-level) |
+| Output folder | `artifacts/pdf/` | `artifacts/book/` |
+| Generator string | `generate-pdf@0.1.0` | `generate-book@0.1.0` |
+
+## Template Customisation
+
+Override the print template by dropping a LaTeX template at `.claude/skills/generate-pdf/templates/print.tex` (or pass `--template <name>` mapping to that directory). Start from `pandoc -D latex` and simplify.
+
+## Known Limitations (Phase 2A)
+
+Same as `generate-book`:
+
+- Mermaid blocks are not rendered (survive as code blocks).
+- Wikilinks are italicised inline text, not clickable hyperlinks.
+- Cross-vault references are not resolved.
+
+## See Also
+
+- `.claude/skills/generate/SKILL.md` — router that dispatches here.
+- `.claude/skills/generate-book/SKILL.md` — the other side of the 2A foundation pair.
+- `.claude/skills/generate/lib/ensure-pandoc.sh` — shared dependency check.
+- `.claude/skills/generate/lib/render-pdf.sh` — shared pandoc invocation.
+- `.claude/skills/generate/lib/source-hash.sh` — shared provenance hash.
+- `sites/docs/src/content/docs/reference/artifacts.md` — sidecar schema.
