@@ -10,11 +10,29 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 | Command | Arguments | Description |
 |---------|-----------|-------------|
 | `/ingest <source>` | `--vault <name>` | Process any source into wiki pages (detects type automatically) |
+| `/generate <type> <topic>` | `--vault <name>` + handler flags | Emit an artifact from wiki pages. Dispatches to `generate-<type>` handlers. The mirror of `/ingest` |
 | `/query "question"` | `--vault <name>` `--save` | Ask questions, get cited answers. `--save` files the answer back into the wiki |
 | `/lint` | `--vault <name>` `--fix` | Health-check wiki (8 checks). `--fix` auto-repairs what's fixable |
 | `/promote <vault>` | `--to <target>` | Graduate reusable knowledge between vaults (default target: `meta`) |
 | `/search "terms"` | `--vault <name>` | Full-text search via qmd (hybrid BM25/vector) with grep fallback |
 | `/slides "topic"` | `--vault <name>` | Generate Marp slide deck from wiki content |
+
+### /generate Handler Types
+
+| Type | Handler | Phase | Description |
+|------|---------|-------|-------------|
+| `book` | `generate-book` | 2A ✅ | Pandoc-rendered PDF book — title page, TOC, chapter-per-page |
+| `pdf` | `generate-pdf` | 2A ✅ | Quick shareable PDF from a page or folder — no ceremony |
+| `slides` | `generate-slides` | 2B | Marp / Reveal.js deck |
+| `mindmap` | `generate-mindmap` | 2B | Markmap HTML |
+| `infographic` | `generate-infographic` | 2B | Poster-style infographic |
+| `podcast` | `generate-podcast` | 2C | TTS-rendered MP3 explainer |
+| `video` | `generate-video` | 2C | Remotion-rendered MP4 |
+| `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
+| `flashcards` | `generate-flashcards` | 2D | Anki `.apkg` deck |
+| `app` | `generate-app` | 2D | Interactive explorable web app |
+
+See [artifact conventions](./artifacts) for storage paths, sidecar schema, and the source-hash algorithm.
 
 ## Vault Management
 
@@ -48,3 +66,5 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 | `ingest-tweet` | ingest | Extract tweet text via FXTwitter API |
 | `ingest-gist` | ingest | Extract gist content via raw URL |
 | `ingest-text` | ingest | Process pasted text or local markdown |
+| `generate-book` | generate | Render Pandoc PDF book from wiki pages |
+| `generate-pdf` | generate | Render quick PDF from a page or folder |
