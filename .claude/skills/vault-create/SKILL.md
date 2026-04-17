@@ -74,10 +74,11 @@ vaults/<name>/
 │   ├── entities/           # Entity pages (people, orgs, tools, frameworks)
 │   ├── sources/            # Source summaries (one per ingested source)
 │   └── comparisons/        # Comparison and synthesis pages
+├── artifacts/              # GITIGNORED — generated outputs (books, pdfs, slides, …)
 ├── log.md                  # Chronological activity log
 ├── CLAUDE.md               # Vault conventions (thin config)
 ├── README.md               # Overview for GitHub (what's inside, stats, purpose)
-└── .gitignore              # Ignore Obsidian ephemeral state, .DS_Store
+└── .gitignore              # Ignore Obsidian ephemeral state, .DS_Store, artifacts/
 ```
 
 3. **Create `wiki/index.md`** with this template:
@@ -204,6 +205,9 @@ See the [engine repo](https://github.com/RonanCodes/llm-wiki) for setup and usag
 .obsidian/plugins/
 .obsidian/themes/
 .trash/
+
+# Generated artifacts — derivable from wiki/, regenerate with /generate
+artifacts/
 ```
 
 8. **Initialize git repo**:
