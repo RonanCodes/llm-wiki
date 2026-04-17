@@ -1,0 +1,246 @@
+---
+name: generate-book
+description: Render a PDF book from wiki pages matching a topic. Concatenates pages, preserves headings, resolves wikilinks, runs Pandoc. Lazy-installs pandoc. Used by /generate book. Not user-invocable directly — go through /generate.
+user-invocable: false
+allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Read Write Glob Grep
+---
+
+# Generate Book
+
+Concatenate wiki pages matching a topic into a Pandoc-rendered PDF book with a title page, table of contents, and preserved cross-references.
+
+## Usage (via /generate router)
+
+```
+/generate book <topic> [--vault <name>] [--no-toc] [--template <name>]
+```
+
+Where `<topic>` is one of:
+
+- A **tag** (e.g. `attention`) — matches all pages whose frontmatter `tags:` list includes it.
+- A **folder path** under `wiki/` (e.g. `concepts/rag`) — renders every `.md` in that folder.
+- A **single page path** (e.g. `wiki/concepts/attention.md`) — renders just that page.
+- The literal string `all` — renders every `.md` under `wiki/` (minus `index.md` and `log.md`).
+
+## Step 1: Dependency Check
+
+```bash
+which pandoc >/dev/null 2>&1 || {
+  echo "Installing pandoc for PDF rendering..."
+  if command -v brew >/dev/null 2>&1; then
+    brew install pandoc
+  else
+    echo "ERROR: Homebrew not found. Install pandoc manually:"
+    echo "  macOS:   https://pandoc.org/installing.html"
+    echo "  Linux:   apt install pandoc texlive-xetex  (Debian/Ubuntu)"
+    exit 1
+  fi
+}
+```
+
+Pandoc's PDF backend needs a LaTeX engine. Prefer XeLaTeX (unicode-friendly):
+
+```bash
+which xelatex >/dev/null 2>&1 || {
+  echo "Installing BasicTeX for PDF engine (~100MB)..."
+  brew install --cask basictex || {
+    echo "Fallback: will render HTML first, then try wkhtmltopdf."
+    USE_HTML_FALLBACK=1
+  }
+}
+```
+
+If both engines are missing, render to HTML and tell the user to install a LaTeX engine for PDF output.
+
+## Step 2: Resolve Vault + Topic
+
+- Vault is already resolved by the /generate router (forwarded via `--vault <name>`).
+- `VAULT_DIR="vaults/<name>"`, `WIKI_DIR="$VAULT_DIR/wiki"`.
+- Slugify the topic for filenames: lowercase, spaces→`-`, drop non-`[a-z0-9-]`.
+
+Resolve the topic to a list of source page paths:
+
+| Topic form | Selection |
+|------------|-----------|
+| `all` | `find $WIKI_DIR -name '*.md' -not -name 'index.md' -not -name 'log.md'` |
+| Folder path | `find $WIKI_DIR/<folder> -name '*.md'` |
+| Single `.md` path | just that file |
+| Tag | Glob `$WIKI_DIR/**/*.md`, for each read the YAML frontmatter, include file if the `tags:` list contains the topic |
+
+Sort the resulting list deterministically (lexicographic) — this is both the concatenation order and the input order to the source-hash helper.
+
+If the list is empty, exit with a clear error that shows the topic tried and suggests either checking tags or using an `all` / folder form.
+
+## Step 3: Compute Source Hash
+
+```bash
+HASH=$(.claude/skills/generate/lib/source-hash.sh "${PAGES[@]}")
+```
+
+Stamp this into the sidecar. Handlers MUST NOT roll their own hash — the shared helper is the single source of truth for canonicalisation.
+
+## Step 4: Build the Markdown Bundle
+
+Write a temporary combined markdown file (`/tmp/generate-book-<slug>-<pid>.md`) with:
+
+1. **Title page** — Pandoc YAML metadata block:
+
+   ```yaml
+   ---
+   title: "<Topic as Title Case>"
+   subtitle: "An LLM Wiki book"
+   date: "<YYYY-MM-DD>"
+   toc: true                      # unless --no-toc passed
+   toc-depth: 3
+   documentclass: book
+   geometry: margin=1in
+   ---
+   ```
+
+2. **For each source page**, in sorted order:
+
+   a. Strip the page's own YAML frontmatter (everything between the first `---\n` and the next `---\n`).
+
+   b. If the first remaining non-blank line is a `# H1`, keep it (becomes a chapter heading). If not, synthesize one from the filename: `# <Filename as Title Case>`.
+
+   c. Demote nested headings by one level so the H1 is the chapter and H2/H3 become sections (Pandoc's `--shift-heading-level-by=0` suffices if we keep this manual, but easier is: leave headings alone and rely on `documentclass: book` to treat H1 as chapter).
+
+   d. Resolve wikilinks:
+
+      - `[[page-name]]` → *`page-name`* (emphasised inline). Simplest and survives PDF rendering.
+      - `[[page-name|display text]]` → *`display text`*.
+
+      Use a sed pass:
+
+      ```bash
+      sed -E 's/\[\[([^|\]]+)\|([^\]]+)\]\]/*\2*/g; s/\[\[([^\]]+)\]\]/*\1*/g'
+      ```
+
+   e. Rewrite relative image paths (`./assets/foo.png`, `raw/assets/foo.png`) to absolute paths so Pandoc can find them. Images under `raw/assets/` get rewritten to `$VAULT_DIR/raw/assets/foo.png`.
+
+   f. Mermaid code blocks: **leave as-is** for now. In phase 2A, mermaid blocks survive as fenced code blocks in the PDF (readable, not rendered). Phase 2B can add a `mermaid-cli → static PNG` pre-pass. Document this limitation in the "Known Limitations" section below.
+
+   g. Append to the bundle, separated by a page-break (`\newpage` LaTeX or `<div style="page-break-before:always"></div>` HTML).
+
+## Step 5: Render with Pandoc
+
+```bash
+OUT="$VAULT_DIR/artifacts/book/<slug>-<YYYY-MM-DD>.pdf"
+mkdir -p "$(dirname "$OUT")"
+
+TEMPLATE_ARG=""
+if [ -f ".claude/skills/generate-book/templates/book.tex" ]; then
+  TEMPLATE_ARG="--template=.claude/skills/generate-book/templates/book.tex"
+fi
+
+pandoc "$BUNDLE" \
+  --pdf-engine=xelatex \
+  $TEMPLATE_ARG \
+  --toc \
+  --toc-depth=3 \
+  -V mainfont="Helvetica" \
+  -V sansfont="Helvetica" \
+  -V monofont="Menlo" \
+  -V geometry:margin=1in \
+  -o "$OUT" 2> /tmp/pandoc-err.log
+```
+
+If `--no-toc` was passed, drop `--toc` and `--toc-depth`.
+
+### Pandoc Error Handling
+
+Pandoc writes LaTeX errors to stderr. Capture them and surface a friendly summary:
+
+```bash
+if [ $? -ne 0 ]; then
+  echo "Pandoc failed. Last 20 lines of /tmp/pandoc-err.log:"
+  tail -20 /tmp/pandoc-err.log
+  echo ""
+  echo "Common fixes:"
+  echo "  - Missing LaTeX package:   tlmgr install <package>"
+  echo "  - Unicode error:           ensure --pdf-engine=xelatex"
+  echo "  - Image not found:         check relative paths in wiki pages"
+  exit 2
+fi
+```
+
+### HTML Fallback
+
+If `USE_HTML_FALLBACK=1` (no LaTeX engine available), swap `-o $OUT.html` and tell the user:
+
+```
+Pandoc rendered HTML because no LaTeX engine is installed.
+Install one with:  brew install --cask basictex
+Then re-run /generate book <topic> to get PDF output.
+```
+
+## Step 6: Write the Sidecar
+
+```bash
+META="${OUT%.pdf}.meta.yaml"
+cat > "$META" <<EOF
+generator: generate-book@0.1.0
+generated-at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+template: book-default
+topic: "<raw topic argument>"
+flags:
+  toc: ${TOC_FLAG:-true}
+generated-from:
+$(for p in "${PAGES[@]}"; do echo "  - $p"; done)
+source-hash: $HASH
+EOF
+```
+
+Format must match the schema in `sites/docs/src/content/docs/reference/artifacts.md`.
+
+## Step 7: Commit to Vault Repo
+
+Artifacts live in a gitignored directory by default. If the user has opted into tracking artifacts (custom per-vault config), commit:
+
+```bash
+cd "$VAULT_DIR"
+# respect .gitignore — this will be a no-op if artifacts/ is gitignored
+git add artifacts/book/<slug>-<YYYY-MM-DD>.pdf artifacts/book/<slug>-<YYYY-MM-DD>.meta.yaml 2>/dev/null
+git diff --cached --quiet || git commit -m "📚 book: generate <topic> ($(date +%Y-%m-%d))"
+```
+
+Do not fail if the add is a no-op — gitignored artifacts are the default and expected path.
+
+## Step 8: Report to User
+
+```
+✅ Book generated
+   Topic:       <topic>
+   Pages in:    <N> (sorted)
+   Source hash: <first 12 chars of hash>
+   Output:      vaults/<vault>/artifacts/book/<slug>-<date>.pdf
+   Sidecar:     vaults/<vault>/artifacts/book/<slug>-<date>.meta.yaml
+   Open with:   open <absolute path to pdf>
+```
+
+## Template Customisation
+
+Default template = Pandoc's built-in book template (implicit when `documentclass: book`).
+
+To customise:
+
+1. Start from the default: `pandoc -D latex > my-book.tex`.
+2. Save it to `.claude/skills/generate-book/templates/book.tex`.
+3. Edit to taste (fonts, headers, cover).
+4. Re-run `/generate book <topic>`; the skill auto-detects and uses the override.
+
+Per-vault overrides can live at `vaults/<vault>/.artifacts-templates/book.tex` — a future enhancement, not in phase 2A.
+
+## Known Limitations (Phase 2A)
+
+- **Mermaid diagrams** render as fenced code blocks, not images. Phase 2B adds a `mermaid-cli → PNG` pre-pass.
+- **Wikilinks** render as emphasised inline text, not clickable links. Phase 2B adds internal `\hyperref` targets.
+- **Cross-vault references** are not resolved — `[[vault:page]]` is not a thing.
+- **Auto page breaks** between wiki pages use `\newpage`; a page-per-chapter feel may insert blanks. Use `--no-toc` + manual spacing if it matters.
+
+## See Also
+
+- `.claude/skills/generate/SKILL.md` — router that dispatches here.
+- `.claude/skills/generate-pdf/SKILL.md` — sibling handler for non-book single-page PDFs.
+- `.claude/skills/generate/lib/source-hash.sh` — shared hash helper. Always call this.
+- `sites/docs/src/content/docs/reference/artifacts.md` — sidecar schema and convention.
