@@ -1,6 +1,6 @@
 ---
 name: generate-video
-description: Render an animated explainer MP4 for a topic. Picks a Remotion composition from ~/Dev/ai-projects/remotion-studio, parameterises it from wiki pages, optionally muxes generate-podcast voiceover. Used by /generate video. Not user-invocable directly — go through /generate.
+description: Render an animated explainer MP4 for a topic. Picks a Remotion composition from the local remotion-studio (auto-detected, cached in ~/.claude/remotion.env, or via $REMOTION_STUDIO_DIR), parameterises it from wiki pages, optionally muxes generate-podcast voiceover. Used by /generate video. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(brew *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(ffmpeg *) Bash(node *) Bash(npm *) Bash(pnpm *) Bash(npx *) Read Write Glob Grep
 ---
@@ -32,15 +32,65 @@ wiki pages → LLM scene list → pick composition → render MP4 (silent)
 
 ## Step 1: Dependency Check
 
+Resolve the remotion-studio location. Priority:
+
+1. `$REMOTION_STUDIO_DIR` env var (explicit override — wins)
+2. `~/.claude/remotion.env` cache file (set on first successful auto-detect)
+3. Auto-detect in common clone locations (and cache the result)
+4. Error with actionable fix
+
 ```bash
-# remotion-studio must be present
-REMOTION_ROOT="${REMOTION_STUDIO_DIR:-$HOME/Dev/ai-projects/remotion-studio}"
-[ -d "$REMOTION_ROOT" ] || {
-  echo "remotion-studio not found at $REMOTION_ROOT."
-  echo "Clone with: git clone https://github.com/RonanCodes/remotion-studio.git $REMOTION_ROOT"
-  echo "Or override with: REMOTION_STUDIO_DIR=/my/path /generate video …"
+CACHE_FILE="$HOME/.claude/remotion.env"
+REMOTION_ROOT="${REMOTION_STUDIO_DIR:-}"
+
+# Load cached path if env var is unset
+if [ -z "$REMOTION_ROOT" ] && [ -f "$CACHE_FILE" ]; then
+  # shellcheck disable=SC1090
+  . "$CACHE_FILE"
+  REMOTION_ROOT="${REMOTION_STUDIO_DIR:-}"
+fi
+
+# If still unresolved (or the cached path is stale), auto-detect and re-cache
+if [ -z "$REMOTION_ROOT" ] || [ ! -d "$REMOTION_ROOT" ]; then
+  REMOTION_ROOT=""
+  for candidate in \
+    "$HOME/Dev/ai-projects/remotion-studio" \
+    "$HOME/Dev/remotion-studio" \
+    "$HOME/projects/remotion-studio" \
+    "$HOME/code/remotion-studio" \
+    "$HOME/src/remotion-studio" \
+    "$HOME/remotion-studio"; do
+    if [ -d "$candidate" ]; then
+      REMOTION_ROOT="$candidate"
+      break
+    fi
+  done
+
+  if [ -n "$REMOTION_ROOT" ]; then
+    mkdir -p "$(dirname "$CACHE_FILE")"
+    printf 'REMOTION_STUDIO_DIR=%s\n' "$REMOTION_ROOT" > "$CACHE_FILE"
+  fi
+fi
+
+if [ -z "$REMOTION_ROOT" ] || [ ! -d "$REMOTION_ROOT" ]; then
+  cat <<EOF >&2
+remotion-studio not found. Searched:
+  \$REMOTION_STUDIO_DIR (unset)
+  $CACHE_FILE (missing or stale)
+  ~/Dev/ai-projects/remotion-studio
+  ~/Dev/remotion-studio
+  ~/projects/remotion-studio
+  ~/code/remotion-studio
+  ~/src/remotion-studio
+  ~/remotion-studio
+
+Fix (one of):
+  git clone https://github.com/RonanCodes/remotion-studio.git ~/Dev/remotion-studio
+  export REMOTION_STUDIO_DIR=/your/path/to/remotion-studio
+  echo 'REMOTION_STUDIO_DIR=/your/path' > $CACHE_FILE
+EOF
   exit 1
-}
+fi
 
 # node_modules — warm the install once
 [ -d "$REMOTION_ROOT/node_modules" ] || (cd "$REMOTION_ROOT" && pnpm install || npm install)
@@ -49,7 +99,7 @@ REMOTION_ROOT="${REMOTION_STUDIO_DIR:-$HOME/Dev/ai-projects/remotion-studio}"
 [ -z "$VOICEOVER" ] || which ffmpeg >/dev/null || brew install ffmpeg
 ```
 
-`REMOTION_STUDIO_DIR` env var lets CI and containers override the path.
+`REMOTION_STUDIO_DIR` env var short-circuits the lookup for CI, containers, or non-standard layouts. The cache file survives across skill invocations so the auto-detect only runs once per machine.
 
 ## Step 2: Resolve Vault + Topic
 
@@ -82,7 +132,7 @@ The LLM reads selected pages and writes a `scenes.json` describing the video. Sh
 
 ## Step 4: Composition Picker
 
-Remotion compositions currently available in `~/Dev/ai-projects/remotion-studio/src/projects/llm-wiki/`:
+Remotion compositions currently available in `$REMOTION_ROOT/src/projects/llm-wiki/`:
 
 | Composition id | Shape | Use when |
 |---------------|-------|----------|
@@ -226,7 +276,7 @@ Keep `scenes.json` alongside — it's the re-renderable source, like `.script.md
 
 ## Authoring New Compositions
 
-Add to `~/Dev/ai-projects/remotion-studio/src/projects/llm-wiki/`:
+Add to `$REMOTION_ROOT/src/projects/llm-wiki/` (wherever remotion-studio is on this machine — see Step 1):
 
 1. Create `YourComposition.tsx`. Destructure props from the component signature — these match scene props in `scenes.json`.
 2. Register in `src/Root.tsx`:
@@ -244,7 +294,7 @@ Add to `~/Dev/ai-projects/remotion-studio/src/projects/llm-wiki/`:
 3. Update the "Composition id" table in this SKILL.md.
 4. Use the Observatory palette (amber, cyan, green on dark bg) for brand consistency.
 
-Hot-reload via `npx remotion preview` from the remotion-studio directory.
+Hot-reload via `npx remotion preview` from `$REMOTION_ROOT`.
 
 ## Known Limitations (Phase 2C)
 
@@ -258,5 +308,5 @@ Hot-reload via `npx remotion preview` from the remotion-studio directory.
 - `.claude/skills/generate/SKILL.md` — router.
 - `.claude/skills/generate-podcast/SKILL.md` — voiceover source.
 - `.claude/skills/generate/lib/select-pages.sh` — shared topic resolution.
-- `~/Dev/ai-projects/remotion-studio/README.md` — upstream Remotion studio.
+- `$REMOTION_ROOT/README.md` — upstream Remotion studio (path resolved by Step 1).
 - `sites/docs/src/content/docs/reference/artifacts.md` — sidecar schema.
