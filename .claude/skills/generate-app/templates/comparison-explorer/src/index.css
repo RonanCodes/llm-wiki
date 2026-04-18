@@ -1,0 +1,74 @@
+:root {
+  --amber: #e0af40;
+  --cyan: #5bbcd6;
+  --green: #7dcea0;
+  --bg: #0b0f14;
+  --bg2: #111922;
+  --card: #1a2230;
+  --text: #e8eef6;
+  --muted: #8090a5;
+  --border: #22304a;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: linear-gradient(180deg, var(--bg), var(--bg2));
+  color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1rem; }
+header { border-bottom: 1px solid var(--border); padding-bottom: 1.2rem; margin-bottom: 1.8rem; }
+h1 { color: var(--amber); margin: 0; font-size: 1.9rem; }
+.sub { color: var(--muted); font-size: .95rem; margin-top: .35rem; }
+
+.controls { display: flex; flex-wrap: wrap; gap: .6rem 1rem; margin-bottom: 1.2rem; align-items: center; }
+.controls input {
+  background: #0f1520; color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: .55rem .8rem; font: inherit; min-width: 220px;
+}
+.controls input:focus { outline: none; border-color: var(--cyan); }
+.filter-chip {
+  background: #0f1520; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: .25rem .7rem; font-size: .85rem; cursor: pointer;
+}
+.filter-chip.active { color: var(--bg); background: var(--cyan); border-color: var(--cyan); }
+.count { color: var(--muted); font-size: .85rem; margin-left: auto; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 1.1rem 1.1rem 1rem;
+  border-left: 4px solid var(--cyan);
+  display: flex; flex-direction: column; gap: .6rem;
+}
+.card h2 {
+  margin: 0; font-size: 1.1rem; color: var(--text);
+  display: flex; justify-content: space-between; gap: .5rem; align-items: baseline;
+}
+.card .src { color: var(--amber); font-size: .78rem; text-decoration: none; }
+.card .src:hover { text-decoration: underline; }
+.card .summary { color: var(--text); opacity: .88; font-size: .92rem; }
+
+.values { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: auto; }
+.values .pill {
+  background: #0f1520; color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: .18rem .55rem; font-size: .78rem;
+}
+.values .pill b { color: var(--muted); font-weight: 500; margin-right: .35rem; }
+
+.empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+
+footer { margin-top: 2.5rem; color: var(--muted); text-align: center; font-size: .8rem; }

@@ -37,3 +37,24 @@
   - Model-ID versioning (`v1`) costs nothing now and buys room for future models (cloze, image-occlusion) without clobbering users' review history.
   - Anki `.apkg` import doesn't require a local Anki install to generate the file — it's just SQLite under the hood. That makes this handler pure Python + no daemon, same spirit as markmap's self-contained HTML.
 ---
+
+## 2026-04-18 13:05 - US-003: Implement generate-app handler (scaffolder)
+
+- Created `.claude/skills/generate-app/SKILL.md` — 9-step pipeline: dep check → resolve → LLM picks template → LLM writes data.json → `cp -r template/ → app-dir/` + write data.json → README → sidecar → commit → report.
+- Shipped **both** templates (PRD hedge said "comparison-explorer only if timeline is brittle" — but timeline came out cleanly in ~200 LOC, so both made it in).
+  - `templates/comparison-explorer/` — filterable card grid. Chips per column generate from unique values across rows. Search box queries name + summary + values.
+  - `templates/timeline/` — vertical chronological list with sort-direction toggle and tag chips. Lexical date sort handles `YYYY`, `YYYY-MM`, `YYYY-MM-DD` in the same feed.
+- Each template is a **real Vite + React + TS project** — package.json, vite.config.ts, tsconfig.json, index.html, src/main.tsx, src/App.tsx, src/index.css, src/data.json, src/data.schema.json, TEMPLATE.md, .gitignore. No monorepo magic.
+- Observatory palette baked into `:root` CSS custom properties. No Tailwind, no CSS-in-JS, no component library. Saves install time, version churn, and LLM-authored-component brittleness.
+- **Data-driven** by design: only `src/data.json` varies per generation. Template code (App.tsx, CSS) is 100% static. That keeps the LLM's authoring surface small — author structured data, not React components. Massively de-risks the "LLM writes a broken component" failure mode the PRD warned about.
+- `TEMPLATE_APP_NAME` placeholder in package.json gets sed'd to the topic slug at scaffold time — avoids pnpm "name collision" warnings if user installs multiple generated apps globally.
+- README.md in each generated app documents `pnpm install && pnpm dev` + where to edit data + where to find the TEMPLATE.md hack guide.
+- Sidecar (`<slug>-<date>.meta.yaml`) deliberately sits **next to** the app dir, not inside it — so the app dir stays a clean Vite project with no stray YAML.
+- **Learnings for future iterations:**
+  - The "data is JSON, template is static" split is the right abstraction for LLM-scaffolded apps. When the LLM only has to produce a JSON fixture (not React components), success rate goes from "coin flip" to "near-deterministic". Same principle as quiz's questions.json + static template.
+  - Shipping both templates rather than hedging was the right call. Timeline's complexity is not materially higher than comparison-explorer's — both are ~100 LOC of data-driven JSX. Hedging on speculative complexity is a tax.
+  - `cp -r` + slug-sed is the whole scaffolder. No Yeoman, no plop, no cookiecutter. The SKILL.md stays legible in one read.
+  - Schema files (`data.schema.json`) serve a dual purpose: doc for humans, anchor for future Phase 2E `verify-artifact` re-ingest (it can validate the JSON fixture against the schema before re-rendering cards).
+  - Vault-local template override (`.templates/app/<name>/`) was cheap to add — one `[ -d ]` check. Pays for itself the first time a user wants a custom layout for one vault only.
+  - `user-invocable: false` pattern across all /generate handlers is now 8-handler consistent. Only the router (/generate) is user-facing. Makes the mental model clean: "one router, N handlers, each a cp-and-fill pipeline over a domain-specific tool".
+---

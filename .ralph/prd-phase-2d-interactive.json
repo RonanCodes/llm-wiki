@@ -49,8 +49,8 @@
         "LLM produces a working app, not a stub — verify by running pnpm dev and taking a screenshot"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": "This is the most ambitious story in 2D. If the LLM-authored components are brittle, ship 'comparison-explorer' only and push timeline to 2D.2."
+      "passes": true,
+      "notes": "This is the most ambitious story in 2D. If the LLM-authored components are brittle, ship 'comparison-explorer' only and push timeline to 2D.2. — Done: both templates shipped (comparison-explorer + timeline). Each is a minimal Vite + React + TS app (~200 LOC across package.json, vite.config.ts, tsconfig, index.html, main.tsx, App.tsx, index.css, data.json, data.schema.json, TEMPLATE.md). Observatory palette, vanilla CSS, no frameworks. Scaffolder logic is `cp -r template/ → app-dir/` + write `data.json` + sed package.json name. LLM auto-picks template or user forces via --template. Data-driven: the only LLM-authored output that varies per generation is src/data.json — template code is static. Template authoring guide in SKILL.md shows it's literally `cp -r` so any Vite project can become a template."
     },
     {
       "id": "US-004",

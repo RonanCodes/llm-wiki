@@ -1,0 +1,23 @@
+{
+  "title": "Example Comparison",
+  "topic": "example",
+  "generated_at": "2026-04-18",
+  "columns": [
+    { "key": "license", "label": "License" },
+    { "key": "lang", "label": "Language" }
+  ],
+  "rows": [
+    {
+      "name": "Example A",
+      "source": "wiki/example-a.md",
+      "summary": "Placeholder row — the scaffolder overwrites this file with real data.",
+      "values": { "license": "MIT", "lang": "TypeScript" }
+    },
+    {
+      "name": "Example B",
+      "source": "wiki/example-b.md",
+      "summary": "Another placeholder row.",
+      "values": { "license": "Apache-2.0", "lang": "Python" }
+    }
+  ]
+}

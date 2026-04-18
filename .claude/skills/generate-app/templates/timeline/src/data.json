@@ -1,0 +1,21 @@
+{
+  "title": "Example Timeline",
+  "topic": "example",
+  "generated_at": "2026-04-18",
+  "events": [
+    {
+      "date": "2024-01",
+      "title": "Example Event A",
+      "source": "wiki/example-a.md",
+      "summary": "Placeholder event — the scaffolder overwrites this file with real data.",
+      "tags": ["example"]
+    },
+    {
+      "date": "2024-06",
+      "title": "Example Event B",
+      "source": "wiki/example-b.md",
+      "summary": "Another placeholder.",
+      "tags": ["example", "milestone"]
+    }
+  ]
+}
