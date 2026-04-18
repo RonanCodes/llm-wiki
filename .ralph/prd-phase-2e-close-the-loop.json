@@ -47,8 +47,8 @@
         "Existing /lint behaviour unchanged when --artifacts not passed"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Done: extended .claude/skills/lint/SKILL.md with Step 7 (`--artifacts` mode). When --artifacts is passed, wiki checks (Steps 2–6) are skipped and the skill walks $VAULT/artifacts/ for *.meta.yaml sidecars, recomputes source-hash from the current wiki pages listed in `generated-from`, and flags any mismatches. Report buckets: Drifted (hash changed), Orphaned (source page deleted), In sync. For each drifted artifact the report includes old hash, new hash, generated-at timestamp, and drift-age (count of git commits on the source pages since generated-at). Portable awk-based YAML extraction (no yq dep). Optional --verify flag chains into `/verify-artifact --from <path>` for flagged artifacts and appends a Verification Results section. Exit codes: 0 no drift / 0 drift without --verify / 1 drift + --verify with any verification below target / 2 infra error. Existing wiki-lint behaviour unchanged when --artifacts not passed. Golden-corpus (US-004) will chain `/lint --artifacts --verify` in CI."
     },
     {
       "id": "US-004",
