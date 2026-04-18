@@ -21,3 +21,18 @@
   - Reveal.js PDF is intentionally omitted — browser-print-to-PDF is brittle; keep scope tight.
   - Two more duplications spotted (page-selection + wikilink sed) — worth promoting to `.claude/skills/generate/lib/` when US-002 or US-003 touches them.
 ---
+
+## 2026-04-18 11:34 - US-002: Implement generate-mindmap handler
+
+- Created `.claude/skills/generate-mindmap/SKILL.md` — markmap-cli renderer (lazy install via pnpm/npm fallback), mermaid-mindmap fallback when install fails. Output: `.outline.md` (markmap source) + `.html` (self-contained rendered mindmap) + `.meta.yaml` sidecar.
+- Added `.claude/skills/generate-mindmap/templates/default.md` with `markmap:` YAML config block (colorFreezeLevel, maxWidth, initialExpandLevel, spacing).
+- Outline construction rule: H1 as root label, H2 as top branches, H3 as sub-branches, H4+ flattened. Wikilinks render as italic labels; `--include-wikilinks` adds a "Related" sub-branch. Each page ends with a `[Source]()` link to the original wiki `.md`.
+- Documented Obsidian embedding via HTML Reader plugin + `<iframe>` dataviewjs snippet for the .html output.
+- **Learnings for future iterations:**
+  - Page-selection logic is now duplicated THREE times (book, slides, mindmap) — `.claude/skills/generate/lib/select-pages.sh` is now overdue. Extract on US-003 (generate-infographic) to avoid a fourth copy.
+  - Wikilink sed pass also at 3x — same extraction opportunity into `lib/resolve-wikilinks.sh`.
+  - Markmap produces self-contained HTML (inline SVG + JS) — no hosting concern, no CDN dependency. Good fit for the artifacts-are-portable principle.
+  - Mermaid-mindmap fallback gives us graceful degradation when npm install is blocked — same pattern as generate-book's HTML-fallback-when-LaTeX-missing.
+  - Markmap does NOT support cross-file hyperlinks to other markmaps; node-level links only work for external URLs or local file paths. Documented as a limitation.
+  - The `markmap:` YAML block inside the outline.md is markmap-specific (not standard frontmatter) — markmap-cli parses it; other tools ignore it.
+---
