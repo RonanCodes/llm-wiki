@@ -1,8 +1,8 @@
 ---
 name: generate-book
-description: Render a PDF book from wiki pages matching a topic. Concatenates pages, preserves headings, resolves wikilinks, runs Pandoc. Lazy-installs pandoc. Used by /generate book. Not user-invocable directly — go through /generate.
+description: Render a PDF book from wiki pages matching a topic. Concatenates pages, preserves headings, resolves wikilinks, renders HTML then converts to PDF via Playwright. Used by /generate book. Not user-invocable directly — go through /generate.
 user-invocable: false
-allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Read Write Glob Grep
+allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(node *) Bash(npx *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Read Write Glob Grep
 ---
 
 # Generate Book
@@ -104,27 +104,57 @@ Write a temporary combined markdown file (`/tmp/generate-book-<slug>-<pid>.md`) 
 
    g. Append to the bundle, separated by a page-break (`\newpage` LaTeX or `<div style="page-break-before:always"></div>` HTML).
 
-## Step 5: Render with Pandoc
+## Step 5: Render HTML with Pandoc
 
-Delegate to the shared render helper. It picks engine/fallback based on the env vars set by `ensure_latex_engine` in Step 1, handles error tail + fix hints, and supports template override:
+Render the markdown bundle to a styled HTML file first — this is the primary output format that preserves the Observatory dark theme perfectly.
 
 ```bash
-OUT="$VAULT_DIR/artifacts/book/<slug>-<YYYY-MM-DD>.pdf"
+HTML_OUT="$VAULT_DIR/artifacts/book/<slug>-<YYYY-MM-DD>.html"
 
-RENDER_ARGS=(--toc)                            # drop --toc if --no-toc was passed
-if [ -f ".claude/skills/generate-book/templates/book.tex" ]; then
-  RENDER_ARGS+=(--template ".claude/skills/generate-book/templates/book.tex")
-fi
-
-.claude/skills/generate/lib/render-pdf.sh "$BUNDLE" "$OUT" "${RENDER_ARGS[@]}"
+pandoc "$BUNDLE" -o "$HTML_OUT" --standalone --toc --toc-depth=3 \
+  --metadata title="<Topic as Title Case>" \
+  --metadata subtitle="An LLM Wiki book" \
+  --metadata date="<YYYY-MM-DD>"
 ```
 
-The helper:
+After Pandoc generates the HTML, inject the Observatory theme CSS into the `<style>` block:
 
-- Uses `$PDF_ENGINE` (xelatex / pdflatex) when set.
-- Falls back to HTML output when `USE_HTML_FALLBACK=1` — writes `$OUT.html` and tells the user how to install a LaTeX engine.
-- Tails the last 20 lines of pandoc stderr on failure and suggests the common fixes (missing LaTeX package → `tlmgr install`, unicode → `--pdf-engine=xelatex`, image-path issues, font issues).
-- Exits 0 on success, 2 on render failure, 3 on bad arguments, 4 if pandoc is absent.
+- Body: `max-width: 1100px; margin: 0 auto; padding: 2.5rem 3rem; background: #0f172a; color: #e2e8f0; line-height: 1.7;`
+- HTML background: `#0b0f14` (darker outer framing for visual centering)
+- H1: amber `#e0af40`, H2: cyan `#5bbcd6`, H3: green `#7dcea0`
+- Code blocks, tables, blockquotes styled to match Observatory palette
+- Override Pandoc's default `background-color: #fdfdfd` → `#0b0f14`
+
+The HTML file is self-contained and viewable in any browser.
+
+## Step 5b: Convert HTML to PDF via Playwright
+
+Use the Playwright-based converter to render the styled HTML to a high-quality PDF that preserves the dark theme:
+
+```bash
+PDF_OUT="$VAULT_DIR/artifacts/book/<slug>-<YYYY-MM-DD>.pdf"
+
+node .claude/skills/generate-book/html-to-pdf.mjs "$HTML_OUT" "$PDF_OUT" --format A4
+```
+
+The converter (`html-to-pdf.mjs`) uses headless Chromium via Playwright:
+
+- `printBackground: true` — preserves dark backgrounds in print
+- Injects `@media print` CSS for page breaks: `page-break-before: always` on H1 (chapter starts)
+- Footer with page numbers: `<span class="pageNumber"></span> / <span class="totalPages"></span>`
+- Default margins: `1cm` top/bottom, `1.5cm` left/right
+- A4 format (configurable via `--format`)
+
+If Playwright is not installed, fall back to the Pandoc LaTeX pipeline:
+
+```bash
+if ! node -e "require('playwright')" 2>/dev/null; then
+  echo "⚠️  Playwright not available — falling back to Pandoc LaTeX PDF"
+  .claude/skills/generate/lib/render-pdf.sh "$BUNDLE" "$PDF_OUT" "${RENDER_ARGS[@]}"
+fi
+```
+
+The Pandoc LaTeX fallback uses `$PDF_ENGINE` (xelatex / pdflatex) when set, or `USE_HTML_FALLBACK=1` for HTML-only output.
 
 ## Step 6: Version Detection
 
@@ -190,9 +220,11 @@ Do not fail if the add is a no-op — gitignored artifacts are the default and e
    Topic:       <topic>
    Pages in:    <N> (sorted)
    Source hash: <first 12 chars of hash>
-   Output:      vaults/<vault>/artifacts/book/<slug>-<date>.pdf
+   HTML:        vaults/<vault>/artifacts/book/<slug>-<date>.html
+   PDF:         vaults/<vault>/artifacts/book/<slug>-<date>.pdf
    Sidecar:     vaults/<vault>/artifacts/book/<slug>-<date>.meta.yaml
-   Open with:   open <absolute path to pdf>
+   Open HTML:   open <absolute path to html>
+   Open PDF:    open <absolute path to pdf>
 ```
 
 ## Template Customisation
@@ -218,6 +250,7 @@ Per-vault overrides can live at `vaults/<vault>/.artifacts-templates/book.tex` �
 ## See Also
 
 - `.claude/skills/generate/SKILL.md` — router that dispatches here.
+- `.claude/skills/generate-book/html-to-pdf.mjs` — Playwright HTML→PDF converter (headless Chromium).
 - `.claude/skills/generate-pdf/SKILL.md` — sibling handler for non-book single-page PDFs.
 - `.claude/skills/generate/lib/source-hash.sh` — shared hash helper. Always call this.
 - `sites/docs/src/content/docs/reference/artifacts.md` — sidecar schema and convention.
