@@ -1,0 +1,23 @@
+## Codebase Patterns (Phase 2D, interactive handlers)
+
+- Shared lib from 2B (.claude/skills/generate/lib/select-pages.sh, resolve-wikilinks.sh, source-hash.sh) — use these.
+- "Re-renderable source + binary output" convention is now established across 5 handlers (book, slides, mindmap, podcast, video) — keep it: quiz ships .questions.json, flashcards ship .cards.csv, app IS its source.
+- Observatory palette (amber, cyan, green on dark) applies to any HTML/app scaffolds.
+- Self-contained HTML artifacts (markmap) > server-dependent ones (no hosting concern).
+- Handler docs now include Mermaid flow + troubleshooting table by convention.
+
+---
+
+## 2026-04-18 12:08 - US-001: Implement generate-quiz handler
+
+- Created `.claude/skills/generate-quiz/SKILL.md` — pure text pipeline (no runtime deps), awk-based template fill to avoid sed escaping pain on JSON braces/quotes.
+- Shipped `templates/quiz.html` — single-file, Observatory palette, vanilla JS. 270 lines including CSS. MCQ + short-answer. Per-question explanation reveal. Score panel. No bundler, no framework.
+- Questions schema supports `mcq` (options + correct index) and `short` (correct_keywords for lenient client-side grading). Each question carries a `source` wiki page path — critical for Phase 2E fidelity testing.
+- `.questions.json` kept alongside `.html` (same pattern as `.script.md`, `.outline.md`, `scenes.json`).
+- LocalStorage persistence intentionally omitted — "one-liner to add when anyone asks".
+- **Learnings for future iterations:**
+  - awk beats sed for template fill when placeholder content is multi-line JSON — sed's newline-in-replacement pain isn't worth the 2 fewer characters.
+  - Client-side grading via keyword match is "good enough for self-study, not for assessment". Documented that limitation explicitly rather than trying to solve it — the right tool for strict grading is a different artifact type.
+  - Single-file HTML with inlined CSS + JS + JSON is the right default for shareable study artifacts: email-able, offline, no hosting. Same spirit as markmap's output.
+  - Per-question `source` field is the fidelity-test hook. When Phase 2E's `verify-artifact` runs, it'll re-check each question's claims against the cited wiki page. Designing for that loop from the start.
+---

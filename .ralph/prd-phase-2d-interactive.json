@@ -16,8 +16,8 @@
         "Each question links back to its source wiki page (critical for close-the-loop fidelity testing)"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": "Self-contained HTML means no server. Good for emailing to a study partner."
+      "passes": true,
+      "notes": "Self-contained HTML means no server. Good for emailing to a study partner. — Done: generate-quiz handler with self-contained HTML template (Observatory palette, vanilla JS, no deps). Questions schema supports MCQ + short-answer with per-question `source` field for close-the-loop testing. --count (default 10), --difficulty easy|medium|hard. .questions.json kept alongside .html as re-renderable source. LocalStorage persistence intentionally omitted (one-liner if asked)."
     },
     {
       "id": "US-002",
