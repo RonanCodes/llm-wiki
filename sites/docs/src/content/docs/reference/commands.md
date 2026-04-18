@@ -26,8 +26,8 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 | `slides` | `generate-slides` | 2B ✅ | Marp (default) or Reveal.js deck |
 | `mindmap` | `generate-mindmap` | 2B ✅ | Markmap HTML with Mermaid fallback |
 | `infographic` | `generate-infographic` | 2B ✅ | Observatory-themed SVG + optional PNG |
-| `podcast` | `generate-podcast` | 2C | TTS-rendered MP3 explainer |
-| `video` | `generate-video` | 2C | Remotion-rendered MP4 |
+| `podcast` | `generate-podcast` | 2C ✅ | TTS-rendered MP3 explainer (ElevenLabs / OpenAI / Piper) |
+| `video` | `generate-video` | 2C ✅ | Remotion-rendered MP4 with optional voiceover mux |
 | `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
 | `flashcards` | `generate-flashcards` | 2D | Anki `.apkg` deck |
 | `app` | `generate-app` | 2D | Interactive explorable web app |
@@ -71,3 +71,5 @@ See [artifact conventions](./artifacts) for storage paths, sidecar schema, and t
 | `generate-slides` | generate | Render Marp / Reveal.js slide deck |
 | `generate-mindmap` | generate | Render Markmap HTML mindmap (Mermaid fallback) |
 | `generate-infographic` | generate | Render Observatory-themed SVG infographic |
+| `generate-podcast` | generate | Render MP3 podcast via Piper / OpenAI / ElevenLabs TTS |
+| `generate-video` | generate | Render MP4 via Remotion; optional voiceover mux |

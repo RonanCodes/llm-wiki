@@ -41,3 +41,16 @@
   - The auto-pick rule uses "vs"/"versus" and scene shape — same heuristic as generate-infographic. Any future comparison-themed handler should hook into this same signal. Candidate for a shared `detect-shape.sh` helper if a 4th user emerges.
   - `render.sh` for generate-podcast is referenced but optional — the invoking LLM can also call `/generate podcast` and capture the MP3 path from the report. Simpler, same effect. Real shell helper lands when a non-LLM caller needs it.
 ---
+
+## 2026-04-18 12:02 - US-003: Document Phase 2C in sites/docs
+
+- Shipped `sites/docs/src/content/docs/features/generate-podcast.md` — Mermaid flow with TTS priority branch, ElevenLabs/OpenAI/Piper cost table, voice-default table per backend, troubleshooting table, .script.md artifact explanation.
+- Shipped `features/generate-video.md` — Mermaid flow with auto-pick branch and voiceover-mux branch, remotion-studio dependency setup, composition picker table, scenes.json contract example, authoring-new-compositions workflow, troubleshooting table.
+- Updated `reference/commands.md`: podcast + video marked ✅ 2C, internal-skills table now lists generate-podcast and generate-video.
+- Updated `features/generate.md`: handlers table shows 2C ✅, See Also expanded.
+- **Learnings for future iterations:**
+  - Troubleshooting tables are now a standard doc pattern (podcast + video both have them; Phase 2B trio didn't). Worth retro-adding to generate-slides/mindmap/infographic when those docs get next-touched.
+  - Two cross-cutting concerns surfaced in both podcast and video docs: (1) cost control for paid TTS, (2) duration-sync between voiceover and composition. Both flagged for Phase 2E's `verify-artifact` skill.
+  - The pattern of keeping the scripted source (`.script.md`, `.outline.md`, `scenes.json`) alongside the binary artifact is now consistent across 5 handlers (book, slides, mindmap, podcast, video). Worth codifying in reference/artifacts.md as a convention — "every binary artifact ships with its re-renderable source".
+  - Phase 2C PRD fully green. Ready to merge `ralph/output-phase-2c-multimedia` → `main` and cut `ralph/output-phase-2d-interactive`.
+---

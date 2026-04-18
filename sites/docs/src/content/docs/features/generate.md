@@ -67,8 +67,8 @@ Phase 2A shipped the foundation + two Pandoc-based handlers. Phase 2B adds the p
 | `slides` | `generate-slides` | 2B ✅ | Marp (default) or Reveal.js deck |
 | `mindmap` | `generate-mindmap` | 2B ✅ | Markmap HTML (Mermaid fallback) |
 | `infographic` | `generate-infographic` | 2B ✅ | Observatory-themed SVG + optional PNG |
-| `podcast` | `generate-podcast` | 2C | TTS-rendered MP3 |
-| `video` | `generate-video` | 2C | Remotion-rendered MP4 |
+| `podcast` | `generate-podcast` | 2C ✅ | TTS-rendered MP3 (ElevenLabs / OpenAI / Piper) |
+| `video` | `generate-video` | 2C ✅ | Remotion MP4 with optional voiceover mux |
 | `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
 | `flashcards` | `generate-flashcards` | 2D | Anki `.apkg` deck |
 | `app` | `generate-app` | 2D | Interactive web app |
@@ -92,5 +92,7 @@ This contract is what makes [drift detection](../lint) and [round-trip fidelity 
 - [generate-slides](./generate-slides) — presentation deck handler
 - [generate-mindmap](./generate-mindmap) — interactive mindmap handler
 - [generate-infographic](./generate-infographic) — SVG infographic handler
+- [generate-podcast](./generate-podcast) — spoken-word MP3 handler
+- [generate-video](./generate-video) — Remotion MP4 handler
 - [artifact conventions](../../reference/artifacts) — storage path, sidecar schema, source-hash algorithm
 - [/ingest](./ingest) — the opposite direction

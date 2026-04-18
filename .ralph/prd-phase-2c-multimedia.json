@@ -49,8 +49,8 @@
         "Mermaid flow diagrams on both pages"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Done: shipped sites/docs/src/content/docs/features/generate-podcast.md and generate-video.md, each with a Mermaid flow diagram (TTS priority branch for podcast, voiceover branch for video), usage examples, dependency tables, troubleshooting tables, and authoring guides. Updated reference/commands.md (2C handlers ✅, new internal-skill rows) and features/generate.md (handlers table + See Also links)."
     }
   ]
 }
