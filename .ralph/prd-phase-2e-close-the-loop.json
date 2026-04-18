@@ -15,8 +15,8 @@
         "Document the hashing algorithm in reference/artifacts.md"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": "Deterministic hashing is the foundation of everything else in 2E. Get this right first."
+      "passes": true,
+      "notes": "Deterministic hashing is the foundation of everything else in 2E. Get this right first. — Done: audited all 10 generate-* SKILL.md files (book, pdf, slides, mindmap, infographic, podcast, video, quiz, flashcards, app) — every one already calls .claude/skills/generate/lib/source-hash.sh and emits `source-hash:` in the .meta.yaml sidecar. No backfill needed. Added unit test suite at .claude/skills/generate/lib/tests/test-source-hash.sh covering: baseline digest length, idempotence, order-independence, stdin/argv parity, whitespace-only invariance (trailing spaces, blank-line runs, CRLF, EOF blanks), internal-whitespace sensitivity (semantic), content sensitivity, missing-file exit, empty-input exit — 9/9 passing. Documented the algorithm in sites/docs/src/content/docs/reference/artifacts.md including the internal-whitespace nuance and a run-the-tests pointer."
     },
     {
       "id": "US-002",

@@ -1,0 +1,23 @@
+## Codebase Patterns (Phase 2E, close-the-loop)
+
+- Shared lib at .claude/skills/generate/lib/ is now 5-helper strong (select-pages, resolve-wikilinks, source-hash, ensure-pandoc, render-pdf). Test fixtures + test script live under lib/tests/.
+- Every generate-* handler writes a `.meta.yaml` sidecar with: `generator`, `generated-at`, `topic`, `generated-from` (list), `source-hash`. This is the contract verify-artifact + lint --artifacts rely on.
+- Re-renderable source alongside binary is now 5-handler consistent (script.md, outline.md, scenes.json, questions.json, cards.csv). Phase 2E's verify-artifact re-ingests these rather than the binary form.
+- user-invocable: false for all generate-* handlers; /generate router is the only user-facing entry point. Verify-artifact will be user-invocable.
+
+---
+
+## 2026-04-18 14:42 - US-001: Ensure source-hash sidecars across all generate-* handlers
+
+- Audit: all 10 generate-* SKILL.md files (book, pdf, slides, mindmap, infographic, podcast, video, quiz, flashcards, app) already call `.claude/skills/generate/lib/source-hash.sh` in their Step 2 and emit `source-hash: $HASH` in the `.meta.yaml` sidecar. The shared helper is already canonical — no DRY violation to fix.
+- Helper itself (`.claude/skills/generate/lib/source-hash.sh`, shipped in 2A) is well-structured: pure bash, portable sha256 (shasum → sha256sum fallback), canonicalization pipeline of tr → sed → awk → awk for (1) strip CR (2) strip trailing whitespace (3) squeeze blank-line runs (4) strip leading/trailing blanks.
+- **Wrote the first test suite for this repo**: `.claude/skills/generate/lib/tests/test-source-hash.sh` + 3 fixture files. No pytest/bats/shunit2 — plain bash helper functions (check, check_ne, check_exit) with ANSI green/red output. 9 tests covering: 64-char hex output, idempotence, order-independence, stdin/argv parity, whitespace-only invariance (trailing spaces, blank-line runs, CRLF conversion, EOF blanks), internal-whitespace sensitivity, content sensitivity, missing-file exit (3), empty-input exit (2). All 9 pass on macOS darwin 25.2.0.
+- **Caught my own false assumption in test v1**: injected `quadratic  in` (internal double-space) as a "whitespace change" — the helper correctly treated that as content. Refined the test to distinguish *formatting whitespace* (EOL, EOF, line endings, blank runs) from *internal whitespace* (semantic, e.g. inside code blocks and tables where whitespace width matters). Added an explicit test that internal-whitespace changes DO alter the hash — documents the invariant and prevents future regressions that would over-collapse.
+- Updated sites/docs/src/content/docs/reference/artifacts.md: added the internal-whitespace nuance, promoted the Invariants list from 3 to 4 items (added Error handling), and linked the test suite as the canonical way to verify the helper hasn't drifted.
+- **Learnings for future iterations:**
+  - Handler-audit first, test-suite second is the right order. Walking all 10 SKILL.md files confirmed the shared helper was already-canonical — the "extract DRY helper" acceptance criterion was retroactively satisfied by 2A. Documented that outcome in the PRD notes rather than contriving work.
+  - Bash test scripts with ANSI colours + explicit pass/fail counters beat a framework dependency at this scale. Nine tests, 140 lines, no new installs. Future handlers' test scripts can copy this shape.
+  - "Whitespace-only" is ambiguous until you codify it. My first test inadvertently tested internal-whitespace invariance (a property the helper does NOT claim). Clarifying both directions in the test makes the contract precise and readable to a future maintainer.
+  - When an acceptance criterion seems trivially satisfied by prior phase work, document *why* in the PRD notes — future readers (including verify-artifact's author) will want to know the helper is already load-bearing across all 10 handlers and shouldn't be changed casually.
+  - Fixtures as real files (not heredocs inside the test) makes diagnostics 10× faster when something fails — you can `cat` / `xxd` them directly.
+---

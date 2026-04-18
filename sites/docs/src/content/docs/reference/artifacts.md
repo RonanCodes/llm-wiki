@@ -96,13 +96,22 @@ Canonicalization rules (applied to each file in lexicographically-sorted order, 
 3. Collapse runs of blank lines to a single blank line.
 4. Trim leading/trailing blank lines on the whole file.
 
+**Internal whitespace is treated as content**, not formatting. Changing `quadratic in` to `quadratic  in` (extra space mid-line) alters the hash — the same rule markdown parsers use when whitespace is semantic inside code blocks, tables, or definition lists.
+
 ### Invariants
 
-The algorithm satisfies three properties, verified by the helper's self-test:
+The algorithm satisfies four properties, covered by the helper's test suite at `.claude/skills/generate/lib/tests/test-source-hash.sh`:
 
-- **Whitespace invariance.** Reformatting a wiki page (extra blank lines, trailing spaces, Windows CRLF) must not change the hash.
-- **Content sensitivity.** Any substantive change (word added, sentence edited) must change the hash.
+- **Whitespace invariance (formatting).** Extra blank lines, trailing spaces, Windows CRLF, or extra trailing newlines at end-of-file must **not** change the hash.
+- **Content sensitivity.** Any substantive change (word added, sentence edited, internal whitespace altered) **must** change the hash.
 - **Order independence.** Passing the same files in a different order must yield the same hash.
+- **Error handling.** Missing or unreadable files produce a non-zero exit; empty input produces a non-zero exit. Handlers can rely on `set -e` semantics.
+
+Run the tests any time the helper changes:
+
+```bash
+bash .claude/skills/generate/lib/tests/test-source-hash.sh
+```
 
 ### Why SHA-256 + canonical text
 
