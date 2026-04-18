@@ -1,0 +1,23 @@
+## Codebase Patterns (Phase 2B, presentation-format handlers)
+
+- Pandoc helpers (ensure-pandoc.sh, render-pdf.sh, source-hash.sh) from Phase 2A are the substrate — inherit them, don't reinvent.
+- Page-selection logic (tag / folder / file / `all` + deterministic sort) is duplicated across generate-book and generate-slides. If generate-mindmap or generate-infographic makes it a third copy, lift it into `.claude/skills/generate/lib/select-pages.sh`.
+- Wikilink sed pass is the exact same one-liner in every handler — another candidate for the shared lib/.
+- Marp CLI installs via `pnpm add -g` or `npm install -g`; fall back to `npx @marp-team/marp-cli` if install fails. No brew formula.
+- Vault-local template overrides live at `<vault>/.templates/<type>/` — lets vaults ship house style without polluting the shared handler.
+
+---
+
+## 2026-04-18 10:25 - US-001: Refactor /slides into generate-slides handler
+
+- Created `.claude/skills/generate-slides/SKILL.md` — Marp default, `--format reveal` opt-in, artifacts/slides/ output with HTML + PDF + .marp.md + .meta.yaml sidecar.
+- Added `.claude/skills/generate-slides/templates/default.md` — minimal Marp template with `{{title}} {{author}} {{date}} {{source_count}} {{body}}` placeholders.
+- Reduced `.claude/skills/slides/SKILL.md` to a deprecation shim — prints redirect, hands off to generate-slides with the same args.
+- Matches the established Phase 2A pattern exactly: same 8-step pipeline (deps → resolve → hash → build → render → sidecar → commit → report), `user-invocable: false`, sidecar schema from reference/artifacts.md.
+- **Learnings for future iterations:**
+  - The `---` slide separator in Marp collides with YAML frontmatter — safe because frontmatter only has one leading pair, but worth documenting in the handler.
+  - Marp does not auto-paginate — slides with long bodies overflow silently. Handler documents a 12-line soft rule and "(cont.)" continuation slide pattern.
+  - Mermaid blocks still aren't rendered in slides (same limitation as book/pdf in Phase 2A). Phase 2B sibling story should add a `mermaid-cli → PNG` pre-pass that all handlers can share.
+  - Reveal.js PDF is intentionally omitted — browser-print-to-PDF is brittle; keep scope tight.
+  - Two more duplications spotted (page-selection + wikilink sed) — worth promoting to `.claude/skills/generate/lib/` when US-002 or US-003 touches them.
+---

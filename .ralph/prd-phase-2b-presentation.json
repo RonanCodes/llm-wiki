@@ -17,8 +17,8 @@
         "Update sites/docs feature page to reflect new invocation"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": "If /slides currently writes to a different path, migrate existing generated slides or just leave them — document the break."
+      "passes": true,
+      "notes": "If /slides currently writes to a different path, migrate existing generated slides or just leave them — document the break. — Done: generate-slides handler at .claude/skills/generate-slides/ with Marp default + --format reveal, artifacts/slides/ output, vault-local template override at <vault>/.templates/slides/, source-hash provenance, default template at templates/default.md. Legacy /slides reduced to deprecation shim that delegates to /generate slides."
     },
     {
       "id": "US-002",
