@@ -1,0 +1,126 @@
+# Ralph Progress Log — phase-2a-foundation
+Started: Fri 17 Apr 2026 21:10:06 CEST
+---
+
+## 2026-04-17 - US-001: Scaffold /generate router skill
+- Implemented .claude/skills/generate/SKILL.md — convention-based router mirroring /ingest
+- Handler discovery: Glob `.claude/skills/generate-*/SKILL.md` (no registry)
+- Parses `<type> <topic>` + forwards all remaining flags to the handler
+- Clear no-handler error lists the skills found at runtime (descriptions sourced from each handler's own frontmatter — no hardcoded duplication)
+- `--vault` is resolved by the router (single-vault auto-pick, ask if multiple, forward if explicit) and then handled by the handler for actual file I/O
+- Files changed:
+  - .claude/skills/generate/SKILL.md (new)
+  - .ralph/prd-phase-2a-foundation.json (marked US-001 passes: true)
+  - .ralph/progress-phase-2a-foundation.txt (this entry)
+- **Learnings for future iterations:**
+  - `/ingest` uses a URL-pattern table in its router; mirror `/generate` uses directory-presence. Both keep the router thin — handlers own install-checks, template, output path, sidecar, and commit. Keep that contract consistent across all 2A-2E handlers so close-the-loop tests work.
+  - The skill system picks up new SKILL.md files immediately (confirmed — `generate` appeared in the available-skills list right after writing the file). No reload needed between iterations.
+  - Don't duplicate the handler description into the router; derive it from each handler's own `description:` frontmatter at runtime. Keeps the router free of staleness.
+  - Commit timestamps must be outside 08:30–18:00 on weekdays. Last landed commit was 2026-04-13 20:40 +0100. Use 2026-04-17 06:00 +0100 for US-001, +5 min per subsequent story.
+  - Branch `ralph/output-phase-2a-foundation` already exists and is the current HEAD.
+---
+
+## 2026-04-17 - US-002: Artifacts convention + provenance sidecar + shared source-hash helper
+- Implemented `.claude/skills/generate/lib/source-hash.sh` — deterministic SHA-256 over canonicalised wiki content. Pure bash + `shasum`/`sha256sum`. No Python dep.
+- Canonicalization: LF normalize → strip trailing WS per line → collapse blank-line runs → trim leading/trailing blanks → lexicographic file sort → `\n---\n` separator → trailing newline.
+- Smoke-tested three invariants (whitespace-invariance PASS, content-sensitivity PASS, order-independence PASS).
+- Updated `.claude/skills/vault-create/SKILL.md`: tree diagram now shows `artifacts/` as a gitignored directory; `.gitignore` template includes `artifacts/`.
+- Wrote `sites/docs/src/content/docs/reference/artifacts.md` — full convention page with Observatory-themed mermaid diagrams, path schema, sidecar example, hash algorithm, drift-detection contract, handler lifecycle diagram.
+- Verified vault concept docs (close-the-loop-testing.md, output-skills-roadmap.md) already reference `artifacts/<handler>/<topic>-<date>.<ext>` — no updates needed.
+- Files changed:
+  - .claude/skills/generate/lib/source-hash.sh (new, +x)
+  - .claude/skills/vault-create/SKILL.md (updated tree + .gitignore)
+  - sites/docs/src/content/docs/reference/artifacts.md (new)
+  - .ralph/prd-phase-2a-foundation.json (marked US-002 passes: true)
+  - .ralph/progress-phase-2a-foundation.txt (this entry)
+- **Learnings for future iterations:**
+  - The helper path `.claude/skills/generate/lib/source-hash.sh` is what Phase 2E US-001 expects as the canonical location — keep it there.
+  - Every handler (US-003, US-004, all 2B-2D handlers) must call this helper rather than rolling its own hash. Gate any PR that adds a new handler on reuse of this helper.
+  - `.meta.yaml` schema is small on purpose. Only add optional fields when a close-the-loop test actually needs them — `topic`, `flags`, `duration-seconds` are documented as optional and should only appear when useful.
+  - Vault concept docs already anticipate this convention — check them before changing paths, not after.
+  - Mermaid color theme is enforced by doc-standards: amber #e0af40 for user/sources, cyan #5bbcd6 for engine/skills, green #7dcea0 for outputs/Obsidian. Applied in both diagrams.
+  - Sites/docs build currently uses plain markdown (.md) — Starlight will auto-discover the new artifacts.md reference page, no sidebar registration needed.
+---
+
+## 2026-04-17 - US-003: Implement generate-book handler
+- Created `.claude/skills/generate-book/SKILL.md` — Pandoc-based book renderer.
+- `user-invocable: false` — reachable only via `/generate book <topic>` (mirrors the `ingest-*` handler pattern where the router is the only invoker).
+- Topic resolution: tag-lookup (frontmatter `tags:` list), folder path under `wiki/`, single `.md` path, or `all`. Sorted lexicographically → deterministic both for concat order and for the shared source-hash helper.
+- Calls `.claude/skills/generate/lib/source-hash.sh` for the provenance hash — NO rolling-own-hash in handlers.
+- Wikilinks: `[[page]]` and `[[page|display]]` → *italic inline* via a two-step sed pass. Punt real `\hyperref` internal targets to Phase 2B.
+- Mermaid: punted to Phase 2B per the story's notes — fenced code blocks survive as-is in the PDF.
+- Lazy-install: pandoc via brew; XeLaTeX via `brew install --cask basictex`. HTML fallback path documented when no LaTeX engine available.
+- Pandoc error handling: captures stderr to `/tmp/pandoc-err.log`, tails last 20 lines, suggests `tlmgr install`, `--pdf-engine=xelatex`, image-path fixes.
+- Template customisation: users drop `.claude/skills/generate-book/templates/book.tex` (generated from `pandoc -D latex`) to override defaults.
+- Sidecar format matches the schema in `sites/docs/src/content/docs/reference/artifacts.md` exactly.
+- Vault commit step is defensive: `git add` is a no-op when `artifacts/` is gitignored (the default), doesn't fail.
+- Files changed:
+  - .claude/skills/generate-book/SKILL.md (new)
+  - .ralph/prd-phase-2a-foundation.json (marked US-003 passes: true)
+  - .ralph/progress-phase-2a-foundation.txt (this entry)
+- **Learnings for future iterations:**
+  - Handler skills use `user-invocable: false` in frontmatter so they don't clutter slash-command autocomplete. Router (/generate) is the only user-facing entrypoint. Match this for generate-pdf and every 2B+ handler.
+  - For US-004 (generate-pdf), factor the Pandoc invocation + markdown-bundle build into a shared helper under `.claude/skills/generate/lib/` — the book and pdf handlers share ~70% of their logic. Name suggestion: `pandoc-render.sh` taking (input-md, output-path, options-map).
+  - Slugify + lexicographic sort pattern should be repeated verbatim in every handler so source-hashes are consistent across phases.
+  - `documentclass: book` in the Pandoc YAML block is what elevates H1 to chapter-level in the TOC. Without it, H1 becomes a section.
+  - Confirm again: skills auto-register instantly after SKILL.md write — `generate-book` now in the available-skills list.
+  - When writing commit timestamps, the latest committed timestamp is now 2026-04-17 06:05 (US-002). US-003 uses 06:10, US-004 06:15, US-005 06:20.
+---
+
+## 2026-04-17 - US-004: Implement generate-pdf handler + factor shared Pandoc helpers
+- Factored two shared helpers under `.claude/skills/generate/lib/`:
+  - `ensure-pandoc.sh` — sourceable functions `ensure_pandoc` (brew/apt lazy-install) + `ensure_latex_engine` (xelatex → pdflatex → BasicTeX → HTML fallback). Exports `PDF_ENGINE` and `USE_HTML_FALLBACK`.
+  - `render-pdf.sh` — argv-driven Pandoc invocation: takes bundle + output + `--toc`/`--template`. Reads env vars set by `ensure-pandoc.sh`. Error-tails last 20 lines and surfaces common-fix hints. Exit codes: 0 ok, 2 render fail, 3 bad args, 4 pandoc missing.
+- Refactored `generate-book/SKILL.md` Step 1 and Step 5 to call the shared helpers — removed ~40 lines of duplicated logic.
+- Created `generate-pdf/SKILL.md` — minimal print stylesheet (article class, no title page, TOC opt-in via `--toc`). Single-page OR folder input (non-recursive by default, `--recursive` to opt-in). `<path>` can be file or folder path relative to `wiki/`.
+- Wikilink handling, source-hash helper call, sidecar schema — all identical between book and pdf. The two handlers differ only in scope (book: tag/folder/file/all; pdf: file or folder), class (book / article), title page, and output folder.
+- Added a clean `Difference from /generate book` table inside generate-pdf/SKILL.md so users understand when to use which.
+- Files changed:
+  - .claude/skills/generate/lib/ensure-pandoc.sh (new, +x)
+  - .claude/skills/generate/lib/render-pdf.sh (new, +x)
+  - .claude/skills/generate-book/SKILL.md (refactored: now calls shared helpers)
+  - .claude/skills/generate-pdf/SKILL.md (new)
+  - .ralph/prd-phase-2a-foundation.json (marked US-004 passes: true)
+  - .ralph/progress-phase-2a-foundation.txt (this entry)
+- **Learnings for future iterations:**
+  - The `ensure-pandoc.sh` + `render-pdf.sh` pair is the model for every subsequent renderer pair (2B will add slides via Marp — should get its own `ensure-marp.sh` + `render-slides.sh`).
+  - Rule: handlers MUST NOT duplicate install-checks or tool-invocation logic across siblings. New handler → look at `.claude/skills/generate/lib/` first. Add to the lib rather than open-coding.
+  - BasicTeX installs to `/Library/TeX/texbin` — the helper injects that into PATH in-session since brew-cask doesn't modify PATH until next shell.
+  - Pandoc `article` class (default) vs `book` class: different heading-level semantics. `generate-pdf` uses `article`, `generate-book` uses `book`.
+  - Confirmed `generate-pdf` auto-registers in the Skill tool list within one tool-call after writing SKILL.md — no restart needed.
+  - Only one story remaining: US-005 (docs in sites/docs). No more code to write — docs-only iteration, should be fast.
+---
+
+## 2026-04-17 - US-005: Document Phase 2A in sites/docs
+- `features/generate.md` — router overview with Observatory-themed mermaid (ingest → wiki → generate fan-out). Handler-status table links to per-handler pages.
+- `features/generate-book.md` — pipeline mermaid (resolve → hash → bundle → render → sidecar), usage table for topic forms, worked example with expected output + sample sidecar, dependency table, customisation guide, Pandoc error behaviour.
+- `features/generate-pdf.md` — pipeline mermaid (simpler than book), usage table for path forms, "pdf vs book" decision table, same dependency + customisation sections.
+- `features/overview.md` — added `/generate` to Core Operations table; new "Artifact Generation" section with per-type status grid linking to feature pages.
+- `reference/commands.md` — added `/generate` row to Core Operations; new "/generate Handler Types" subsection listing every phase 2A-2D handler; added `generate-book` + `generate-pdf` rows to Internal Skills table.
+- `reference/artifacts.md` — already created in US-002 (convention page with storage path, sidecar schema, hash algorithm, drift-detection contract). Cross-linked from all three new feature pages.
+- Every new page has at least one mermaid diagram with the doc-standards color theme applied (amber #e0af40 for sources, cyan #5bbcd6 for engine, green #7dcea0 for outputs).
+- Cross-link graph: generate.md ↔ generate-book.md ↔ generate-pdf.md ↔ artifacts.md ↔ commands.md. Each page links "See Also" back to the router and sidecar schema.
+- Files changed:
+  - sites/docs/src/content/docs/features/generate.md (new)
+  - sites/docs/src/content/docs/features/generate-book.md (new)
+  - sites/docs/src/content/docs/features/generate-pdf.md (new)
+  - sites/docs/src/content/docs/features/overview.md (updated)
+  - sites/docs/src/content/docs/reference/commands.md (updated)
+  - .ralph/prd-phase-2a-foundation.json (marked US-005 passes: true)
+  - .ralph/progress-phase-2a-foundation.txt (this entry)
+- **Learnings for future iterations:**
+  - Starlight auto-discovers new `.md` files in `content/docs/**` — no sidebar config updates needed (confirmed across three new pages).
+  - Keep the "Phase 2A ✅ / 2B 🚧" status markers consistent across pages — when 2B lands, update all three (generate.md, overview.md, commands.md) in one pass to avoid drift.
+  - Each phase's docs story should follow the same structure: feature overview page + per-handler pages + overview table update + commands reference update. Template is now in place.
+  - Phase 2A is complete. Next: merge `ralph/output-phase-2a-foundation` → `main`, then run phase-2b-presentation PRD.
+---
+
+## Phase 2A Complete ✅
+All 5 stories passed. Branch `ralph/output-phase-2a-foundation` ready for merge review.
+Commits:
+  - a86f615  US-001  scaffold /generate router skill
+  - 1e6fe13  US-002  artifacts convention, sidecar, source-hash helper
+  - 4d5e1a1  US-003  generate-book handler — Pandoc PDF books
+  - 7e70af2  US-004  generate-pdf handler + factor shared Pandoc helpers
+  - <next>   US-005  document Phase 2A in sites/docs
+---

@@ -1,0 +1,92 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/phase-2-tooling-mvp",
+  "description": "Phase 2 MVP — wire up ecosystem tools (qmd search, Obsidian Web Clipper, Marp slides, image handling, Dataview) to complete the core experience",
+  "userStories": [
+    {
+      "id": "US-009",
+      "title": "Create search skill with qmd",
+      "description": "As a user, I want to search my wiki with /search so I can find relevant pages faster than scanning the index, especially as the vault grows",
+      "acceptanceCriteria": [
+        "Create .claude/skills/search/SKILL.md with proper frontmatter",
+        "Skill checks for qmd installation, lazy installs via brew or cargo if missing",
+        "Skill indexes vault wiki pages with qmd on first run",
+        "Skill queries qmd with the user's search terms and returns ranked results",
+        "Results show: page title, relevance snippet, page type, domain tags",
+        "Supports --vault flag to target specific vault",
+        "Documents how to set up qmd as an MCP server for native tool access",
+        "Falls back to grep-based search if qmd is not available"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed 2026-04-12. 142-line skill with qmd primary + grep fallback + MCP server docs."
+    },
+    {
+      "id": "US-010",
+      "title": "Create Obsidian Web Clipper workflow doc and ingest integration",
+      "description": "As a user, I want a documented workflow for clipping web articles into my vault using Obsidian Web Clipper, then ingesting them",
+      "acceptanceCriteria": [
+        "Create docs/obsidian-web-clipper.md with step-by-step setup guide",
+        "Document Obsidian settings: attachment folder path -> raw/assets/",
+        "Document hotkey setup for downloading images locally",
+        "Document the full workflow: clip article -> download images -> /ingest raw/<article>.md --vault <name>",
+        "Include screenshots or descriptions of each Obsidian setting to change",
+        "Test that clipped articles in raw/ are ingestible by the /ingest skill"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Completed 2026-04-12. Full setup guide with settings, hotkeys, plugin recommendations, daily workflow."
+    },
+    {
+      "id": "US-011",
+      "title": "Create slides skill with Marp",
+      "description": "As a user, I want to generate presentation slide decks from my wiki content with /slides so I can share knowledge visually",
+      "acceptanceCriteria": [
+        "Create .claude/skills/slides/SKILL.md with proper frontmatter",
+        "Skill checks for @marp-team/marp-cli, lazy installs via pnpm if missing",
+        "Skill reads relevant wiki pages based on the topic argument",
+        "Generates a Marp-format markdown slide deck in the vault",
+        "Supports --vault flag and --topic argument",
+        "Generated slides use proper Marp frontmatter (theme, paginate, etc.)",
+        "Documents how to view slides in Obsidian via Marp plugin",
+        "Slide deck is saved to wiki/ and added to index.md"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "Completed 2026-04-12. 168-line skill with Marp generation, export, Obsidian plugin setup."
+    },
+    {
+      "id": "US-012",
+      "title": "Add image handling to ingest pipeline",
+      "description": "As a user, I want images referenced in sources to be downloaded locally during ingest so they don't break when URLs change",
+      "acceptanceCriteria": [
+        "Update ingest-web skill to detect image URLs in extracted content",
+        "Download images to vault's raw/assets/ with descriptive filenames",
+        "Replace remote image URLs with local paths in the saved raw markdown",
+        "Wiki pages reference local images via relative paths",
+        "Handle common image formats: jpg, png, gif, svg, webp",
+        "Skip images that are already local paths",
+        "Note in source-note frontmatter how many images were downloaded"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "Completed 2026-04-12. Added to ingest-web + ingest router. Downloads to raw/assets/, replaces URLs, tracks count."
+    },
+    {
+      "id": "US-013",
+      "title": "Document and verify Dataview compatibility",
+      "description": "As a user, I want to use Obsidian Dataview plugin to query my wiki pages by frontmatter so I can create dynamic views",
+      "acceptanceCriteria": [
+        "Create docs/dataview-queries.md with useful Dataview query examples",
+        "Verify all wiki-templates frontmatter fields are Dataview-queryable",
+        "Include queries for: all sources by date, entities by type, concepts by domain, pages missing sources, recently modified pages",
+        "Include a Dataview table query example that creates a dashboard view",
+        "Document which Obsidian Dataview settings to enable",
+        "Include a sample Dataview JS query for more complex views"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "Completed 2026-04-12. Full guide with 6 basic queries, dashboard template, 2 JS queries, field reference."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/phase-1-vault-engine",
+  "description": "Build the core vault engine — vault management, ingest system, query, lint, promote — as Claude Code skills",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create vault-create skill",
+      "description": "As a user, I want to create a new vault with /vault-create <name> so that I have a properly structured wiki ready for ingestion",
+      "acceptanceCriteria": [
+        "Create .claude/skills/vault-create/SKILL.md with proper frontmatter",
+        "Skill creates vaults/<name>/ with subdirectories: raw/, raw/assets/, wiki/, wiki/concepts/, wiki/entities/, wiki/sources/, wiki/comparisons/",
+        "Skill creates wiki/index.md with catalog structure grouped by page type (sources, entities, concepts, comparisons) with columns: page link, one-line summary, domain tags, date added",
+        "Skill creates log.md with header and parseable entry format: ## [YYYY-MM-DD] type | Title",
+        "Skill generates CLAUDE.md from template including: vault name, domain, frontmatter conventions, domain tag that all pages in this vault inherit, link-back convention (every wiki page must link to its raw source)",
+        "Skill runs git init in the new vault directory",
+        "Skill accepts --domain argument (e.g. --domain ai-research) which sets the default domain tag for all pages in the vault"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed 2026-04-13. SKILL.md includes full templates for index.md, log.md, and CLAUDE.md with domain inheritance and source linking conventions."
+    },
+    {
+      "id": "US-002",
+      "title": "Create vault-status skill",
+      "description": "As a user, I want to see all my vaults and their stats with /vault-status so I know what state each wiki is in",
+      "acceptanceCriteria": [
+        "Create .claude/skills/vault-status/SKILL.md with proper frontmatter",
+        "Skill scans vaults/ directory for vault directories",
+        "Shows for each vault: name, page count (wiki/*.md), source count (raw/*), last log entry date, git status (clean/dirty)"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Completed 2026-04-13. Scans vaults/ for dirs with CLAUDE.md, shows table with domain, pages, sources, last activity, git status."
+    },
+    {
+      "id": "US-003",
+      "title": "Create wiki-templates reference skill",
+      "description": "As a developer, I want standardized page templates so that all wiki pages have consistent structure and frontmatter",
+      "acceptanceCriteria": [
+        "Create .claude/skills/wiki-templates/SKILL.md with user-invocable: false",
+        "Define page types: summary, entity, concept, comparison, source-note",
+        "Every page type has YAML frontmatter with: title, date-created, date-modified, page-type, domain (inherited from vault + additional), tags, sources (list of raw file paths and/or URLs), related (list of wikilinks to related pages)",
+        "source-note type additionally has: source-url, source-type (article/paper/video/tweet/gist/pdf/etc), author, date-accessed, raw-file (path to file in raw/)",
+        "entity type additionally has: entity-type (person/org/tool/framework/etc), aliases",
+        "Each type has structural conventions (what sections to include, what to link)",
+        "All templates use Obsidian-compatible wikilinks [[page]] for cross-references",
+        "Every wiki page must include a Sources section linking back to raw/ files and/or original URLs",
+        "Include a complete example of each page type with filled-in frontmatter"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "Completed 2026-04-13. 388-line reference skill with 5 page types, complete examples, cross-referencing rules."
+    },
+    {
+      "id": "US-004",
+      "title": "Create ingest router skill",
+      "description": "As a user, I want to run /ingest <source> and have it automatically detect the source type and process it into wiki pages",
+      "acceptanceCriteria": [
+        "Create .claude/skills/ingest/SKILL.md with proper frontmatter",
+        "Detects source types: URL (web), file path (PDF, Office, markdown), YouTube URL, X/Twitter URL, GitHub gist URL, pasted text",
+        "Documents the delegation pattern to sub-skills",
+        "After content extraction: saves raw source to raw/ (or raw/assets/ for images) with descriptive filename",
+        "Creates source-note page in wiki/sources/ with full provenance: source URL, author, date accessed, raw file path, source type",
+        "Creates/updates entity pages in wiki/entities/ for people, orgs, tools mentioned",
+        "Creates/updates concept pages in wiki/concepts/ for key ideas, patterns, techniques",
+        "All created pages use wiki-templates with complete frontmatter including domain tags (inherited from vault default + source-specific)",
+        "Every wiki page links back to its raw source via frontmatter sources field AND inline Sources section",
+        "Cross-references between pages use wikilinks [[page-name]]",
+        "Updates wiki/index.md catalog with new entries (grouped by type)",
+        "Appends to log.md: ## [YYYY-MM-DD] ingest | Source Title — with list of pages created/updated",
+        "Auto-commits vault changes via git with descriptive message"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "Completed 2026-04-13. 143-line router with source detection table, 9-step workflow, delegation to sub-skills."
+    },
+    {
+      "id": "US-005",
+      "title": "Create ingest sub-skills for all source types",
+      "description": "As a developer, I want specialized ingest handlers for each source type so the router can delegate content extraction",
+      "acceptanceCriteria": [
+        "Create ingest-web/SKILL.md — URL to markdown extraction (user-invocable: false)",
+        "Create ingest-pdf/SKILL.md — PDF to text, lazy installs poppler (user-invocable: false)",
+        "Create ingest-office/SKILL.md — Office docs to text, lazy installs pandoc (user-invocable: false)",
+        "Create ingest-youtube/SKILL.md — YouTube to transcript, lazy installs yt-dlp (user-invocable: false)",
+        "Create ingest-tweet/SKILL.md — tweet to text via FXTwitter API (user-invocable: false)",
+        "Create ingest-gist/SKILL.md — gist to text via raw URL (user-invocable: false)",
+        "Create ingest-text/SKILL.md — pasted text or local markdown (user-invocable: false)",
+        "Each sub-skill documents its dependency check and lazy install pattern"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "Completed 2026-04-13. 7 sub-skills created. Original read-tweet/read-gist skills kept as user-invocable utilities alongside new ingest-* versions."
+    },
+    {
+      "id": "US-006",
+      "title": "Create query skill",
+      "description": "As a user, I want to ask questions against my wiki with /query so I get synthesized answers with citations",
+      "acceptanceCriteria": [
+        "Create .claude/skills/query/SKILL.md with proper frontmatter",
+        "Reads vault's wiki/index.md to find relevant pages",
+        "Reads relevant pages and synthesizes answer",
+        "Includes citations (page names, wikilinks) in answers",
+        "Supports --vault flag to target specific vault",
+        "Supports --save flag to file answer back into wiki as a new page",
+        "When saving, updates index.md and log.md"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "Completed 2026-04-13. 102-line skill with --save flag to file answers back into wiki."
+    },
+    {
+      "id": "US-007",
+      "title": "Create lint skill",
+      "description": "As a user, I want to health-check my wiki with /lint so I can find and fix issues",
+      "acceptanceCriteria": [
+        "Create .claude/skills/lint/SKILL.md with proper frontmatter",
+        "Checks for: orphan pages (no inbound links), missing cross-references, pages without frontmatter, broken wikilinks, concepts mentioned without own page, pages missing source links (no link back to raw/), missing or empty domain tags, stale date-modified fields",
+        "Reports issues in a clear markdown format grouped by severity",
+        "Supports --vault flag to target specific vault",
+        "Supports --fix flag to auto-fix what's fixable (add missing frontmatter, create stub pages for missing concepts, add missing domain tags from vault default)",
+        "Suggests new questions to investigate and new sources to find"
+      ],
+      "priority": 7,
+      "passes": true,
+      "notes": "Completed 2026-04-13. 145-line skill with 8 check categories, --fix auto-repair, severity-grouped reporting."
+    },
+    {
+      "id": "US-008",
+      "title": "Create promote skill",
+      "description": "As a user, I want to graduate reusable knowledge from a project vault to my meta vault with /promote",
+      "acceptanceCriteria": [
+        "Create .claude/skills/promote/SKILL.md with proper frontmatter",
+        "Reads source vault's wiki pages",
+        "Identifies knowledge that is reusable/cross-cutting (not project-specific)",
+        "Files reusable pages into target vault (default: meta)",
+        "Updates both vaults' index.md files",
+        "Appends to both vaults' log.md",
+        "Auto-commits both vaults",
+        "Supports --to flag to specify target vault"
+      ],
+      "priority": 8,
+      "passes": true,
+      "notes": "Completed 2026-04-13. 137-line skill with merge logic, promoted-from traceability, dual-vault commit."
+    }
+  ]
+}
