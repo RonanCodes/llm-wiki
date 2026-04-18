@@ -1,0 +1,85 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/output-phase-2e-close-the-loop",
+  "description": "Phase 2E — Close the loop: round-trip fidelity testing, drift detection, golden-corpus fixtures. Validates that every artifact type is faithfully re-ingestable. See vaults/llm-wiki/wiki/concepts/close-the-loop-testing.md for the design.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Ensure source-hash sidecars across all generate-* handlers",
+      "description": "As the verify skill, I need every artifact to carry a deterministic source-hash so I can detect drift and recompute the baseline for round-trip tests.",
+      "acceptanceCriteria": [
+        "Audit every .claude/skills/generate-*/SKILL.md — confirm .meta.yaml sidecar includes source-hash computed over the concatenated source wiki page contents (normalised newlines, stripped trailing whitespace)",
+        "Extract a single shared helper (bash or python) at .claude/skills/generate/lib/source-hash.sh that all handlers call — DRY compliance",
+        "Unit tests: given a fixture of 3 markdown files, helper produces a stable hash; a whitespace-only change does not change the hash; a content change does",
+        "Backfill any generate-* handler missing source-hash",
+        "Document the hashing algorithm in reference/artifacts.md"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Deterministic hashing is the foundation of everything else in 2E. Get this right first."
+    },
+    {
+      "id": "US-002",
+      "title": "Implement /verify-artifact skill (round-trip fidelity test)",
+      "description": "As a user, I want `/verify-artifact <type> <topic>` to generate the artifact, re-ingest it into a scratch vault, diff against the original wiki pages, and report a fidelity score.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/verify-artifact/SKILL.md",
+        "Pipeline: (1) run /generate <type> <topic> → artifact A, (2) create throwaway scratch vault under /tmp/, (3) run the matching /ingest handler on A → pages P', (4) compare P' against original pages P, (5) emit fidelity report, (6) clean up scratch vault",
+        "Report includes: coverage percent, concept-set Jaccard similarity, LLM-judge fact-level diff (optional, flag-gated)",
+        "Expected-recoverability targets per artifact type encoded in the skill (book 0.85, slides 0.35, quiz 0.40, etc. — see close-the-loop-testing.md)",
+        "Exit code non-zero if fidelity below target — usable in CI",
+        "Supports --keep-scratch flag to preserve the scratch vault for manual inspection",
+        "Handles all artifact→ingest mappings: PDF→ingest-pdf, MP3→whisper→ingest-text, MP4→whisper+OCR→ingest-text, quiz.json→ingest-text, etc."
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Whisper for audio/video transcription is lazy-installed here. May already exist in ingest-video; reuse."
+    },
+    {
+      "id": "US-003",
+      "title": "Extend /lint with --artifacts mode for drift detection",
+      "description": "As a user, I want `/lint --artifacts` to flag artifacts whose source wiki has drifted since generation, without doing a full re-verify pass.",
+      "acceptanceCriteria": [
+        "Modify .claude/skills/lint/SKILL.md to accept --artifacts flag",
+        "In --artifacts mode: walk <vault>/artifacts/ for .meta.yaml sidecars, recompute source-hash from current wiki pages, flag mismatches",
+        "Report format: artifact path, generated-at timestamp, old hash, new hash, drift-age (git log commits on source pages since generated-at)",
+        "Optional --verify flag chains into /verify-artifact for flagged artifacts",
+        "Existing /lint behaviour unchanged when --artifacts not passed"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create golden-corpus fixture + advisory CI check",
+      "description": "As a maintainer, I want a known-good set of wiki pages whose artifact generation is tracked over time so template regressions are caught.",
+      "acceptanceCriteria": [
+        "Create golden-corpus/ directory at repo root (committed, not gitignored) with 3–5 small example wiki pages (cleanly concept-focused)",
+        "Add .github/workflows/golden-corpus.yml that on push runs /generate for each artifact type against the corpus and uploads outputs as CI artifacts",
+        "CI step runs /verify-artifact for each type and fails advisory (continue-on-error: true for initial rollout — per close-the-loop-testing.md non-goals)",
+        "Document golden-corpus in sites/docs/src/content/docs/reference/",
+        "Include a small README in golden-corpus/ explaining the intent and how to add new fixtures"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "Advisory first. Hard-fail in CI can come in 2E.2 once scores stabilise."
+    },
+    {
+      "id": "US-005",
+      "title": "Document Phase 2E in sites/docs",
+      "description": "As a user, I want docs for /verify-artifact, /lint --artifacts, the fidelity-score system, and golden-corpus.",
+      "acceptanceCriteria": [
+        "Add sites/docs/src/content/docs/features/verify-artifact.md with the round-trip diagram from close-the-loop-testing.md",
+        "Update sites/docs/src/content/docs/features/lint.md with --artifacts mode",
+        "Add sites/docs/src/content/docs/reference/fidelity-scoring.md explaining the three-tier scoring and per-artifact targets",
+        "Update commands.md reference",
+        "Cross-link from artifact-generation-vision page in Starlight (if promoted) or from research/roadmap.md",
+        "Mermaid diagrams per doc-standards"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

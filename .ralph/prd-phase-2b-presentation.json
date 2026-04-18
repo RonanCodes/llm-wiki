@@ -1,0 +1,73 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/output-phase-2b-presentation",
+  "description": "Phase 2B — Presentation artifacts: slides, mindmap, infographic. Reuses the /generate router and artifacts/ convention from Phase 2A.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Refactor /slides into generate-slides handler",
+      "description": "As a user, I want the existing /slides command to become a handler under /generate so that all artifact generators live behind one router.",
+      "acceptanceCriteria": [
+        "Move the existing /slides skill content into .claude/skills/generate-slides/",
+        "Add a thin shim at .claude/skills/slides/SKILL.md that delegates to /generate slides (or deprecate /slides with a warning)",
+        "Handler integrates with artifacts/ convention: writes to vaults/<vault>/artifacts/slides/<topic>-<date>.{html,pdf} + .meta.yaml",
+        "Supports both Marp and Reveal.js backends via --format marp|reveal (pick one default — likely Marp)",
+        "Reads template from .claude/skills/generate-slides/templates/ with vault-local override at <vault>/.templates/slides/",
+        "Preserves source-hash + generated-from provenance like other handlers",
+        "Update sites/docs feature page to reflect new invocation"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "If /slides currently writes to a different path, migrate existing generated slides or just leave them — document the break."
+    },
+    {
+      "id": "US-002",
+      "title": "Implement generate-mindmap handler",
+      "description": "As a user, I want `/generate mindmap <topic>` to produce an interactive mindmap HTML file visualising the topic's wiki pages and their wikilinks.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-mindmap/SKILL.md",
+        "Uses Markmap (npm i -g markmap-cli) as the renderer; lazy-installs on first use",
+        "Handler walks wiki pages matching the topic, builds a markdown outline using headings, and feeds to markmap",
+        "Output: vaults/<vault>/artifacts/mindmap/<topic>-<date>.html + .meta.yaml sidecar",
+        "Preserves wikilinks as clickable nodes where possible",
+        "Fallback: emit a Mermaid mindmap block if markmap-cli unavailable"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Markmap outputs self-contained HTML; no hosting needed. Great for Obsidian dataview embedding."
+    },
+    {
+      "id": "US-003",
+      "title": "Implement generate-infographic handler",
+      "description": "As a user, I want `/generate infographic <topic>` to produce a single-page SVG infographic summarising the topic.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-infographic/SKILL.md",
+        "Ship at least 2 SVG templates in .claude/skills/generate-infographic/templates/ (e.g., 'stats-card', 'comparison-grid')",
+        "LLM selects a template based on the topic's wiki content (counts, comparisons, timeline hints) and fills slots",
+        "Output: vaults/<vault>/artifacts/infographic/<topic>-<date>.svg + optional PNG via rsvg-convert or similar + .meta.yaml",
+        "Templates follow Observatory color theme from CLAUDE.md (amber, cyan, green)",
+        "Documents how to author new templates"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Harder than it looks — the LLM needs to both pick the template and supply valid data. Start with 1 template if time-constrained."
+    },
+    {
+      "id": "US-004",
+      "title": "Document Phase 2B in sites/docs",
+      "description": "As a user, I want docs for generate-slides, generate-mindmap, and generate-infographic including examples and template authoring guides.",
+      "acceptanceCriteria": [
+        "Add/update sites/docs/src/content/docs/features/generate-slides.md (update existing /slides page if present)",
+        "Add sites/docs/src/content/docs/features/generate-mindmap.md",
+        "Add sites/docs/src/content/docs/features/generate-infographic.md",
+        "Include example commands + sample screenshots of generated artifacts",
+        "Reference Observatory color theme for infographic template authoring",
+        "Update commands.md reference page",
+        "Every flow page includes a mermaid diagram"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+# Ralph Progress Log
+Started: 2026-04-13
+
+## Codebase Patterns
+- Skills use SKILL.md format inside named directories under .claude/skills/
+- YAML frontmatter fields: name, description, argument-hint, disable-model-invocation, allowed-tools, user-invocable
+- Vault CLAUDE.md files are thin config (conventions, not logic)
+- Use Obsidian-compatible wikilinks [[page-name]] for cross-references
+- Every wiki page must have frontmatter AND link back to raw sources
+- Domain tags inherited from vault default, can be extended per-page
+- Commit messages use emoji conventional commit format
+- Sub-skills (ingest-*) use user-invocable: false — loaded by router, not user
+- Lazy dep install pattern: `which tool >/dev/null 2>&1 || { brew install tool; }`
+- Zero-dep skills preferred (curl only) when possible
+- Promote adds `promoted-from` frontmatter for cross-vault traceability
+
+---
+
+## [2026-04-12] - US-013: Dataview compatibility
+- Created docs/dataview-queries.md (197 lines)
+- 6 basic Dataview queries + dashboard template + 2 advanced JS queries
+- Complete frontmatter field reference for all page types
+- Files changed: docs/dataview-queries.md
+- **Learnings:** Dataview JavaScript queries unlock powerful views (tag clouds, entity networks) but require enabling JS queries in Dataview settings
+---
+
+## [2026-04-12] - US-012: Image handling in ingest
+- Updated ingest-web and ingest router skills
+- Images downloaded to raw/assets/, remote URLs replaced with local paths
+- Skips tracking pixels and data URIs
+- Records image count in raw file frontmatter
+- Files changed: .claude/skills/ingest-web/SKILL.md, .claude/skills/ingest/SKILL.md
+- **Learnings:** Image handling is an update to existing skills, not a new skill — keeps the skill tree clean
+---
+
+## [2026-04-12] - US-011: Create slides skill
+- Created .claude/skills/slides/SKILL.md (168 lines)
+- Marp-format slide generation from wiki content
+- PDF/HTML export, Obsidian Marp plugin integration
+- Slides are wiki pages with frontmatter, added to index
+- Files changed: .claude/skills/slides/SKILL.md
+- **Learnings:** Slide decks as wiki pages is elegant — they compound and show up in graph view
+---
+
+## [2026-04-12] - US-010: Obsidian Web Clipper workflow
+- Created docs/obsidian-web-clipper.md (85 lines)
+- Step-by-step setup: extension, Obsidian settings, clipper config
+- Daily workflow: clip → download images → /ingest
+- Files changed: docs/obsidian-web-clipper.md
+- **Learnings:** This is a doc, not a skill — the workflow is manual (clip in browser, ingest in Claude Code)
+---
+
+## [2026-04-12] - US-009: Create search skill
+- Created .claude/skills/search/SKILL.md (142 lines)
+- qmd primary (hybrid BM25/vector), grep fallback
+- Documents MCP server setup for native tool access
+- Files changed: .claude/skills/search/SKILL.md
+- **Learnings:** qmd's MCP server mode is the most seamless integration — avoids the skill entirely
+---
+
+## [2026-04-12] - US-008: Create promote skill
+- Created .claude/skills/promote/SKILL.md (137 lines)
+- Graduates reusable knowledge from project vault → meta vault
+- Identifies promotable vs project-specific content
+- Creates/merges pages in target vault, updates both indexes and logs
+- Adds `promoted-from` frontmatter for traceability
+- Files changed: .claude/skills/promote/SKILL.md
+- **Learnings:** Dual-vault operations (reading/writing two vaults in one skill) need clear step-by-step commit instructions for both repos
+---
+
+## [2026-04-13] - US-007: Create lint skill
+- Created .claude/skills/lint/SKILL.md (145 lines)
+- 8 check categories: frontmatter, orphans, broken links, missing sources, missing domains, concepts without pages, stale content, index completeness
+- --fix flag auto-repairs: missing frontmatter, stub pages, domain tags, index entries
+- Severity-grouped report: Critical / Warning / Info
+- Files changed: .claude/skills/lint/SKILL.md
+- **Learnings:** Concrete bash commands for each check (grep, find) make the skill actionable, not vague
+---
+
+## [2026-04-13] - US-006: Create query skill
+- Created .claude/skills/query/SKILL.md (102 lines)
+- Reads index.md → identifies relevant pages → reads them → synthesizes answer
+- --save flag files answers back into wiki (queries compound knowledge)
+- Files changed: .claude/skills/query/SKILL.md
+- **Learnings:** The --save flag is the key Karpathy insight — explorations should enrich the wiki, not disappear into chat history
+---
+
+## [2026-04-13] - US-005: Create ingest sub-skills
+- Created 7 sub-skills: ingest-web, ingest-pdf, ingest-office, ingest-youtube, ingest-tweet, ingest-gist, ingest-text
+- All set user-invocable: false — loaded by ingest router
+- Each documents its own dependency check and lazy install
+- Zero-dep skills: tweet (FXTwitter API), gist (raw URL), text (direct), web (curl)
+- Lazy-dep skills: pdf (poppler), office (pandoc), youtube (yt-dlp)
+- Files changed: 7 SKILL.md files in .claude/skills/ingest-*/
+- **Learnings:** Keeping original read-tweet/read-gist as user-invocable utilities makes sense — sometimes you just want to read a tweet, not ingest it
+---
+
+## [2026-04-13] - US-004: Create ingest router skill
+- Created .claude/skills/ingest/SKILL.md (143 lines)
+- Source type detection table with extraction methods
+- 9-step workflow: parse → detect type → extract → save raw → read conventions → create wiki pages → update index → update log → commit
+- Documents delegation to sub-skills
+- Files changed: .claude/skills/ingest/SKILL.md
+- **Learnings:** The router pattern keeps the main skill focused on workflow while sub-skills handle extraction specifics
+---
+
+## [2026-04-13] - US-003: Create wiki-templates reference skill
+- Created .claude/skills/wiki-templates/SKILL.md (388 lines)
+- Defines 5 page types: source-note, entity, concept, comparison, summary
+- Full frontmatter specs with complete filled-in examples for each type
+- Universal fields: title, date-created, date-modified, page-type, domain, tags, sources, related
+- source-note extras: source-url, source-type, author, date-accessed, raw-file
+- entity extras: entity-type, aliases
+- Cross-referencing rules documented
+- Files changed: .claude/skills/wiki-templates/SKILL.md
+- **Learnings for future iterations:**
+  - This is the longest skill at 388 lines — should consider splitting into separate files per page type if it grows, but SKILL.md under 500 lines is fine per docs
+  - Complete examples with real data (Karpathy gist) make the templates much clearer than abstract placeholders
+  - user-invocable: false is correct — this is a reference doc loaded by other skills
+---
+
+## [2026-04-13] - US-002: Create vault-status skill
+- Created .claude/skills/vault-status/SKILL.md
+- Scans vaults/ for directories containing CLAUDE.md
+- Displays markdown table: vault name, domain, page count, source count, last log entry, git status
+- Files changed: .claude/skills/vault-status/SKILL.md
+- **Learnings for future iterations:**
+  - Skills that gather stats need concrete bash commands documented — the LLM needs exact commands to run, not vague "check the status"
+  - Parsing log.md with `grep "^## \["` is the standard pattern for extracting activity entries
+---
+
+## [2026-04-13] - US-001: Create vault-create skill
+- Created .claude/skills/vault-create/SKILL.md
+- Includes full templates for: directory structure, index.md (grouped by type with table columns), log.md (parseable format), CLAUDE.md (domain inheritance, frontmatter requirements, source linking rules, cross-reference conventions)
+- Supports --domain flag for default domain tagging
+- Files changed: .claude/skills/vault-create/SKILL.md
+- **Learnings for future iterations:**
+  - The SKILL.md template approach works well — embedding the full file templates inline means the skill is self-contained
+  - grep validation against acceptance criteria is a quick way to verify completeness
+  - raw/assets/ subdirectory needed for downloaded images during ingest
+---

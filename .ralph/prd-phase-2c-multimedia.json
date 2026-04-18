@@ -1,0 +1,56 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/output-phase-2c-multimedia",
+  "description": "Phase 2C — Multimedia artifacts: podcast (TTS) and video (Remotion). Leverages existing ~/Dev/ai-projects/remotion-studio for video. Reuses /generate router.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement generate-podcast handler",
+      "description": "As a user, I want `/generate podcast <topic>` to produce a 3–10 minute MP3 explainer on the topic, optionally with two AI voices in conversation.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-podcast/SKILL.md",
+        "Two-stage pipeline: (1) LLM writes podcast script from wiki pages (single-host by default, --two-voice for dialogue), (2) TTS renders each line to audio, ffmpeg concatenates",
+        "TTS backend: default to Piper (local, free, lazy-install) — fallback to ElevenLabs / OpenAI TTS if ELEVENLABS_API_KEY or OPENAI_API_KEY present",
+        "Output: vaults/<vault>/artifacts/podcast/<topic>-<date>.mp3 + .meta.yaml + .script.md (the full script alongside for review)",
+        "Lazy-installs ffmpeg and piper if missing; prints voice selection options",
+        "Script generation prompts the LLM to cite wiki pages inline and produce a consumable spoken-word narrative, not a bulleted summary",
+        "Supports --length short|medium|long (maps to ~3/6/10 minutes)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Two-voice dialogue is the NotebookLM killer feature — worth doing well. Piper voices are a bit robotic; document that tradeoff."
+    },
+    {
+      "id": "US-002",
+      "title": "Implement generate-video handler with Remotion",
+      "description": "As a user, I want `/generate video <topic>` to produce an animated explainer MP4 using the Remotion studio.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-video/SKILL.md",
+        "Reads from the existing ~/Dev/ai-projects/remotion-studio repo (symlink or path-ref in skill config)",
+        "Pipeline: LLM writes video script + scene list → selects/parameterises a Remotion composition → invokes `npx remotion render` → outputs MP4",
+        "Composition library: at minimum reuses the promo video V2–V9 compositions already in remotion-studio; adds a new 'wiki-explainer' composition tuned for topic overviews",
+        "Output: vaults/<vault>/artifacts/video/<topic>-<date>.mp4 + .meta.yaml + optional .script.md",
+        "Audio: reuses generate-podcast for voiceover (chain skills) — so video voiceover is just podcast output muxed into Remotion timeline",
+        "Documents the remotion-studio dependency and how to add new compositions"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "The video compositions already exist. The bulk of work is the skill that picks a composition and parameterises it from wiki content."
+    },
+    {
+      "id": "US-003",
+      "title": "Document Phase 2C in sites/docs",
+      "description": "As a user, I want docs for generate-podcast and generate-video including TTS backend selection and Remotion composition customisation.",
+      "acceptanceCriteria": [
+        "Add sites/docs/src/content/docs/features/generate-podcast.md with pipeline diagram, TTS backend comparison, sample output",
+        "Add sites/docs/src/content/docs/features/generate-video.md covering remotion-studio integration",
+        "Update commands.md reference",
+        "Include a troubleshooting section for ffmpeg / piper / Remotion common errors",
+        "Mermaid flow diagrams on both pages"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

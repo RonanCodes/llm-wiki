@@ -1,0 +1,71 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/output-phase-2d-interactive",
+  "description": "Phase 2D — Interactive artifacts: quiz, flashcards, app scaffolder. Heaviest LLM creativity of any phase. Reuses /generate router.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement generate-quiz handler",
+      "description": "As a user, I want `/generate quiz <topic>` to produce a standalone HTML quiz (multiple choice + short answer) I can open locally to self-test.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-quiz/SKILL.md",
+        "LLM generates a quiz JSON schema (question, type: mcq|short, options?, correct, explanation, source-page) from topic wiki pages",
+        "Ships a static HTML + vanilla JS template at .claude/skills/generate-quiz/templates/quiz.html that renders the JSON",
+        "Output: vaults/<vault>/artifacts/quiz/<topic>-<date>.html (self-contained) + .meta.yaml + .questions.json for re-ingest support",
+        "Supports --count <n> (default 10) and --difficulty easy|medium|hard",
+        "Each question links back to its source wiki page (critical for close-the-loop fidelity testing)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Self-contained HTML means no server. Good for emailing to a study partner."
+    },
+    {
+      "id": "US-002",
+      "title": "Implement generate-flashcards handler",
+      "description": "As a user, I want `/generate flashcards <topic>` to produce an Anki .apkg file so I can import into Anki for spaced-repetition study.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-flashcards/SKILL.md",
+        "Uses the genanki Python library; lazy-installs via pip/pipx",
+        "LLM generates card pairs (front=question/concept, back=answer/definition, source=wiki page path)",
+        "Output: vaults/<vault>/artifacts/flashcards/<topic>-<date>.apkg + .meta.yaml + .cards.csv for re-ingest support",
+        "Deck name derived from topic; tags include the vault name and topic",
+        "Cards include a 'source' field at the bottom linking to the wiki page",
+        "Documents how to import into Anki desktop/mobile"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "CSV sidecar is what close-the-loop testing will re-ingest, since Anki apkg is a SQLite file and awkward to parse."
+    },
+    {
+      "id": "US-003",
+      "title": "Implement generate-app handler (scaffolder)",
+      "description": "As a user, I want `/generate app <topic>` to scaffold an interactive explorable web app (e.g., comparison explorer, timeline viewer) populated with data from wiki pages.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-app/SKILL.md",
+        "Ships 2 app templates in .claude/skills/generate-app/templates/: 'comparison-explorer' (for comparison-type wiki pages) and 'timeline' (for date-indexed wiki content)",
+        "LLM reads topic wiki pages, selects the best-fit template, extracts structured data into a JSON fixture, scaffolds a Vite + React or Astro app",
+        "Output: vaults/<vault>/artifacts/app/<topic>-<date>/ (directory with README, package.json, src/, plus .meta.yaml)",
+        "App is runnable via `cd <app-dir> && pnpm install && pnpm dev` — documented in the generated README",
+        "LLM produces a working app, not a stub — verify by running pnpm dev and taking a screenshot"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "This is the most ambitious story in 2D. If the LLM-authored components are brittle, ship 'comparison-explorer' only and push timeline to 2D.2."
+    },
+    {
+      "id": "US-004",
+      "title": "Document Phase 2D in sites/docs",
+      "description": "As a user, I want docs for generate-quiz, generate-flashcards, and generate-app including template authoring.",
+      "acceptanceCriteria": [
+        "Add sites/docs/src/content/docs/features/generate-quiz.md with example quiz screenshot",
+        "Add sites/docs/src/content/docs/features/generate-flashcards.md with Anki import walkthrough",
+        "Add sites/docs/src/content/docs/features/generate-app.md with template gallery and custom-template authoring guide",
+        "Update commands.md reference",
+        "Mermaid flow diagrams on each page"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

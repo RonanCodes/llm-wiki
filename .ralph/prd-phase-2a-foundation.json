@@ -1,0 +1,90 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/output-phase-2a-foundation",
+  "description": "Phase 2A — Foundation for the /generate router. Ship the router skill plus two Pandoc-based handlers (book, pdf), the artifacts/ convention, and provenance frontmatter. See vaults/llm-wiki/wiki/concepts/output-skills-roadmap.md for context.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Scaffold /generate router skill",
+      "description": "As a user, I want a /generate command that mirrors /ingest — dispatching to per-artifact-type handler skills — so that artifact generation follows the established router pattern.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate/SKILL.md with proper YAML frontmatter (name, description, argument-hint)",
+        "Skill accepts first positional arg as artifact type (book, pdf, slides, etc.)",
+        "Skill looks up a handler skill named generate-<type> and invokes it with remaining args",
+        "Errors clearly when no handler is registered for the requested type, listing known handlers",
+        "Accepts --vault flag to target a specific vault (default: resolve from cwd like /ingest does)",
+        "SKILL.md explains the mirror-of-/ingest mental model and lists currently-implemented handlers"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Handler discovery should be convention-based — look for .claude/skills/generate-*/SKILL.md. No registry needed."
+    },
+    {
+      "id": "US-002",
+      "title": "Define artifacts/ directory convention and provenance frontmatter",
+      "description": "As a developer, I want a predictable location and metadata contract for generated artifacts so that drift detection and close-the-loop testing work in later phases.",
+      "acceptanceCriteria": [
+        "Decide on storage path: vaults/<vault>/artifacts/<handler>/<topic>-<date>.<ext>",
+        "Each artifact gets a .meta.yaml sidecar with: generated-from (wiki page paths), source-hash (sha256 of concatenated source pages), generator (handler name + version), generated-at (ISO date), template (template name used)",
+        "Update the vault template (.claude/skills/vault-create/) to gitignore artifacts/ by default",
+        "Document the convention in sites/docs/src/content/docs/reference/ as a new page 'Artifact conventions'",
+        "Add a tiny shared helper (bash or python) that computes source-hash given a list of wiki paths so each handler reuses it",
+        "Update vaults/llm-wiki/wiki/concepts/output-skills-roadmap.md and close-the-loop-testing.md cross-refs if the paths change"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Keep the sidecar tiny — handlers must be able to read/write it without a YAML library if possible."
+    },
+    {
+      "id": "US-003",
+      "title": "Implement generate-book handler",
+      "description": "As a user, I want `/generate book <topic>` to produce a PDF book from wiki pages matching the topic, with a table of contents and cross-references preserved.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-book/SKILL.md",
+        "Handler accepts a topic (tag, folder path, or 'all') and optional --vault flag",
+        "Handler selects matching wiki pages, concatenates them with headings preserved, runs Pandoc",
+        "Output written to vaults/<vault>/artifacts/book/<topic>-<date>.pdf plus .meta.yaml sidecar",
+        "Lazy-installs pandoc via brew if missing; prints install instructions if brew unavailable",
+        "Handles wikilinks: converts [[page]] to in-PDF internal links or footnotes",
+        "Includes title page derived from topic; auto-generated table of contents; preserves mermaid diagrams (via mermaid-cli fallback or static image)",
+        "Skill documents: template location, how to customise the LaTeX/HTML template, how Pandoc errors surface to the user"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "Mermaid is nice-to-have for 2A; if brittle, punt to 2B and ship without mermaid rendering first. — Done: mermaid punted to 2B (renders as fenced code block); wikilinks render as italic inline text; LaTeX fallback to HTML when no engine installed."
+    },
+    {
+      "id": "US-004",
+      "title": "Implement generate-pdf handler",
+      "description": "As a user, I want `/generate pdf <page-or-folder>` to produce a shareable PDF from a specific wiki page or sub-section, without the book ceremony (TOC, title page).",
+      "acceptanceCriteria": [
+        "Create .claude/skills/generate-pdf/SKILL.md",
+        "Handler accepts a page path or folder path (relative to wiki/) and optional --vault",
+        "Output written to vaults/<vault>/artifacts/pdf/<slug>-<date>.pdf with .meta.yaml sidecar",
+        "Uses Pandoc with a minimal print stylesheet — no title page, no TOC unless --toc passed",
+        "Shares the same install / hash / template machinery as generate-book (DRY — factor common helpers)",
+        "Handles multi-page folder input by concatenating pages in filename order"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "Factor shared Pandoc invocation into a helper to avoid copy-paste between book and pdf handlers. — Done: extracted ensure-pandoc.sh + render-pdf.sh under .claude/skills/generate/lib/; generate-book refactored to call them, generate-pdf built on top from the start."
+    },
+    {
+      "id": "US-005",
+      "title": "Document Phase 2A in sites/docs",
+      "description": "As a new user, I want usage docs for /generate, generate-book, generate-pdf, and the artifacts/ convention so I can actually use Phase 2A.",
+      "acceptanceCriteria": [
+        "Add sites/docs/src/content/docs/features/generate.md (top-level overview of /generate + mirror-of-ingest framing)",
+        "Add sites/docs/src/content/docs/features/generate-book.md with usage, example command, expected output, customisation",
+        "Add sites/docs/src/content/docs/features/generate-pdf.md with usage and examples",
+        "Add sites/docs/src/content/docs/reference/artifacts.md documenting the storage path, sidecar schema, source-hash algorithm",
+        "Update sites/docs/src/content/docs/reference/commands.md with new /generate command row",
+        "Cross-link from the features index page",
+        "All new pages include a mermaid diagram where a flow is described (per project doc-standards)"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "This is the final story for the phase — nothing to build, just write. Should be fast if earlier stories landed cleanly. — Done: features/generate.md + generate-book.md + generate-pdf.md added, commands.md updated with /generate row + handler table + internal-skill rows, overview.md updated with artifact-generation section, reference/artifacts.md written in US-002. Observatory-themed mermaid on every flow-description page."
+    }
+  ]
+}
