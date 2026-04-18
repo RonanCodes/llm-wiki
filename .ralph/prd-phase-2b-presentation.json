@@ -66,8 +66,8 @@
         "Every flow page includes a mermaid diagram"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Done: shipped sites/docs/src/content/docs/features/generate-slides.md, generate-mindmap.md, generate-infographic.md — each with a Mermaid flow diagram, usage example, dependencies table, known-limitations section, and authoring notes. Updated reference/commands.md (marked 2B handlers ✅, added internal-skill rows) and features/generate.md (handlers table + See Also links). Folded stale /slides section in features/search-slides.md into a short redirect pointing at generate-slides."
     }
   ]
 }

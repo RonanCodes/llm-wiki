@@ -58,15 +58,15 @@ No registry. Adding a new artifact type is just creating a new `.claude/skills/g
 
 ## Currently-Implemented Handlers
 
-Phase 2A ships the foundation + two Pandoc-based handlers:
+Phase 2A shipped the foundation + two Pandoc-based handlers. Phase 2B adds the presentation trio:
 
 | Type | Handler | Phase | Purpose |
 |------|---------|-------|---------|
 | `book` | `generate-book` | 2A ✅ | Pandoc-rendered book PDF with title page + TOC |
 | `pdf` | `generate-pdf` | 2A ✅ | Shareable PDF from a page or folder (no ceremony) |
-| `slides` | `generate-slides` | 2B | Marp / Reveal.js deck |
-| `mindmap` | `generate-mindmap` | 2B | Markmap HTML |
-| `infographic` | `generate-infographic` | 2B | Poster-style infographic |
+| `slides` | `generate-slides` | 2B ✅ | Marp (default) or Reveal.js deck |
+| `mindmap` | `generate-mindmap` | 2B ✅ | Markmap HTML (Mermaid fallback) |
+| `infographic` | `generate-infographic` | 2B ✅ | Observatory-themed SVG + optional PNG |
 | `podcast` | `generate-podcast` | 2C | TTS-rendered MP3 |
 | `video` | `generate-video` | 2C | Remotion-rendered MP4 |
 | `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
@@ -89,5 +89,8 @@ This contract is what makes [drift detection](../lint) and [round-trip fidelity 
 
 - [generate-book](./generate-book) — the full-book handler
 - [generate-pdf](./generate-pdf) — the single-page/folder handler
+- [generate-slides](./generate-slides) — presentation deck handler
+- [generate-mindmap](./generate-mindmap) — interactive mindmap handler
+- [generate-infographic](./generate-infographic) — SVG infographic handler
 - [artifact conventions](../../reference/artifacts) — storage path, sidecar schema, source-hash algorithm
 - [/ingest](./ingest) — the opposite direction

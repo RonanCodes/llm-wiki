@@ -53,3 +53,19 @@
   - `rsvg-convert` is a better bet than Inkscape for headless PNG export — smaller dependency, scriptable, consistent output. brew install librsvg.
   - 2-template shipping target from PRD was met; timeline template intentionally deferred to Phase 2C/2E.
 ---
+
+## 2026-04-18 11:46 - US-004: Document Phase 2B in sites/docs
+
+- Shipped `sites/docs/src/content/docs/features/generate-slides.md` — Mermaid flow, Marp/Reveal decision split, dependency table, Marp pagination soft rule, vault-local override.
+- Shipped `features/generate-mindmap.md` — Mermaid flow with markmap/mermaid fork, outline-construction table, markmap: YAML explanation, Obsidian dataviewjs embed snippet.
+- Shipped `features/generate-infographic.md` — Mermaid flow with auto-pick branch, template table, Observatory palette, authoring-new-templates section calling out the `<foreignObject>` requirement.
+- Updated `reference/commands.md`: 2B handlers marked ✅, `/slides` re-labelled as deprecation shim, internal-skills table now lists generate-slides/mindmap/infographic.
+- Updated `features/generate.md`: handlers table now shows 2B ✅, See Also links expanded.
+- Collapsed the stale `/slides` section in `features/search-slides.md` into a redirect note. Page frontmatter title changed to "Search".
+- **Learnings for future iterations:**
+  - All three handler docs share the same spine (Usage / Example / Deps / Customisation / Known Limitations / See Also). When Phase 2C/2D adds more handlers, a shared doc fragment would cut copy. For now 3 docs is below the duplication-pain threshold — same judgment call as the `select-pages.sh` extraction.
+  - Every flow page includes a Mermaid diagram with the Observatory palette classDefs (engine = cyan, output = green, source = amber). This is now the house style — documented in doc-standards.
+  - `search-slides.md` kept its filename (sidebar links still work) but only covers search now. If the sidebar starts showing a confusing "Search & Slides" title anywhere, rename file and add a redirect in Starlight config.
+  - No new /generate overview page needed — existing `generate.md` already enumerates handlers by phase and updates were surgical.
+  - Phase 2B PRD is now fully green (US-001..US-004 all passes: true). Ready to merge `ralph/output-phase-2b-presentation` → `main` and cut `ralph/output-phase-2c-multimedia`.
+---

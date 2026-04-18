@@ -15,7 +15,7 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 | `/lint` | `--vault <name>` `--fix` | Health-check wiki (8 checks). `--fix` auto-repairs what's fixable |
 | `/promote <vault>` | `--to <target>` | Graduate reusable knowledge between vaults (default target: `meta`) |
 | `/search "terms"` | `--vault <name>` | Full-text search via qmd (hybrid BM25/vector) with grep fallback |
-| `/slides "topic"` | `--vault <name>` | Generate Marp slide deck from wiki content |
+| `/slides "topic"` | `--vault <name>` | Deprecated shim — delegates to `/generate slides` |
 
 ### /generate Handler Types
 
@@ -23,9 +23,9 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 |------|---------|-------|-------------|
 | `book` | `generate-book` | 2A ✅ | Pandoc-rendered PDF book — title page, TOC, chapter-per-page |
 | `pdf` | `generate-pdf` | 2A ✅ | Quick shareable PDF from a page or folder — no ceremony |
-| `slides` | `generate-slides` | 2B | Marp / Reveal.js deck |
-| `mindmap` | `generate-mindmap` | 2B | Markmap HTML |
-| `infographic` | `generate-infographic` | 2B | Poster-style infographic |
+| `slides` | `generate-slides` | 2B ✅ | Marp (default) or Reveal.js deck |
+| `mindmap` | `generate-mindmap` | 2B ✅ | Markmap HTML with Mermaid fallback |
+| `infographic` | `generate-infographic` | 2B ✅ | Observatory-themed SVG + optional PNG |
 | `podcast` | `generate-podcast` | 2C | TTS-rendered MP3 explainer |
 | `video` | `generate-video` | 2C | Remotion-rendered MP4 |
 | `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
@@ -68,3 +68,6 @@ See [artifact conventions](./artifacts) for storage paths, sidecar schema, and t
 | `ingest-text` | ingest | Process pasted text or local markdown |
 | `generate-book` | generate | Render Pandoc PDF book from wiki pages |
 | `generate-pdf` | generate | Render quick PDF from a page or folder |
+| `generate-slides` | generate | Render Marp / Reveal.js slide deck |
+| `generate-mindmap` | generate | Render Markmap HTML mindmap (Mermaid fallback) |
+| `generate-infographic` | generate | Render Observatory-themed SVG infographic |
