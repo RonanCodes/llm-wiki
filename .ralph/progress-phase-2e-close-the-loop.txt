@@ -71,3 +71,33 @@
   - Stubbing the workflow rather than leaving steps unwritten is load-bearing. It sets the CI contract (job names, artifact upload paths, summary format) so future handler updates only have to swap the placeholder command for the real invocation — no workflow rewrite.
   - Connected-graph constraint (every page links to ≥1 other) pays for itself: handlers like mindmap and slides that depend on cross-references would quietly succeed on isolated pages and catastrophically fail on connected ones. Keeping the constraint in the README-authoring rules means future fixtures preserve the property.
 ---
+
+## 2026-04-18 15:06 - US-005: Document Phase 2E in sites/docs
+
+- **sites/docs/src/content/docs/features/verify-artifact.md** — user-facing doc for the round-trip skill. Full Mermaid of the round trip (source pages → /generate → artifact → inverse path → scratch vault → /ingest → re-derived pages → diff + score → report). Inverse-path preference table names the cheap sidecar for every handler (book/pdf → PDF + pdftotext; podcast → .script.md not whisper; video → .scenes.json not whisper+OCR; quiz → .questions.json; flashcards → .cards.csv; app → src/data.json). 3-tier scoring summary (coverage + Jaccard + LLM-judge), target table, exit codes for CI, known limitations.
+- **sites/docs/src/content/docs/reference/fidelity-scoring.md** — deep-dive companion. Explains each scoring tier in isolation with the formula, why coverage uses a 0.5 per-page threshold (legitimately lossy types would fail anything stricter), why jaccard complements coverage (corpus-level set robustness), why the LLM judge is [0.85, 1.15] multiplier not dominant (deterministic math should lead). Per-artifact target table with a `Reasoning` column so maintainers understand why book=0.85 and infographic=0.25 rather than treating the numbers as magic. Extractor rules (wikilinks > tags > capitalised-phrases in false-positive order) and known caveats (prose-only under-extracts, code-heavy distorts, synonym drift invisible).
+- **sites/docs/src/content/docs/features/lint.md** extended with an "Artifact Drift Detection" section: Mermaid of the hash-recompute flow, bucket table (Drifted / Orphaned / In sync), side-by-side cost comparison of `/lint --artifacts` vs `/verify-artifact` (O(ms) vs O(s-min)), exit-code table. Left the existing 8-check wiki-health docs intact — `--artifacts` is a parallel mode, not a replacement.
+- **sites/docs/src/content/docs/reference/commands.md** updated: `/lint` row adds `--artifacts` + `--verify` flags with one-line description; new `/verify-artifact` row in Core Operations with all six flags documented; new internal-skills entry for `verify-artifact` showing it's used by both user and CI.
+- **Cross-linking discipline.** Every new/updated page links to the others via relative Starlight paths (`../research/close-the-loop-testing`, `./artifacts`, etc.) so the reader can pivot between design doc → reference → feature → CI fixture. Mermaid diagrams on all four touched pages use the Observatory palette from doc-standards.
+- **Learnings for future iterations:**
+  - Two docs pages per user-facing feature is the right shape: one "how to use it" (features/*.md) and one "why these numbers" (reference/*.md). The feature page is short and recipe-oriented; the reference page explains the design. Splitting them means the user can skim the feature page and the maintainer can read the reference page, without either being overwhelmed.
+  - "Reasoning" column in the per-type target table is load-bearing. Without it a future contributor would look at "app=0.25" and either (a) think the handler is broken and try to fix it, or (b) bump it to parity with book without understanding the compression difference. The column saves that future conversation.
+  - Updating an existing docs page (lint.md) with a *parallel mode* rather than rewriting is the cleaner pattern — wiki-lint behaviour is unchanged for existing readers, artifacts behaviour lives in its own section. Rewriting would have forced readers to re-learn something they already knew.
+  - Cross-links are the scaffolding that keeps the docs navigable when they grow. Every doc I wrote this phase links to ≥3 others; the user can arrive from any entry point and find the rest.
+  - Observatory palette for every Mermaid means the docs feel coherent regardless of which page the user lands on. Without the palette rule, each author would pick a colour scheme and the site would fragment visually. Doc-standards skill pays for itself here.
+
+---
+
+## Phase 2E Complete
+
+All 5 stories pass. Branch ralph/output-phase-2e-close-the-loop ready to merge back to main.
+
+Phase 2E delivered:
+- US-001: source-hash test suite (9 tests) + docs on internal-whitespace nuance
+- US-002: /verify-artifact skill — 8-step pipeline, sidecar-first inverse, coverage + Jaccard scoring, flag-gated LLM judge, CI exit codes
+- US-003: /lint --artifacts mode — drift detection via sidecar hash recompute, three-bucket report, optional --verify chain
+- US-004: golden-corpus/ fixture (4 connected wiki pages) + advisory CI workflow over 8-type matrix
+- US-005: sites/docs coverage — features/verify-artifact.md, reference/fidelity-scoring.md, features/lint.md extension, commands.md updates
+
+The loop is now closed. Every artifact has a sidecar with a source-hash, drift is detectable in O(ms), fidelity is measurable in O(seconds), and the golden corpus acts as the regression harness over time.
+---

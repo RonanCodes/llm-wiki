@@ -12,7 +12,8 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 | `/ingest <source>` | `--vault <name>` | Process any source into wiki pages (detects type automatically) |
 | `/generate <type> <topic>` | `--vault <name>` + handler flags | Emit an artifact from wiki pages. Dispatches to `generate-<type>` handlers. The mirror of `/ingest` |
 | `/query "question"` | `--vault <name>` `--save` | Ask questions, get cited answers. `--save` files the answer back into the wiki |
-| `/lint` | `--vault <name>` `--fix` | Health-check wiki (8 checks). `--fix` auto-repairs what's fixable |
+| `/lint` | `--vault <name>` `--fix` `--artifacts` `--verify` | Health-check wiki (8 checks). `--fix` auto-repairs; `--artifacts` detects artifact drift; `--verify` chains into `/verify-artifact` for flagged artifacts |
+| `/verify-artifact <type>` | `--vault <name>` `--topic <slug>` `--target <float>` `--llm-judge` `--keep-scratch` `--from <path>` | Round-trip fidelity test — regenerate, re-ingest into scratch vault, score. See [verify-artifact feature](../features/verify-artifact) |
 | `/promote <vault>` | `--to <target>` | Graduate reusable knowledge between vaults (default target: `meta`) |
 | `/search "terms"` | `--vault <name>` | Full-text search via qmd (hybrid BM25/vector) with grep fallback |
 | `/slides "topic"` | `--vault <name>` | Deprecated shim — delegates to `/generate slides` |
@@ -76,3 +77,4 @@ See [artifact conventions](./artifacts) for storage paths, sidecar schema, and t
 | `generate-quiz` | generate | Render single-file HTML quiz (MCQ + short answer) |
 | `generate-flashcards` | generate | Build Anki `.apkg` via genanki; stable deck IDs for in-place updates |
 | `generate-app` | generate | Scaffold Vite + React explorer app (comparison-explorer / timeline) |
+| `verify-artifact` | user + CI | Round-trip fidelity test; prefers re-renderable source sidecars over whisper/OCR |

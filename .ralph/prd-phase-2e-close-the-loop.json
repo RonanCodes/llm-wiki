@@ -78,8 +78,8 @@
         "Mermaid diagrams per doc-standards"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Done: sites/docs/src/content/docs/features/verify-artifact.md — full round-trip Mermaid (P → /generate → A → inverse → scratch vault → /ingest → P' → diff → score), inverse-path preference table (sidecar vs heavy fallback per type), 3-tier scoring summary, exit-code table, known limitations. sites/docs/src/content/docs/reference/fidelity-scoring.md — deep dive on coverage + Jaccard + LLM-judge tiers, 0.6/0.4 weighting rationale, per-artifact target table with reasoning column, concept-extraction rules, override recipe, known caveats. sites/docs/src/content/docs/features/lint.md updated with Artifact Drift Detection section (Mermaid, bucket table, cost comparison with /verify-artifact, exit codes). sites/docs/src/content/docs/reference/commands.md — /lint row extended with --artifacts/--verify, new /verify-artifact row, new internal-skill entry for verify-artifact. All pages cross-link to close-the-loop-testing.md (research), artifacts.md (sidecar contract), and golden-corpus.md (CI fixture). Mermaid diagrams use Observatory palette per doc-standards."
     }
   ]
 }
