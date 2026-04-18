@@ -64,8 +64,8 @@
         "Mermaid flow diagrams on each page"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Done: three new Starlight pages — features/generate-quiz.md, features/generate-flashcards.md, features/generate-app.md — each with a Mermaid flow diagram in Observatory palette, usage + flag tables, example output, template authoring notes, troubleshooting table, known limitations, and See Also. features/generate.md handler table + See Also updated to mark 2D handlers ✅. reference/commands.md /generate handler table + internal-skills table updated. generate-app doc includes a full template-authoring guide (custom template workflow + vault-local override + palette + single-file-component guidelines)."
     }
   ]
 }

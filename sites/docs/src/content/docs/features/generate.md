@@ -58,7 +58,7 @@ No registry. Adding a new artifact type is just creating a new `.claude/skills/g
 
 ## Currently-Implemented Handlers
 
-Phase 2A shipped the foundation + two Pandoc-based handlers. Phase 2B adds the presentation trio:
+Phases 2A–2D have shipped the full artifact surface:
 
 | Type | Handler | Phase | Purpose |
 |------|---------|-------|---------|
@@ -69,9 +69,9 @@ Phase 2A shipped the foundation + two Pandoc-based handlers. Phase 2B adds the p
 | `infographic` | `generate-infographic` | 2B ✅ | Observatory-themed SVG + optional PNG |
 | `podcast` | `generate-podcast` | 2C ✅ | TTS-rendered MP3 (ElevenLabs / OpenAI / Piper) |
 | `video` | `generate-video` | 2C ✅ | Remotion MP4 with optional voiceover mux |
-| `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
-| `flashcards` | `generate-flashcards` | 2D | Anki `.apkg` deck |
-| `app` | `generate-app` | 2D | Interactive web app |
+| `quiz` | `generate-quiz` | 2D ✅ | Single-file HTML self-test |
+| `flashcards` | `generate-flashcards` | 2D ✅ | Anki `.apkg` deck (stable deck IDs) |
+| `app` | `generate-app` | 2D ✅ | Vite + React explorer app (2 templates) |
 
 Invoking a not-yet-implemented type prints a clear error listing the handlers currently available.
 
@@ -94,5 +94,8 @@ This contract is what makes [drift detection](../lint) and [round-trip fidelity 
 - [generate-infographic](./generate-infographic) — SVG infographic handler
 - [generate-podcast](./generate-podcast) — spoken-word MP3 handler
 - [generate-video](./generate-video) — Remotion MP4 handler
+- [generate-quiz](./generate-quiz) — single-file HTML self-test
+- [generate-flashcards](./generate-flashcards) — Anki `.apkg` deck
+- [generate-app](./generate-app) — Vite + React explorer app
 - [artifact conventions](../../reference/artifacts) — storage path, sidecar schema, source-hash algorithm
 - [/ingest](./ingest) — the opposite direction

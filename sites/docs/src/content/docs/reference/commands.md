@@ -28,9 +28,9 @@ All commands are Claude Code skills invoked with `/command-name`. Run them insid
 | `infographic` | `generate-infographic` | 2B ✅ | Observatory-themed SVG + optional PNG |
 | `podcast` | `generate-podcast` | 2C ✅ | TTS-rendered MP3 explainer (ElevenLabs / OpenAI / Piper) |
 | `video` | `generate-video` | 2C ✅ | Remotion-rendered MP4 with optional voiceover mux |
-| `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
-| `flashcards` | `generate-flashcards` | 2D | Anki `.apkg` deck |
-| `app` | `generate-app` | 2D | Interactive explorable web app |
+| `quiz` | `generate-quiz` | 2D ✅ | Single-file HTML self-test (MCQ + short answer) |
+| `flashcards` | `generate-flashcards` | 2D ✅ | Anki `.apkg` deck with stable deck IDs (re-renders update in place) |
+| `app` | `generate-app` | 2D ✅ | Vite + React explorer app — `comparison-explorer` or `timeline` template |
 
 See [artifact conventions](./artifacts) for storage paths, sidecar schema, and the source-hash algorithm.
 
@@ -73,3 +73,6 @@ See [artifact conventions](./artifacts) for storage paths, sidecar schema, and t
 | `generate-infographic` | generate | Render Observatory-themed SVG infographic |
 | `generate-podcast` | generate | Render MP3 podcast via Piper / OpenAI / ElevenLabs TTS |
 | `generate-video` | generate | Render MP4 via Remotion; optional voiceover mux |
+| `generate-quiz` | generate | Render single-file HTML quiz (MCQ + short answer) |
+| `generate-flashcards` | generate | Build Anki `.apkg` via genanki; stable deck IDs for in-place updates |
+| `generate-app` | generate | Scaffold Vite + React explorer app (comparison-explorer / timeline) |

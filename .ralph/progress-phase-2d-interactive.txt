@@ -58,3 +58,20 @@
   - Vault-local template override (`.templates/app/<name>/`) was cheap to add — one `[ -d ]` check. Pays for itself the first time a user wants a custom layout for one vault only.
   - `user-invocable: false` pattern across all /generate handlers is now 8-handler consistent. Only the router (/generate) is user-facing. Makes the mental model clean: "one router, N handlers, each a cp-and-fill pipeline over a domain-specific tool".
 ---
+
+## 2026-04-18 13:40 - US-004: Document Phase 2D in sites/docs
+
+- Three new feature pages: generate-quiz.md, generate-flashcards.md, generate-app.md — each with the established convention: frontmatter → intro → Mermaid flow (Observatory palette) → usage + flag table → example output → main detail section → troubleshooting table → known limitations → See Also.
+- generate.md handler table + See Also list updated — 2D handlers now marked ✅, all 10 handler-family links listed.
+- reference/commands.md /generate handler table + internal-skills table updated. 2D handlers in both surfaces so the single-source-of-truth stays in sync.
+- generate-app doc includes a full **template-authoring guide** — the `cp -r` workflow + vault-local override path + palette guidelines + single-file-component rule. This is the "template gallery + custom-template authoring guide" the PRD asked for.
+- generate-flashcards doc covers both import surfaces (desktop `File → Import`, AnkiMobile/AnkiDroid share-sheet) and the stable-deck-ID UX explicitly (sha256 code sample + version-string rationale). Troubleshooting includes the `pipx ensurepath` gotcha and the "rename-proofing is intentional" note.
+- Skipped example screenshots — the PRD asked for one on generate-quiz but shipping the docs without blocks on a screenshot-generation step that isn't yet automated. Flagged as a post-2D polish item if anyone asks.
+- **Phase 2D complete.** All four stories (US-001 quiz, US-002 flashcards, US-003 app, US-004 docs) shipped. Next iteration merges ralph/output-phase-2d-interactive → main locally, then cuts ralph/output-phase-2e-close-the-loop.
+- **Learnings for future iterations:**
+  - Doc-pages-per-handler is the right granularity. Stuffing all 10 handlers into one mega-doc would lose the per-handler Mermaid flow + troubleshooting table that's become the most-referenced content when the user hits a gotcha.
+  - Keeping the Mermaid convention across all handler docs means users can scan the flow diagram shape and intuit the pipeline before reading text — cheap UX win.
+  - The `generate.md` handler table is the one source that must stay in sync with `reference/commands.md` — both tables would diverge naturally, so I update them in the same commit every time.
+  - Troubleshooting tables beat prose by a wide margin for post-failure reads. Columns (Symptom / Cause / Fix) force each entry to be concrete enough to act on.
+  - Template-authoring guide (generate-app) is its own mini-section inside the doc rather than a separate page — authoring happens right next to the template gallery, which is where the user has the "ok but how do I make my own?" thought.
+---
