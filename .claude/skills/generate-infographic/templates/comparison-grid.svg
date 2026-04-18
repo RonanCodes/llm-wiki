@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  comparison-grid — two-column comparison with row-per-dimension and verdict band.
+  Observatory theme.
+
+  placeholders:
+    {{title}}            — headline (large, amber)
+    {{date}}             — YYYY-MM-DD
+    {{left_name}}        — left column label
+    {{right_name}}       — right column label
+    {{dim_1_label}}      — row 1 dimension name
+    {{dim_1_left}}       — row 1 left-side value
+    {{dim_1_right}}      — row 1 right-side value
+    {{dim_2_label}}
+    {{dim_2_left}}
+    {{dim_2_right}}
+    {{dim_3_label}}
+    {{dim_3_left}}
+    {{dim_3_right}}
+    {{dim_4_label}}
+    {{dim_4_left}}
+    {{dim_4_right}}
+    {{verdict}}          — one-line summary (e.g. "Left wins on setup, right on scale")
+    {{vault_name}}
+  export-width: 1600
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b0f14"/>
+      <stop offset="100%" stop-color="#111922"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="1600" height="8" fill="#e0af40"/>
+
+  <!-- Title -->
+  <text x="80" y="120" font-size="56" font-weight="700" fill="#e0af40">{{title}}</text>
+  <text x="80" y="158" font-size="20" fill="#8090a5">Comparison · Generated {{date}} · {{vault_name}}</text>
+
+  <!-- Column headers -->
+  <g transform="translate(80, 220)">
+    <rect width="700" height="72" rx="12" fill="#1a2230" stroke="#5bbcd6" stroke-width="2"/>
+    <text x="350" y="48" font-size="30" font-weight="700" fill="#5bbcd6" text-anchor="middle">{{left_name}}</text>
+    <rect x="740" width="700" height="72" rx="12" fill="#1a2230" stroke="#7dcea0" stroke-width="2"/>
+    <text x="1090" y="48" font-size="30" font-weight="700" fill="#7dcea0" text-anchor="middle">{{right_name}}</text>
+  </g>
+
+  <!-- Rows -->
+  <g transform="translate(80, 330)" font-size="22" fill="#e8eef6">
+    <!-- row 1 -->
+    <text x="0" y="28" fill="#8090a5" font-size="16">{{dim_1_label}}</text>
+    <rect x="0" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#5bbcd6" stroke-width="1" stroke-opacity="0.3"/>
+    <foreignObject x="16" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_1_left}}</div></foreignObject>
+    <rect x="740" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#7dcea0" stroke-width="1" stroke-opacity="0.3"/>
+    <foreignObject x="756" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_1_right}}</div></foreignObject>
+
+    <!-- row 2 -->
+    <g transform="translate(0, 150)">
+      <text x="0" y="28" fill="#8090a5" font-size="16">{{dim_2_label}}</text>
+      <rect x="0" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#5bbcd6" stroke-width="1" stroke-opacity="0.3"/>
+      <foreignObject x="16" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_2_left}}</div></foreignObject>
+      <rect x="740" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#7dcea0" stroke-width="1" stroke-opacity="0.3"/>
+      <foreignObject x="756" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_2_right}}</div></foreignObject>
+    </g>
+
+    <!-- row 3 -->
+    <g transform="translate(0, 300)">
+      <text x="0" y="28" fill="#8090a5" font-size="16">{{dim_3_label}}</text>
+      <rect x="0" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#5bbcd6" stroke-width="1" stroke-opacity="0.3"/>
+      <foreignObject x="16" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_3_left}}</div></foreignObject>
+      <rect x="740" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#7dcea0" stroke-width="1" stroke-opacity="0.3"/>
+      <foreignObject x="756" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_3_right}}</div></foreignObject>
+    </g>
+
+    <!-- row 4 -->
+    <g transform="translate(0, 450)">
+      <text x="0" y="28" fill="#8090a5" font-size="16">{{dim_4_label}}</text>
+      <rect x="0" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#5bbcd6" stroke-width="1" stroke-opacity="0.3"/>
+      <foreignObject x="16" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_4_left}}</div></foreignObject>
+      <rect x="740" y="48" width="700" height="80" rx="10" fill="#0f1520" stroke="#7dcea0" stroke-width="1" stroke-opacity="0.3"/>
+      <foreignObject x="756" y="56" width="672" height="68"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;">{{dim_4_right}}</div></foreignObject>
+    </g>
+  </g>
+
+  <!-- Verdict band -->
+  <g transform="translate(80, 890)">
+    <rect width="1440" height="72" rx="16" fill="#e0af40"/>
+    <text x="36" y="46" font-size="24" font-weight="700" fill="#0b0f14">Verdict</text>
+    <foreignObject x="160" y="14" width="1264" height="50"><div xmlns="http://www.w3.org/1999/xhtml" style="color:#0b0f14;font-size:22px;line-height:1.35;font-family:system-ui,sans-serif;font-weight:500;">{{verdict}}</div></foreignObject>
+  </g>
+
+  <!-- Footer -->
+  <rect x="0" y="992" width="1600" height="8" fill="#5bbcd6"/>
+</svg>

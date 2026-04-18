@@ -36,3 +36,20 @@
   - Markmap does NOT support cross-file hyperlinks to other markmaps; node-level links only work for external URLs or local file paths. Documented as a limitation.
   - The `markmap:` YAML block inside the outline.md is markmap-specific (not standard frontmatter) — markmap-cli parses it; other tools ignore it.
 ---
+
+## 2026-04-18 11:38 - US-003: Implement generate-infographic handler + extract shared helpers
+
+- Created `.claude/skills/generate/lib/select-pages.sh` — single source of truth for topic-to-pages resolution (all / folder / file / tag). Exit 1 on empty match.
+- Created `.claude/skills/generate/lib/resolve-wikilinks.sh` — sed one-liner that renders `[[page]]` / `[[page|text]]` as italic. Pipe through this instead of copying the pattern.
+- Created `.claude/skills/generate-infographic/SKILL.md` — SVG-template handler with auto-pick (comparison-grid if "vs"/"versus" in topic OR ≥2 comparison pages, else stats-card). Optional PNG export via rsvg-convert (brew install librsvg).
+- Shipped 2 Observatory-themed SVG templates:
+  - `templates/stats-card.svg` — 1600×900, header band amber, 3 stat cards (pages cyan, tags amber, top concepts green), tag strip, pull-quote panel. Uses `<foreignObject>` for text wrapping.
+  - `templates/comparison-grid.svg` — 1600×1000, two columns (cyan left, green right) with 4 dimension rows + amber verdict band. Also uses foreignObject for long text.
+- Handler documents the `{{placeholder}}` convention and the Observatory palette table; new templates must stay on-brand or note deviations.
+- **Learnings for future iterations:**
+  - Extraction into `generate/lib/` was overdue — did it at the 4th-use point (would-be). The older handlers (book, slides, mindmap) still have inline copies; they can migrate lazily on next touch. No forced refactor — the inline code still works.
+  - SVG `<foreignObject>` with embedded HTML is essential for multi-line text that wraps — pure `<text>` elements don't wrap. Works in all modern SVG renderers including rsvg-convert.
+  - The LLM-fills-template pattern here is fragile: if the invoking LLM produces bad data (empty strings, malformed SVG fragments) the output silently breaks. Future close-the-loop testing (Phase 2E) should validate SVG parses as XML.
+  - `rsvg-convert` is a better bet than Inkscape for headless PNG export — smaller dependency, scriptable, consistent output. brew install librsvg.
+  - 2-template shipping target from PRD was met; timeline template intentionally deferred to Phase 2C/2E.
+---

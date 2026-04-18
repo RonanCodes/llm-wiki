@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  stats-card — top-line counts, tag strip, and a pull quote.
+  Observatory theme: amber (#e0af40), cyan (#5bbcd6), green (#7dcea0).
+
+  placeholders:
+    {{title}}          — headline (large, amber)
+    {{date}}           — YYYY-MM-DD generated date
+    {{page_count}}     — integer
+    {{tag_count}}      — integer
+    {{top_concept_1}}  — string
+    {{top_concept_2}}  — string
+    {{top_concept_3}}  — string
+    {{tag_strip}}      — inline SVG fragment (e.g. <tspan>...</tspan>) for tag cloud
+    {{pull_quote}}     — short quote string
+    {{pull_quote_source}} — wiki page path or "Multiple sources"
+    {{vault_name}}     — footer attribution
+  export-width: 1600
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b0f14"/>
+      <stop offset="100%" stop-color="#111922"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="1600" height="8" fill="#e0af40"/>
+
+  <!-- Title -->
+  <text x="80" y="140" font-size="64" font-weight="700" fill="#e0af40">{{title}}</text>
+  <text x="80" y="180" font-size="22" fill="#8090a5">Generated {{date}} · {{vault_name}}</text>
+
+  <!-- Stats row -->
+  <g transform="translate(80, 260)">
+    <g>
+      <rect width="420" height="160" rx="16" fill="#1a2230" stroke="#5bbcd6" stroke-width="2"/>
+      <text x="28" y="60" font-size="20" fill="#8090a5">Pages</text>
+      <text x="28" y="130" font-size="84" font-weight="700" fill="#5bbcd6">{{page_count}}</text>
+    </g>
+    <g transform="translate(460, 0)">
+      <rect width="420" height="160" rx="16" fill="#1a2230" stroke="#e0af40" stroke-width="2"/>
+      <text x="28" y="60" font-size="20" fill="#8090a5">Tags</text>
+      <text x="28" y="130" font-size="84" font-weight="700" fill="#e0af40">{{tag_count}}</text>
+    </g>
+    <g transform="translate(920, 0)">
+      <rect width="520" height="160" rx="16" fill="#1a2230" stroke="#7dcea0" stroke-width="2"/>
+      <text x="28" y="60" font-size="20" fill="#8090a5">Top concepts</text>
+      <text x="28" y="96" font-size="22" fill="#e8eef6">· {{top_concept_1}}</text>
+      <text x="28" y="124" font-size="22" fill="#e8eef6">· {{top_concept_2}}</text>
+      <text x="28" y="152" font-size="22" fill="#e8eef6">· {{top_concept_3}}</text>
+    </g>
+  </g>
+
+  <!-- Tag strip -->
+  <g transform="translate(80, 480)">
+    <text x="0" y="0" font-size="20" fill="#8090a5">Tag cloud</text>
+    <text x="0" y="44" font-size="22" fill="#e8eef6">{{tag_strip}}</text>
+  </g>
+
+  <!-- Pull quote panel -->
+  <g transform="translate(80, 580)">
+    <rect width="1440" height="240" rx="20" fill="#0f1520" stroke="#e0af40" stroke-width="1" stroke-opacity="0.4"/>
+    <text x="48" y="56" font-size="28" fill="#e0af40">&#8220;</text>
+    <foreignObject x="88" y="24" width="1304" height="180">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="color:#e8eef6;font-size:26px;line-height:1.4;font-family:system-ui,sans-serif;">
+        {{pull_quote}}
+      </div>
+    </foreignObject>
+    <text x="88" y="210" font-size="18" fill="#8090a5">— {{pull_quote_source}}</text>
+  </g>
+
+  <!-- Footer -->
+  <rect x="0" y="892" width="1600" height="8" fill="#5bbcd6"/>
+</svg>

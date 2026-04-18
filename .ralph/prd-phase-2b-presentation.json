@@ -49,8 +49,8 @@
         "Documents how to author new templates"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": "Harder than it looks — the LLM needs to both pick the template and supply valid data. Start with 1 template if time-constrained."
+      "passes": true,
+      "notes": "Harder than it looks — the LLM needs to both pick the template and supply valid data. Start with 1 template if time-constrained. — Done: generate-infographic handler with 2 SVG templates (stats-card.svg, comparison-grid.svg) in Observatory palette, mustache placeholders, optional PNG export via rsvg-convert, auto template-pick based on content shape (comparison-grid if 'vs'/'versus' or ≥2 comparison pages; stats-card otherwise). Also extracted .claude/skills/generate/lib/select-pages.sh + resolve-wikilinks.sh as shared helpers (overdue after 3x duplication)."
     },
     {
       "id": "US-004",
