@@ -34,8 +34,8 @@
         "Documents the remotion-studio dependency and how to add new compositions"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": "The video compositions already exist. The bulk of work is the skill that picks a composition and parameterises it from wiki content."
+      "passes": true,
+      "notes": "The video compositions already exist. The bulk of work is the skill that picks a composition and parameterises it from wiki content. — Done: generate-video handler at .claude/skills/generate-video/ reading compositions from $REMOTION_STUDIO_DIR (default ~/Dev/ai-projects/remotion-studio). Pipeline: wiki → LLM scenes.json → npx remotion render → optional ffmpeg mux with generate-podcast voiceover. Composition picker lists real existing compositions (KineticPitch, PromoV10, PromoV2-V9, AppDemo, MarketingPromo) with wiki-explainer as the to-be-added default. Sidecar pins remotion-studio-commit for re-renderability. scenes.json kept alongside MP4 as the re-renderable source. Documented composition authoring workflow."
     },
     {
       "id": "US-003",

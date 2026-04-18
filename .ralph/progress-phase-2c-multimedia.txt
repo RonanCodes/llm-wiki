@@ -24,3 +24,20 @@
   - Two templates felt right (monologue + dialogue). Resist the urge to ship a third ("interview with expert", etc.) until someone actually asks — templates rot without feedback.
   - Handler is script-shape-agnostic: the parser just splits on `[HOST]` / `[A]` / `[B]`. New formats slot in by adding a new template + documenting the tags.
 ---
+
+## 2026-04-18 11:58 - US-002: Implement generate-video handler
+
+- Created `.claude/skills/generate-video/SKILL.md` — 9-step pipeline (deps → resolve+hash → scenes.json → pick composition → remotion render → optional voiceover mux → sidecar → commit → report).
+- `REMOTION_STUDIO_DIR` env var (default `~/Dev/ai-projects/remotion-studio`) locates the external renderer — the handler treats remotion-studio as a peer repo, not a submodule. Works for CI + container overrides.
+- Composition picker enumerates real existing compositions I read from `src/Root.tsx`: KineticPitch (32s), PromoV10 (56s), PromoV2–V9 (style variants, light/dark/synth/screenshots), AppDemo, MarketingPromo. Listed `wiki-explainer` as to-be-added default (fallback to PromoV10 until it lands).
+- scenes.json contract documented — `title`, `subtitle`, `voiceover_script`, `scenes[]` with `id`, `duration_s`, `props{}`. Remotion's `--props=<file>` flag takes this directly; Remotion components destructure from input props.
+- `--voiceover` chains `generate-podcast` — produces MP3, then `ffmpeg -map` muxes into the silent Remotion render. `-shortest` trim guards mismatched durations.
+- Sidecar pins `remotion-studio-commit` — essential for re-renderability because composition props can drift between commits of the external repo.
+- scenes.json kept alongside MP4 as the re-renderable source (same pattern as `.script.md` for podcasts and `.outline.md` for mindmaps).
+- **Learnings for future iterations:**
+  - Treating remotion-studio as a peer repo (not vendored, not submodule) is the right call for now — it's Ronan's actively-iterated space. The `remotion-studio-commit` sidecar pin is sufficient provenance.
+  - Handler scope intentionally stops short of building a `wiki-explainer` composition — that's a React/Remotion artifact, belongs in remotion-studio, not here. Documented as a follow-up in Known Limitations.
+  - Composition durations are hardcoded in Root.tsx (`durationInFrames`). Voiceover must match or `-shortest` will truncate one or the other. Phase 2E should add a duration check before rendering.
+  - The auto-pick rule uses "vs"/"versus" and scene shape — same heuristic as generate-infographic. Any future comparison-themed handler should hook into this same signal. Candidate for a shared `detect-shape.sh` helper if a 4th user emerges.
+  - `render.sh` for generate-podcast is referenced but optional — the invoking LLM can also call `/generate podcast` and capture the MP3 path from the report. Simpler, same effect. Real shell helper lands when a non-LLM caller needs it.
+---
