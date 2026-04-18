@@ -1,0 +1,26 @@
+## Codebase Patterns (Phase 2C, multimedia handlers)
+
+- Pandoc helpers (ensure-pandoc.sh, render-pdf.sh, source-hash.sh) from Phase 2A are the substrate — inherit them.
+- Shared lib from Phase 2B (.claude/skills/generate/lib/select-pages.sh, resolve-wikilinks.sh) — use these, don't duplicate.
+- Observatory palette (amber #e0af40, cyan #5bbcd6, green #7dcea0 on #0b0f14) is the house style — applies to any audio card art, video intro frames, or waveform visuals.
+- generate-video leans on ~/Dev/ai-projects/remotion-studio — treat it as an external renderer, not a submodule. Reference by path.
+- Chain skills: video voiceover is generate-podcast output muxed into Remotion — so ship podcast first.
+
+---
+
+## 2026-04-18 11:52 - US-001: Implement generate-podcast handler
+
+- Created `.claude/skills/generate-podcast/SKILL.md` — 10-step pipeline matching the Phase 2A/2B cadence (deps → resolve → hash → script → TTS → concat → sidecar → commit → report).
+- TTS backend priority: ElevenLabs (if `ELEVENLABS_API_KEY`) → OpenAI TTS (if `OPENAI_API_KEY`) → Piper (local, free, lazy-installed). Documented the quality/cost tradeoff in a table.
+- Two templates at `templates/single-host.md` and `templates/two-voice.md` — monologue and NotebookLM-style dialogue. Placeholder-driven; the invoking LLM fills them using wiki content.
+- Script conventions documented: ~150 wpm, `{{cite: path}}` preprocessed to `*pagename*`, sources spoken-list at the end.
+- ffmpeg VBR q2 MP3 concat — right quality for voice, smaller than CBR without audible loss. 250ms inter-line silence, 600ms on speaker change.
+- `.script.md` kept alongside `.mp3` — it's diffable, re-renderable, and the honest primary artifact. The MP3 is derived.
+- Reuses `.claude/skills/generate/lib/select-pages.sh` and `source-hash.sh` — no duplication.
+- **Learnings for future iterations:**
+  - Cost guardrail noted in Known Limitations: for long ElevenLabs podcasts, print projected cost before rendering and confirm. Generate-video will inherit this when it chains podcast for voiceover.
+  - Piper voices: en_US-lessac-medium + en_GB-alan-medium for the two-voice default. Robotic but serviceable — the right "draft listen" tier. Good users will set an OpenAI/ElevenLabs key and get the upgrade automatically.
+  - `.script.md` as a first-class artifact is the right pattern — it gives PRs something diffable, avoids the "binary black box" problem, and makes re-rendering free after editing.
+  - Two templates felt right (monologue + dialogue). Resist the urge to ship a third ("interview with expert", etc.) until someone actually asks — templates rot without feedback.
+  - Handler is script-shape-agnostic: the parser just splits on `[HOST]` / `[A]` / `[B]`. New formats slot in by adding a new template + documenting the tags.
+---

@@ -17,8 +17,8 @@
         "Supports --length short|medium|long (maps to ~3/6/10 minutes)"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": "Two-voice dialogue is the NotebookLM killer feature — worth doing well. Piper voices are a bit robotic; document that tradeoff."
+      "passes": true,
+      "notes": "Two-voice dialogue is the NotebookLM killer feature — worth doing well. Piper voices are a bit robotic; document that tradeoff. — Done: generate-podcast handler at .claude/skills/generate-podcast/ with TTS priority ElevenLabs → OpenAI → Piper (default), single-host + --two-voice templates, --length short/medium/long mapping to ~150 wpm word targets, ffmpeg MP3 concat at VBR q2, .script.md kept alongside MP3 as primary re-renderable artifact. Sidecar captures tts-backend, voice, format, length-target, source-hash. Reuses select-pages.sh and source-hash.sh."
     },
     {
       "id": "US-002",
