@@ -40,6 +40,9 @@ out/
 # Tasks/questions (local working state)
 TASKS.md
 
+# Playwright MCP (browser automation local state)
+.playwright-mcp/
+
 # OS
 .DS_Store
 
