@@ -151,7 +151,29 @@ ffmpeg -i "$SILENT_OUT" -i "$VO_MP3" \
 
 If `--voiceover` is not set, `mv "$SILENT_OUT" "$FINAL_OUT"`.
 
-## Step 7: Write the Sidecar
+## Step 7: Version Detection
+
+Before writing the sidecar, check for an existing artifact of the same type and topic:
+
+```bash
+ARTIFACT_TYPE="video"
+EXISTING=$(ls "$VAULT_DIR/artifacts/$ARTIFACT_TYPE/"*"$TOPIC_SLUG"*.meta.yaml 2>/dev/null | sort | tail -1)
+if [ -n "$EXISTING" ]; then
+  PREV_VERSION=$(grep '^version:' "$EXISTING" | awk '{print $2}')
+  PREV_VERSION=${PREV_VERSION:-1}
+  VERSION=$((PREV_VERSION + 1))
+  PREV_SLUG=$(basename "$EXISTING" .meta.yaml)
+else
+  VERSION=1
+  PREV_SLUG=""
+fi
+```
+
+The old artifact stays in place — not deleted, not overwritten. Multiple files of the same type + topic = version history. The portal discovers and displays these automatically.
+
+Small fixes (CSS tweaks, typo corrections) should update the file in-place without incrementing the version — use judgement based on whether the content meaningfully changed.
+
+## Step 8: Write the Sidecar
 
 ```bash
 META="${FINAL_OUT%.mp4}.meta.yaml"
@@ -167,12 +189,15 @@ generated-from:
 $(for p in "${PAGES[@]}"; do echo "  - $p"; done)
 scenes-json: $(basename "$SCENES_JSON")
 source-hash: $HASH
+version: $VERSION
+change-note: "<brief description of what changed, or 'Initial version' for v1>"
+replaces: "$PREV_SLUG"
 EOF
 ```
 
 Pinning the `remotion-studio-commit` is essential for re-renderability — composition props can drift between commits.
 
-## Step 8: Commit to Vault Repo
+## Step 9: Commit to Vault Repo
 
 ```bash
 cd "$VAULT_DIR"
@@ -183,7 +208,7 @@ git diff --cached --quiet || git commit -m "🎬 video: generate <topic> ($(date
 
 Keep `scenes.json` alongside — it's the re-renderable source, like `.script.md` for podcasts and `.outline.md` for mindmaps.
 
-## Step 9: Report to User
+## Step 10: Report to User
 
 ```
 ✅ Video generated

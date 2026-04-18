@@ -126,7 +126,29 @@ The helper:
 - Tails the last 20 lines of pandoc stderr on failure and suggests the common fixes (missing LaTeX package → `tlmgr install`, unicode → `--pdf-engine=xelatex`, image-path issues, font issues).
 - Exits 0 on success, 2 on render failure, 3 on bad arguments, 4 if pandoc is absent.
 
-## Step 6: Write the Sidecar
+## Step 6: Version Detection
+
+Before writing the sidecar, check for an existing artifact of the same type and topic:
+
+```bash
+ARTIFACT_TYPE="book"
+EXISTING=$(ls "$VAULT_DIR/artifacts/$ARTIFACT_TYPE/"*"$TOPIC_SLUG"*.meta.yaml 2>/dev/null | sort | tail -1)
+if [ -n "$EXISTING" ]; then
+  PREV_VERSION=$(grep '^version:' "$EXISTING" | awk '{print $2}')
+  PREV_VERSION=${PREV_VERSION:-1}
+  VERSION=$((PREV_VERSION + 1))
+  PREV_SLUG=$(basename "$EXISTING" .meta.yaml)
+else
+  VERSION=1
+  PREV_SLUG=""
+fi
+```
+
+The old artifact stays in place — not deleted, not overwritten. Multiple files of the same type + topic = version history. The portal discovers and displays these automatically.
+
+Small fixes (CSS tweaks, typo corrections) should update the file in-place without incrementing the version — use judgement based on whether the content meaningfully changed.
+
+## Step 7: Write the Sidecar
 
 ```bash
 META="${OUT%.pdf}.meta.yaml"
@@ -140,12 +162,15 @@ flags:
 generated-from:
 $(for p in "${PAGES[@]}"; do echo "  - $p"; done)
 source-hash: $HASH
+version: $VERSION
+change-note: "<brief description of what changed, or 'Initial version' for v1>"
+replaces: "$PREV_SLUG"
 EOF
 ```
 
 Format must match the schema in `sites/docs/src/content/docs/reference/artifacts.md`.
 
-## Step 7: Commit to Vault Repo
+## Step 8: Commit to Vault Repo
 
 Artifacts live in a gitignored directory by default. If the user has opted into tracking artifacts (custom per-vault config), commit:
 
@@ -158,7 +183,7 @@ git diff --cached --quiet || git commit -m "📚 book: generate <topic> ($(date 
 
 Do not fail if the add is a no-op — gitignored artifacts are the default and expected path.
 
-## Step 8: Report to User
+## Step 9: Report to User
 
 ```
 ✅ Book generated

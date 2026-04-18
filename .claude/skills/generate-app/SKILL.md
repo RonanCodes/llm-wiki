@@ -175,7 +175,29 @@ See \`TEMPLATE.md\` in this directory for what the template does and how to exte
 EOF
 ```
 
-## Step 7: Write the Sidecar
+## Step 7: Version Detection
+
+Before writing the sidecar, check for an existing artifact of the same type and topic:
+
+```bash
+ARTIFACT_TYPE="app"
+EXISTING=$(ls "$VAULT_DIR/artifacts/$ARTIFACT_TYPE/"*"$TOPIC_SLUG"*.meta.yaml 2>/dev/null | sort | tail -1)
+if [ -n "$EXISTING" ]; then
+  PREV_VERSION=$(grep '^version:' "$EXISTING" | awk '{print $2}')
+  PREV_VERSION=${PREV_VERSION:-1}
+  VERSION=$((PREV_VERSION + 1))
+  PREV_SLUG=$(basename "$EXISTING" .meta.yaml)
+else
+  VERSION=1
+  PREV_SLUG=""
+fi
+```
+
+The old artifact stays in place — not deleted, not overwritten. Multiple files of the same type + topic = version history. The portal discovers and displays these automatically.
+
+Small fixes (CSS tweaks, typo corrections) should update the file in-place without incrementing the version — use judgement based on whether the content meaningfully changed.
+
+## Step 8: Write the Sidecar
 
 ```bash
 META="$APP_DIR.meta.yaml"
@@ -189,12 +211,15 @@ generated-from:
 $(for p in "${PAGES[@]}"; do echo "  - $p"; done)
 source-hash: $HASH
 entry-count: $ENTRY_COUNT
+version: $VERSION
+change-note: "<brief description of what changed, or 'Initial version' for v1>"
+replaces: "$PREV_SLUG"
 EOF
 ```
 
 Sidecar sits *next to* the app directory, not inside it — so the app directory can be `pnpm install`ed cleanly without a stray YAML polluting it.
 
-## Step 8: Commit to Vault Repo
+## Step 9: Commit to Vault Repo
 
 ```bash
 cd "$VAULT_DIR"
@@ -205,7 +230,7 @@ git diff --cached --quiet || git commit -m "🛠️  app: scaffold $TOPIC ($TEMP
 
 `.gitignore` in each app includes `node_modules/` and `dist/` — the templates ship one.
 
-## Step 9: Report to User
+## Step 10: Report to User
 
 ```
 ✅ App scaffolded

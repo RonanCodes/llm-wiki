@@ -140,7 +140,29 @@ EOF
 
 Mermaid mindmaps render in Obsidian, GitHub, and anywhere mermaid is supported — losing interactivity but keeping the structure. Document this in the sidecar as `template: mermaid-fallback`.
 
-## Step 7: Write the Sidecar
+## Step 7: Version Detection
+
+Before writing the sidecar, check for an existing artifact of the same type and topic:
+
+```bash
+ARTIFACT_TYPE="mindmap"
+EXISTING=$(ls "$VAULT_DIR/artifacts/$ARTIFACT_TYPE/"*"$TOPIC_SLUG"*.meta.yaml 2>/dev/null | sort | tail -1)
+if [ -n "$EXISTING" ]; then
+  PREV_VERSION=$(grep '^version:' "$EXISTING" | awk '{print $2}')
+  PREV_VERSION=${PREV_VERSION:-1}
+  VERSION=$((PREV_VERSION + 1))
+  PREV_SLUG=$(basename "$EXISTING" .meta.yaml)
+else
+  VERSION=1
+  PREV_SLUG=""
+fi
+```
+
+The old artifact stays in place — not deleted, not overwritten. Multiple files of the same type + topic = version history. The portal discovers and displays these automatically.
+
+Small fixes (CSS tweaks, typo corrections) should update the file in-place without incrementing the version — use judgement based on whether the content meaningfully changed.
+
+## Step 8: Write the Sidecar
 
 ```bash
 META="$VAULT_DIR/artifacts/mindmap/<slug>-<date>.meta.yaml"
@@ -155,12 +177,15 @@ flags:
 generated-from:
 $(for p in "${PAGES[@]}"; do echo "  - $p"; done)
 source-hash: $HASH
+version: $VERSION
+change-note: "<brief description of what changed, or 'Initial version' for v1>"
+replaces: "$PREV_SLUG"
 EOF
 ```
 
 Schema matches `sites/docs/src/content/docs/reference/artifacts.md`.
 
-## Step 8: Commit to Vault Repo
+## Step 9: Commit to Vault Repo
 
 ```bash
 cd "$VAULT_DIR"
@@ -168,7 +193,7 @@ git add "artifacts/mindmap/<slug>-<date>."{outline.md,html,md,meta.yaml} 2>/dev/
 git diff --cached --quiet || git commit -m "🧠 mindmap: generate <topic> ($(date +%Y-%m-%d))"
 ```
 
-## Step 9: Report to User
+## Step 10: Report to User
 
 ```
 ✅ Mindmap generated
