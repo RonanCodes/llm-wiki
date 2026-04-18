@@ -32,8 +32,8 @@
         "Handles all artifact→ingest mappings: PDF→ingest-pdf, MP3→whisper→ingest-text, MP4→whisper+OCR→ingest-text, quiz.json→ingest-text, etc."
       ],
       "priority": 2,
-      "passes": false,
-      "notes": "Whisper for audio/video transcription is lazy-installed here. May already exist in ingest-video; reuse."
+      "passes": true,
+      "notes": "Whisper for audio/video transcription is lazy-installed here. May already exist in ingest-video; reuse. — Done: .claude/skills/verify-artifact/SKILL.md implements the 8-step pipeline (select source pages → /generate → scratch vault under /tmp → inverse-path re-ingest → diff → score → report → cleanup). Inverse path prefers re-renderable source sidecars (.script.md for podcast/video, .scenes.json for video, .questions.json for quiz, .cards.csv for flashcards, src/data.json for app) over PDF/whisper/OCR — cheap, deterministic, no external transcription dep for the common case. Python scoring heredoc computes: (a) per-page coverage (concept overlap ≥0.5 threshold), (b) corpus-level Jaccard similarity over extracted concept sets, (c) weighted fidelity = 0.6*coverage + 0.4*jaccard. Per-type recoverability targets from close-the-loop-testing.md encoded in the skill (book 0.85, pdf 0.85, podcast 0.75, video 0.60, mindmap 0.50, flashcards 0.40, quiz 0.40, slides 0.35, app 0.25, infographic 0.25). Flags: --target (override), --llm-judge (flag-gated expensive tier), --keep-scratch (debug), --from (verify existing artifact without regenerating). Exit 0 pass / 1 fidelity fail / 2+ infra error — CI-usable. user-invocable: true (first user-facing skill alongside /generate). MP4 binary-only path deferred to future iteration; documented limitation in SKILL.md."
     },
     {
       "id": "US-003",
