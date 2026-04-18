@@ -21,3 +21,19 @@
   - Single-file HTML with inlined CSS + JS + JSON is the right default for shareable study artifacts: email-able, offline, no hosting. Same spirit as markmap's output.
   - Per-question `source` field is the fidelity-test hook. When Phase 2E's `verify-artifact` runs, it'll re-check each question's claims against the cited wiki page. Designing for that loop from the start.
 ---
+
+## 2026-04-18 12:42 - US-002: Implement generate-flashcards handler
+
+- Created `.claude/skills/generate-flashcards/SKILL.md` — 8-step pipeline: dep check → resolve pages → cards.csv (LLM) → genanki Python build → keep csv alongside → sidecar → commit → report.
+- Lazy-install chain: `python3 -c "import genanki"` probe, then `pipx install genanki` if available, else `pip install --user genanki`. Same pattern as pandoc/marp/yt-dlp.
+- **Stable deterministic IDs** — `deck_id = sha256(deck_name)[:8]` and `model_id = sha256(b"llm-wiki-basic-v1")[:8]`. This is the critical UX decision: Anki updates cards in-place on re-import when both IDs match. Random IDs would create duplicate decks on every render — silently painful. Model_id version-string (`v1`) leaves room for a future cloze model without breaking existing cards.
+- Deck naming: `llm-wiki::<vault>::<topic>`. The `::` separator is Anki's hierarchical folder convention — keeps the sidebar tidy when a user generates decks across multiple vaults.
+- 4-column CSV schema: `front, back, source, tags`. RFC 4180 quoting (LLM instructed to double embedded `"`). `source` is mandatory — rendered in the card footer at review time, and is the Phase 2E fidelity-check hook.
+- Python helper is heredoc'd inline rather than checked in as `build_deck.py`. ~30 lines — the duplication cost of regenerating it at render time is negligible and it keeps the skill self-contained (one file, no separate assets beyond templates).
+- **Learnings for future iterations:**
+  - CSV beats JSON for flashcard sidecars. Anki's own import path is CSV-native, and `awk`/`cut` keep the diff readable when you re-generate. JSON's escaping would win for complex fields but flashcards are 99% plain text.
+  - Stable deterministic deck IDs are the single biggest UX lever for any "re-generate" artifact that has a native app around it (Anki, Calibre, etc.). Always derive from a human-stable string, not a timestamp.
+  - Hierarchical deck names (`::` separator) are free win in Anki — users get a folder tree without any extra config.
+  - Model-ID versioning (`v1`) costs nothing now and buys room for future models (cloze, image-occlusion) without clobbering users' review history.
+  - Anki `.apkg` import doesn't require a local Anki install to generate the file — it's just SQLite under the hood. That makes this handler pure Python + no daemon, same spirit as markmap's self-contained HTML.
+---

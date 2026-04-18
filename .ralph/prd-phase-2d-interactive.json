@@ -33,8 +33,8 @@
         "Documents how to import into Anki desktop/mobile"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": "CSV sidecar is what close-the-loop testing will re-ingest, since Anki apkg is a SQLite file and awkward to parse."
+      "passes": true,
+      "notes": "CSV sidecar is what close-the-loop testing will re-ingest, since Anki apkg is a SQLite file and awkward to parse. — Done: generate-flashcards handler with genanki lazy-install via pipx (fallback pip --user), stable sha256-derived deck_id + model_id so Anki re-imports update cards in-place (no duplicate-deck pain), hierarchical deck naming `llm-wiki::<vault>::<topic>` (plays well with Anki's folder view), 4-column CSV (front/back/source/tags) with RFC 4180 quoting kept alongside .apkg as re-renderable source. Desktop + mobile (AnkiMobile/AnkiDroid) import walkthrough documented. Cloze cards and media support deferred — basic front/back only for 2D."
     },
     {
       "id": "US-003",
