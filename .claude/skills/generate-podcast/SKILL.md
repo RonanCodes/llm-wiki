@@ -130,7 +130,7 @@ fi
 
 - **Piper**: uses `en_US-lessac-medium` for [HOST] / [A]; `en_GB-alan-medium` for [B]. Override with `--voice <model>`.
 - **OpenAI**: `alloy` for HOST/A, `onyx` for B.
-- **ElevenLabs**: `Rachel` for HOST/A, `Adam` for B (override with `ELEVENLABS_VOICE_A` / `ELEVENLABS_VOICE_B` env vars).
+- **ElevenLabs**: premade voices only — free-tier API blocks library voices (Rachel/Adam) with HTTP 402. Default: `Alice` (voice id `Xb7hH8MSUJpSbSDYk0k2`) for HOST/A, `Eric` (voice id `cjVigY5qzO86Huf0OWal`) for B. Other safe premade options: `Sarah`, `Brian`, `Bill`. Override with `ELEVENLABS_VOICE_A` / `ELEVENLABS_VOICE_B` env vars (pass voice IDs, not names).
 
 ## Step 6: Render Each Line
 

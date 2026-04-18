@@ -109,6 +109,17 @@ The shared `render-pdf.sh` handles:
 
 `generate-pdf` does not roll its own pandoc invocation. If the shared helper doesn't support a pandoc flag you need, **extend the helper** rather than bypassing it.
 
+### HTML fallback when LaTeX is absent
+
+On machines without a LaTeX engine (xelatex / pdflatex), `render-pdf.sh` silently sets `USE_HTML_FALLBACK=1` and emits an **HTML file at the `.pdf` path** rather than failing. This mirrors `generate-book`, but this handler does **not** (yet) chain Playwright to convert the HTML back to a real PDF — see `.claude/skills/generate-book/html-to-pdf.mjs` for the pattern to port.
+
+If you need a real PDF on a LaTeX-less machine:
+
+1. Install a LaTeX engine: `brew install --cask mactex-no-gui` (or `basictex` for a smaller footprint).
+2. Or port the Playwright pipeline — call `html-to-pdf.mjs` after Pandoc emits styled HTML.
+
+The sidecar should reflect reality — add `renderer: html-fallback` to `flags:` when `USE_HTML_FALLBACK=1` so downstream tools can tell a real PDF from a renamed HTML file.
+
 ## Step 6: Version Detection
 
 Before writing the sidecar, check for an existing artifact of the same type and topic:

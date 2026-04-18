@@ -33,8 +33,11 @@ For Marp (default):
 ```bash
 if ! which marp >/dev/null 2>&1 && ! npx --no-install @marp-team/marp-cli --version >/dev/null 2>&1; then
   echo "Installing Marp CLI globally…"
-  pnpm add -g @marp-team/marp-cli 2>/dev/null \
-    || npm install -g @marp-team/marp-cli 2>/dev/null \
+  # npm first — it's always present wherever node is, and doesn't need
+  # `pnpm setup` to have been run first. pnpm -g silently no-ops (or errors
+  # with ERR_PNPM_NO_GLOBAL_BIN_DIR) on machines that haven't run setup.
+  npm install -g @marp-team/marp-cli 2>/dev/null \
+    || pnpm add -g @marp-team/marp-cli 2>/dev/null \
     || echo "⚠️  Could not install marp-cli; falling back to npx (slower, downloads on every run)"
 fi
 ```

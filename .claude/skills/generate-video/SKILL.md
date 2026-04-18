@@ -132,7 +132,14 @@ The LLM reads selected pages and writes a `scenes.json` describing the video. Sh
 
 ## Step 4: Composition Picker
 
-Remotion compositions currently available in `$REMOTION_ROOT/src/projects/llm-wiki/`:
+Compositions are defined in the remotion-studio repo — **check what actually ships there** before assuming any of the ids below exist. The table is a guide to the shape of compositions to author/use, not a guarantee.
+
+```bash
+# Enumerate what's actually registered:
+grep -rE '<Composition\s+id=' "$REMOTION_ROOT/src" | sed -E 's/.*id="([^"]+)".*/\1/'
+```
+
+Shapes we tend to author under `$REMOTION_ROOT/src/projects/llm-wiki/`:
 
 | Composition id | Shape | Use when |
 |---------------|-------|----------|
@@ -141,15 +148,16 @@ Remotion compositions currently available in `$REMOTION_ROOT/src/projects/llm-wi
 | `PromoV2..V9` | Variants (light/dark, screenshots, synth) | Style experiments — pick by taste |
 | `AppDemo` | Screen-recording-style | Feature demos |
 | `MarketingPromo` | Original marketing cut | Evergreen vault overview |
-| `wiki-explainer` | *(to be added)* topic-overview template tuned for `/generate video` | Default for unknown topics |
+| `wiki-explainer` | Topic-overview template tuned for `/generate video` | Default for unknown topics |
 
 Auto-pick rule:
 
-- Topic contains `vs` / `versus` OR the LLM produces `side_by_side` scenes → **KineticPitch** (swap in a new comparison composition in a later iteration).
-- Topic-as-feature-walkthrough → **AppDemo**.
-- Otherwise → **wiki-explainer** (fallback: **PromoV10** until `wiki-explainer` lands).
+- If none of these are registered locally, **author one first** (see "Authoring New Compositions" below) — don't render against a composition id that doesn't exist, Remotion will error loudly.
+- Topic contains `vs` / `versus` OR the LLM produces `side_by_side` scenes → **KineticPitch** if present.
+- Topic-as-feature-walkthrough → **AppDemo** if present.
+- Otherwise → **wiki-explainer** if present, else fall back to whichever composition is registered and closest in shape.
 
-`--composition <id>` overrides the auto-pick.
+`--composition <id>` overrides the auto-pick. Always verify the id exists in `$REMOTION_ROOT/src/Root.tsx` before rendering.
 
 ## Step 5: Render the Video
 

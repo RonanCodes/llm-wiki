@@ -6,10 +6,28 @@
 #
 # Usage:
 #   source-hash.sh <path>...        # explicit list of wiki page paths
-#   source-hash.sh < paths.txt      # one path per line on stdin
+#   source-hash.sh < paths.txt      # one path per line on stdin (SAFER)
 #
 # Output: 64-char hex digest on stdout. Exit 0 on success, non-zero if
 # any listed file is missing or unreadable.
+#
+# Calling convention — prefer stdin when paths may contain spaces:
+#
+#   # ✅ Safest — bulletproof against upstream word-splitting bugs.
+#   # Works with any shell, any path. Use this in new code.
+#   HASH=$(printf '%s\n' "${PAGES[@]}" | .claude/skills/generate/lib/source-hash.sh)
+#
+#   # ✅ Correct IF PAGES is a true bash array (e.g. built with `mapfile -t`).
+#   # Existing callers use this form and it handles spaces fine.
+#   HASH=$(.claude/skills/generate/lib/source-hash.sh "${PAGES[@]}")
+#
+#   # ❌ Broken — unquoted expansion word-splits on every whitespace char
+#   # including spaces inside paths. Don't do this.
+#   HASH=$(.claude/skills/generate/lib/source-hash.sh ${PAGES[@]})
+#
+# If argv form ever misbehaves on paths with spaces, the bug is upstream
+# (the array was populated via unquoted command substitution, not
+# `mapfile -t`). Switching to the stdin form is the fastest workaround.
 #
 # Canonicalization (must be stable across OS, editor, git checkouts):
 #   1. Sort input paths lexicographically — order-independence.
