@@ -1,0 +1,197 @@
+/* ============================================================
+ * O'Reilly-style theme for generate-book
+ * Sober serif body, clean headings, woodcut-animal cover,
+ * ruler-straight margins. Optimised for printed PDF.
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Fira+Mono:wght@400;600&display=swap');
+
+:root {
+  --oreilly-ink:      #111111;
+  --oreilly-body:     #1a1a1a;
+  --oreilly-muted:    #555555;
+  --oreilly-paper:    #fcfcf8;
+  --oreilly-rule:     #d9d3c3;
+  --oreilly-accent:   #b30000;   /* animal-cover red */
+  --oreilly-code-bg:  #f3efe5;
+}
+
+html, body {
+  background: var(--oreilly-paper);
+  color: var(--oreilly-body);
+  font-family: 'Source Serif Pro', Georgia, serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  color: var(--oreilly-ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.4rem; margin: 2.5rem 0 1rem; }
+h2 {
+  font-size: 1.6rem;
+  margin-top: 2.2rem;
+  padding-bottom: .35rem;
+  border-bottom: 1px solid var(--oreilly-rule);
+}
+h3 { font-size: 1.2rem; color: var(--oreilly-accent); }
+
+p { margin: 0 0 .9rem; }
+
+/* Cover — animal woodcut on top, title in a solid rule band */
+.book-cover {
+  position: relative;
+  page-break-after: always;
+  height: 100vh;
+  background: var(--oreilly-paper);
+  display: flex;
+  flex-direction: column;
+}
+.book-cover img {
+  flex: 1 1 auto;
+  object-fit: cover;
+  width: 100%;
+  filter: grayscale(0.1) contrast(1.05);
+}
+.book-cover .cover-title {
+  background: var(--oreilly-paper);
+  border-top: 6px solid var(--oreilly-accent);
+  padding: 1.6rem 1.8rem 2rem;
+}
+.book-cover .cover-title h1 {
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-size: 2.8rem;
+  margin: 0 0 .4rem;
+  color: var(--oreilly-ink);
+}
+.book-cover .cover-subtitle {
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-size: 1.05rem;
+  color: var(--oreilly-muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Chapter opener — roman numeral in the margin, clean */
+.chapter-opener {
+  page-break-before: always;
+  padding: 3.5rem 0 1.5rem;
+  border-bottom: 2px solid var(--oreilly-ink);
+  margin-bottom: 2rem;
+}
+.chapter-opener .eyebrow {
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--oreilly-muted);
+}
+.chapter-opener h1 {
+  font-size: 2.6rem;
+  margin-top: .4rem;
+  margin-bottom: 0;
+}
+
+.dropcap::first-letter {
+  font-family: 'Source Serif Pro', Georgia, serif;
+  font-weight: 700;
+  float: left;
+  font-size: 3.6rem;
+  line-height: 0.95;
+  padding: 0.25rem 0.55rem 0 0;
+  color: var(--oreilly-ink);
+}
+
+/* Pull-quote — simple italic, no color splash */
+.pullquote {
+  border-left: 3px solid var(--oreilly-ink);
+  padding: .4rem 0 .4rem 1rem;
+  margin: 1.4rem 0;
+  font-family: 'Source Serif Pro', Georgia, serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--oreilly-ink);
+}
+
+/* Callouts — boxed with a narrow rule */
+.note, .tip, .warn {
+  border: 1px solid var(--oreilly-rule);
+  border-left: 4px solid var(--oreilly-ink);
+  padding: .8rem 1rem;
+  margin: 1.1rem 0;
+  background: #fff;
+}
+.note::before, .tip::before, .warn::before {
+  display: block;
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--oreilly-muted);
+  margin-bottom: .3rem;
+}
+.note::before { content: "Note"; }
+.tip::before  { content: "Tip"; }
+.warn::before { content: "Warning"; border-left-color: var(--oreilly-accent); }
+.warn { border-left-color: var(--oreilly-accent); }
+
+/* Key takeaways — numbered list in a bordered box */
+.key-takeaways {
+  border-top: 2px solid var(--oreilly-ink);
+  border-bottom: 2px solid var(--oreilly-ink);
+  padding: 1rem 0;
+  margin: 2rem 0 1.2rem;
+}
+.key-takeaways h4 {
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--oreilly-muted);
+  margin: 0 0 .6rem;
+}
+
+/* Code — cream background, Fira Mono */
+pre, code {
+  font-family: 'Fira Mono', 'Menlo', monospace;
+  font-size: 9.2pt;
+}
+pre {
+  background: var(--oreilly-code-bg);
+  border: 1px solid var(--oreilly-rule);
+  padding: .8rem 1rem;
+  overflow-x: auto;
+  border-radius: 2px;
+}
+code { background: var(--oreilly-code-bg); padding: 0 .25rem; border-radius: 2px; }
+
+.source-ref {
+  display: block;
+  font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-size: .78rem;
+  color: var(--oreilly-muted);
+  margin: -.4rem 0 1rem;
+}
+
+/* Mermaid diagrams */
+img[alt^="diagram"] {
+  display: block;
+  margin: 1.2rem auto;
+  max-width: 96%;
+  border: 1px solid var(--oreilly-rule);
+  background: #fff;
+  padding: .5rem;
+}
+
+/* Print rules — page numbers, running heads */
+@page {
+  margin: 22mm 18mm 22mm 18mm;
+  @bottom-center { content: counter(page); font-family: 'Source Sans Pro', sans-serif; font-size: 9pt; color: #555; }
+}
+
+a { color: var(--oreilly-ink); text-decoration: underline; }

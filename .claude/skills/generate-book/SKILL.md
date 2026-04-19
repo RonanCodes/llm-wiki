@@ -1,6 +1,6 @@
 ---
 name: generate-book
-description: Render a beautifully-themed PDF book from wiki pages matching a topic. Renders mermaid diagrams inline, generates a Nano Banana cover illustration, adds drop caps, chapter openers, pull quotes, callouts, and key-takeaways boxes. Preserves code snippet source refs. Used by /generate book. Not user-invocable directly — go through /generate.
+description: Render a beautifully-themed PDF book from wiki pages matching a topic. Pick a publisher style — observatory (default dark editorial), oreilly (woodcut animal + sober serif), dummies (yellow/black cheat-sheet), headfirst (warm cream collage, Q&A). Renders mermaid diagrams inline, generates a per-theme Nano Banana cover, shapes bundle pedagogy to the theme. Preserves code snippet source refs. Used by /generate book. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(node *) Bash(npx *) Bash(pnpm *) Bash(npm *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(cp *) Read Write Glob Grep Skill
 ---
@@ -9,12 +9,21 @@ allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(node *) Bash(npx *
 
 Concatenate wiki pages matching a topic into a **beautifully-themed** PDF book: rendered mermaid diagrams, a generated cover, drop caps, chapter opener pages, pull quotes, callouts, code-snippet source references, and key-takeaways boxes at the end of each chapter. The goal is to keep the learner engaged — not to ship a wall of prose.
 
+Four named themes ship — each with its own CSS, cover prompt, and pedagogy hints:
+
+| Theme | Vibe |
+|-------|------|
+| `observatory` (default) | Dark editorial — amber / cyan / green, reference-grade prose, Inter + Fraunces. |
+| `oreilly` | Sober cream + serif, woodcut animal cover, indexable reference-book voice. |
+| `dummies` | Loud yellow/black chrome, icon callouts, cheat-sheet panels, smart-beginner voice. |
+| `headfirst` | Warm cream collage, Q&A + exercises, handwritten marginalia, brain-friendly redundancy. |
+
 Read `.claude/skills/generate/lib/quality-rubric.md` alongside this file — it is the single source of truth for scope, depth, engagement, source refs, and verification. This handler applies the rubric; it doesn't re-derive the rules.
 
 ## Usage (via /generate router)
 
 ```
-/generate book <topic> [--vault <name>] [--no-toc] [--no-cover] [--template <name>] [--verify]
+/generate book <topic> [--vault <name>] [--theme <name>] [--sample [theme|all]] [--no-toc] [--no-cover] [--template <name>] [--verify]
 ```
 
 Where `<topic>` is one of:
@@ -26,10 +35,46 @@ Where `<topic>` is one of:
 
 | Flag | Default | Effect |
 |------|---------|--------|
+| `--theme <name>` | interactive pick | `observatory` · `oreilly` · `dummies` · `headfirst`. If omitted, Step 0 asks. |
+| `--sample [theme\|all]` | off | Render the first chapter only (saves cost). `theme` = sample the chosen/picked theme. `all` = one sample per theme for side-by-side comparison, then re-prompt. |
 | `--no-toc` | off | Skip the table of contents. |
 | `--no-cover` | off | Skip Nano Banana cover generation. |
-| `--template <name>` | `book-default` | Use a named template from `templates/`. |
+| `--template <name>` | `book-default` | Use a named Pandoc template from `templates/`. Independent of `--theme`. |
 | `--verify` | off | After rendering, also run the heavy `/verify-artifact book <topic>` round-trip. |
+
+## Step 0: Pick a Theme
+
+Theme resolution order:
+
+1. `--theme <name>` passed → use it. Skip to Step 1.
+2. Otherwise, ask the user with `AskUserQuestion`:
+
+   **Question:** "Which book theme?"
+
+   **Options:**
+   1. **Observatory (default)** — Dark editorial, amber/cyan/green, reference-grade. This project's native voice.
+   2. **O'Reilly** — Sober cream + serif, woodcut animal cover, indexable reference voice.
+   3. **For Dummies** — Loud yellow/black, icon callouts, cheat-sheet panels, smart-beginner voice.
+   4. **Head First** — Warm cream collage, Q&A + exercises, handwritten marginalia, brain-friendly.
+   5. **Sample all four first** — render the first chapter in each theme so you can compare, then pick for the full book.
+
+   If the user picks option 5, set `SAMPLE_ALL=1` internally — it's equivalent to `--sample all`.
+
+3. Store the resolved choice as `$THEME` (one of `observatory`, `oreilly`, `dummies`, `headfirst`).
+4. Validate: `.claude/skills/generate-book/themes/$THEME/theme.css` must exist. If not, fall back to `observatory` and print `⚠️  theme '$THEME' not found; falling back to observatory`.
+
+### Sample mode
+
+`--sample` renders the first chapter only (saves LaTeX/Playwright/Nano Banana cost). Two forms:
+
+| Form | Behaviour |
+|------|-----------|
+| `--sample` or `--sample theme` | Render chapter 1 of `$TOPIC` in `$THEME` only. Output to `artifacts/book/samples/<slug>-<date>-<theme>.pdf`. After render, ask: *"Happy with this theme? (Y / pick another / render full book)"*. |
+| `--sample all` | Render chapter 1 in **all four themes** sequentially — observatory, oreilly, dummies, headfirst. Each sample lands in `artifacts/book/samples/`. After all four, ask: *"Which theme for the full book? (observatory / oreilly / dummies / headfirst / skip)"*. |
+
+Samples skip cover generation by default (too costly) unless `--with-cover` was passed. Their sidecars get `flags: { sample: true }`.
+
+When a sample completes, this skill **exits after the picker question** — the user re-runs `/generate book <topic> --theme <choice>` to render the full book. That keeps each run deterministic.
 
 ## Step 1: Dependency Check
 
@@ -72,6 +117,25 @@ This is the "we don't need the full CDM model, just the relevant parts" rule. Th
 ## Step 4: Build the Markdown Bundle
 
 Write `/tmp/generate-book-<slug>-<pid>.bundle.md` with the structure below. The `.bundle.md` suffix matters — `verify-quick.sh` looks for it to measure word count.
+
+**First, read the theme's pedagogy hints** and let them shape tone, structure, and engagement decisions made below:
+
+```bash
+HINTS=".claude/skills/generate-book/themes/$THEME/bundle-hints.md"
+if [ -f "$HINTS" ]; then
+  # The LLM reads $HINTS before generating any chapter content. The hints
+  # rewrite the "voice" — Observatory is precise, Dummies is friendly second-
+  # person, Head First is conversational with Q&A, O'Reilly is indexable-dry.
+  :
+fi
+```
+
+The hints file is the theme's **voice contract**. Observatory keeps the current precise tone; Dummies demands second-person + cheat-sheet panels + icon callouts; Head First demands Q&A dialogue + exercises + handwritten marginalia + the hook-explore-do-check loop; O'Reilly demands third-person + `.in-chapter` lede paragraphs + indexable H2s. In sample mode, only chapter 1 is emitted, so the hints matter even more per chapter.
+
+If `$THEME` is `headfirst`, also emit a `.qa` block and at least one `.exercise` panel per chapter.
+If `$THEME` is `dummies`, also emit an `.in-this-chapter` panel in the opener and a `.cheatsheet` panel at the end.
+If `$THEME` is `oreilly`, do **not** emit drop caps (distracting in a reference book) — use plain paragraph openers.
+If `$THEME` is `observatory`, use the current structure as-is.
 
 ### 4a. Pandoc YAML metadata
 
@@ -175,34 +239,53 @@ Mermaid diagrams use the Observatory theme baked into the helper (dark backgroun
 
 Rubric §7 — long-form artifacts get a cover. Books get a fun, themed, generated illustration.
 
-1. Derive a one-line synopsis from the lead source page's first paragraph (trimmed to ~140 chars).
-2. Pick a **style-of-the-week** deterministically from today's ISO week number mod 6 (see rubric §7 for the rotation). Lock this into the sidecar so regenerations pick the same style.
-3. Detect **fun-mode** topics — if the topic string or vault domain looks playful (heuristic: matches `duck`, `llm wiki`, `debug`, `vibe`, `rubber`, or the vault's `CLAUDE.md` declares `tone: playful`), ask for on-the-nose literal imagery. Otherwise stick to editorial.
-4. Build the cover prompt per the recipe in rubric §7.
-5. Invoke `ro:generate-image` via the Skill tool:
+**Covers are per-theme.** Each theme ships its own cover prompt at
+`.claude/skills/generate-book/themes/$THEME/cover-prompt.md`. That file has
+placeholders `{{TITLE}}` and `{{TOPIC}}` — replace them with the book's title
+and raw topic argument, then send the filled prompt to `ro:generate-image`.
+Do not hand-roll the prompt in this file.
+
+1. Load the theme cover prompt:
+
+   ```bash
+   PROMPT_TEMPLATE=".claude/skills/generate-book/themes/$THEME/cover-prompt.md"
+   # Strip the YAML frontmatter, keep only the body.
+   PROMPT_BODY=$(sed -n '/^---$/,/^---$/!p' "$PROMPT_TEMPLATE" | sed '/./,$!d')
+   PROMPT_BODY="${PROMPT_BODY//\{\{TITLE\}\}/$TITLE_CASE}"
+   PROMPT_BODY="${PROMPT_BODY//\{\{TOPIC\}\}/$TOPIC}"
+   ```
+
+2. Invoke `ro:generate-image` via the Skill tool with the filled prompt:
 
    ```
-   Skill(skill="ro:generate-image", args='<prompt> --output vaults/<vault>/artifacts/book/<slug>-<YYYY-MM-DD>.cover.png --size 1024x1536 --for slide --style illustration')
+   Skill(skill="ro:generate-image", args='<PROMPT_BODY> --output vaults/<vault>/artifacts/book/<slug>-<YYYY-MM-DD>.cover.png --size 1024x1536 --for slide --style illustration')
    ```
 
-   `--size 1024x1536` gives a portrait book cover aspect ratio. `--for slide` + `--style illustration` already push the prompt toward the Observatory palette inside that skill.
+   `--size 1024x1536` gives a portrait book cover aspect ratio. The theme-specific
+   prompt dictates palette and composition — do **not** add Observatory guidance
+   on top of an O'Reilly or Dummies prompt; the prompt is authoritative.
 
-6. Fallback: if `GEMINI_API_KEY` is unset or the skill returns a non-zero exit, skip the cover and emit `⚠️  cover skipped (see rubric §7 fallback)`. Don't block the book on this.
+3. Fallback: if `GEMINI_API_KEY` is unset or the skill returns a non-zero exit, skip the cover and emit `⚠️  cover skipped (see rubric §7 fallback)`. Don't block the book on this.
 
-7. Inject the cover into Step 5's HTML as the very first page inside `<body>`:
+4. Inject the cover into Step 5's HTML as the very first page inside `<body>`. The markup is the same across themes — each theme's CSS styles `.book-cover` differently (Observatory puts a translucent amber panel; O'Reilly a solid red-rule band; Dummies the yellow wedge; Head First a taped card).
 
    ```html
    <div class="book-cover">
      <img src="<absolute path to .cover.png>" alt="Book cover"/>
-     <h1 class="cover-title">{{Topic Title Case}}</h1>
-     <div class="cover-subtitle">An LLM Wiki book · {{YYYY-MM-DD}}</div>
+     <div class="cover-title">
+       <h1>{{Topic Title Case}}</h1>
+       <div class="cover-subtitle">An LLM Wiki book · {{YYYY-MM-DD}}</div>
+     </div>
+     <div class="cover-strap">LLM Wiki Press</div>
    </div>
    <div style="page-break-after:always"></div>
    ```
 
-   The title text is overlaid in CSS (amber on semi-transparent navy panel) rather than baked into the image — Nano Banana is unreliable at rendering text in images.
+   The `.cover-strap` element is ignored by Observatory and O'Reilly CSS but used by Dummies and Head First — keep the markup theme-agnostic.
 
-## Step 5: Render HTML with Pandoc + Inject Beautiful Theme
+5. Fun-mode detection (unchanged): if the topic matches `duck`, `llm wiki`, `debug`, `vibe`, `rubber`, or the vault's `CLAUDE.md` declares `tone: playful`, append `Extra direction: lean into the playfulness of the topic — on-the-nose imagery is welcome.` to `$PROMPT_BODY` before invoking the image skill. Still subject to the theme's visual style.
+
+## Step 5: Render HTML with Pandoc + Inject Theme CSS
 
 ```bash
 HTML_OUT="$VAULT_DIR/artifacts/book/<slug>-<YYYY-MM-DD>.html"
@@ -213,83 +296,56 @@ pandoc "$BUNDLE" -o "$HTML_OUT" --standalone --toc --toc-depth=3 \
   --metadata date="<YYYY-MM-DD>"
 ```
 
-Then inject the full Observatory theme CSS — this is bigger than the old stub. Keep it inline in the HTML so the file stays self-contained.
+Then inject the **theme's CSS** from `.claude/skills/generate-book/themes/$THEME/theme.css` so the file stays self-contained and has no external font/CSS dependency at read-time:
 
-**CSS responsibilities:**
+```bash
+THEME_CSS=".claude/skills/generate-book/themes/$THEME/theme.css"
+if [ ! -f "$THEME_CSS" ]; then
+  echo "theme '$THEME' missing theme.css — falling back to observatory" >&2
+  THEME_CSS=".claude/skills/generate-book/themes/observatory/theme.css"
+fi
 
-```css
-/* Root & body — Observatory palette, generous air */
-html { background: #0b0f14; }
-body {
-  max-width: 1100px; margin: 0 auto; padding: 3rem 3.5rem;
-  background: #0f172a; color: #e8eef6;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 18px; line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-}
+# Allow per-vault override
+VAULT_OVERRIDE="$VAULT_DIR/.artifacts-templates/book-$THEME.css"
+[ -f "$VAULT_OVERRIDE" ] && THEME_CSS="$VAULT_OVERRIDE"
 
-/* Headings — role-coloured per the palette */
-h1 { color: #e0af40; font-size: 2.6rem; letter-spacing: -0.01em; margin: 3rem 0 1rem; }
-h2 { color: #5bbcd6; font-size: 1.8rem; margin-top: 2.5rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.4rem; }
-h3 { color: #7dcea0; font-size: 1.35rem; margin-top: 2rem; }
-
-/* Book cover — first page */
-.book-cover { position: relative; min-height: 90vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 2rem; }
-.book-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
-.cover-title { position: relative; z-index: 2; color: #e0af40; font-size: 3.6rem; line-height: 1.05; background: rgba(11,15,20,0.72); padding: 1.2rem 1.6rem; backdrop-filter: blur(3px); }
-.cover-subtitle { position: relative; z-index: 2; color: #e8eef6; font-size: 1.1rem; background: rgba(11,15,20,0.72); padding: 0.6rem 1.6rem; }
-
-/* Chapter opener */
-.chapter-opener { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; padding: 4rem 2rem; border-top: 6px solid #e0af40; margin-top: 2rem; }
-.chapter-number { color: #64748b; letter-spacing: 0.25em; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 1rem; }
-.chapter-title { color: #e0af40; font-size: 3rem; margin: 0 0 1rem; font-weight: 700; }
-.chapter-synopsis { color: #cbd5e1; font-size: 1.2rem; font-style: italic; max-width: 36rem; }
-
-/* Drop cap — amber serif initial letter */
-.dropcap { font-family: 'Fraunces', 'Playfair Display', Georgia, serif; font-size: 4.2rem; line-height: 1; float: left; color: #e0af40; padding: 0.25rem 0.75rem 0 0; font-weight: 700; }
-
-/* Pull quote — amber left border, large italic */
-.pullquote { margin: 2.5rem 2rem; padding: 1rem 1.5rem 1rem 2rem; border-left: 4px solid #e0af40; color: #f1f5f9; font-size: 1.3rem; font-style: italic; line-height: 1.45; }
-
-/* Callouts — GitHub-style, coloured panels */
-blockquote.note, blockquote:has(p:first-child:is(:contains('[!NOTE]'))) { border-left: 4px solid #5bbcd6; background: rgba(91,188,214,0.08); padding: 1rem 1.25rem; border-radius: 6px; margin: 1.5rem 0; }
-blockquote.tip  { border-left: 4px solid #7dcea0; background: rgba(125,206,160,0.08); padding: 1rem 1.25rem; border-radius: 6px; }
-blockquote.warn { border-left: 4px solid #e0af40; background: rgba(224,175,64,0.10); padding: 1rem 1.25rem; border-radius: 6px; }
-
-/* Key takeaways box — end-of-chapter summary */
-.key-takeaways { margin: 3rem 0; padding: 1.5rem 2rem; background: linear-gradient(135deg, rgba(224,175,64,0.08), rgba(91,188,214,0.06)); border: 1px solid #1e293b; border-radius: 10px; }
-.key-takeaways h3 { color: #e0af40; margin-top: 0; border: none; }
-.key-takeaways ul { margin: 0; padding-left: 1.2rem; }
-.key-takeaways li { margin: 0.4rem 0; }
-
-/* Code blocks — JetBrains Mono, cyan border, surface colour */
-pre { background: #1e293b; border-left: 3px solid #5bbcd6; border-radius: 6px; padding: 1rem 1.25rem; overflow-x: auto; font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; font-size: 0.92rem; line-height: 1.55; }
-code { font-family: 'JetBrains Mono', monospace; background: rgba(91,188,214,0.10); color: #a7d8e6; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.92em; }
-pre code { background: transparent; padding: 0; color: #e8eef6; }
-
-/* Source ref caption below code blocks */
-.source-ref { display: block; margin-top: -0.3rem; font-size: 0.82rem; color: #94a3b8; }
-.source-ref a { color: #5bbcd6; text-decoration: none; border-bottom: 1px dotted #5bbcd6; }
-
-/* Mermaid diagrams — centered, max-width, captioned */
-img[alt^="diagram"] { display: block; margin: 2rem auto; max-width: 100%; height: auto; border-radius: 8px; background: #0b0f14; padding: 1rem; }
-
-/* Tables */
-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-th { text-align: left; color: #e0af40; border-bottom: 2px solid #1e293b; padding: 0.5rem 0.75rem; }
-td { border-bottom: 1px solid #1e293b; padding: 0.5rem 0.75rem; vertical-align: top; }
-
-/* Links */
-a { color: #5bbcd6; text-decoration: none; border-bottom: 1px solid rgba(91,188,214,0.35); }
-a:hover { border-bottom-color: #5bbcd6; }
-
-/* TOC */
-#TOC, .toc { border: 1px solid #1e293b; border-radius: 8px; padding: 1.5rem 2rem; background: #0b0f14; }
-#TOC a, .toc a { color: #cbd5e1; border: none; }
-#TOC a:hover { color: #5bbcd6; }
+# Inline the CSS into the HTML inside a <style> tag just before </head>.
+python3 - <<'PYEOF' "$HTML_OUT" "$THEME_CSS"
+import sys, pathlib
+html_path, css_path = sys.argv[1], sys.argv[2]
+html = pathlib.Path(html_path).read_text()
+css  = pathlib.Path(css_path).read_text()
+needle = "</head>"
+if needle in html:
+    html = html.replace(needle, f"<style>\n{css}\n</style>\n{needle}", 1)
+    pathlib.Path(html_path).write_text(html)
+PYEOF
 ```
 
-Remember: this is a *lot* of CSS. Keep it in a separate template file at `.claude/skills/generate-book/templates/observatory.css` and `sed`-inject it into the Pandoc output, rather than duplicating it inline in the handler script.
+Do **not** duplicate the CSS inline in this SKILL.md. The theme files are the source of truth. The CSS responsibilities (for reviewers) are:
+
+**Every theme.css must define:**
+
+- `html, body` — base palette, font stack, line-height.
+- `h1`/`h2`/`h3` — role-coloured, per the theme's palette.
+- `.book-cover`, `.cover-title`, `.cover-subtitle`, `.cover-strap` — theme's signature cover treatment.
+- `.chapter-opener`, `.chapter-number`/`.eyebrow`, `.chapter-title`, `.chapter-synopsis`/`.chapter-subtitle` — opener spread.
+- `.dropcap` — opening-letter treatment (Observatory + Dummies + Head First). O'Reilly explicitly no-ops this.
+- `.pullquote` — sidebar quote treatment.
+- `blockquote.note` / `.tip` / `.warn` (+ per-theme additions: `.remember`, `.technical`, `.brain`).
+- `.key-takeaways` — end-of-chapter summary panel.
+- `pre` / `code` / `.source-ref` — code block + source-ref caption.
+- `img[alt^="diagram"]` — mermaid SVG framing.
+- `@page` rules for print margins + page numbers.
+
+**Per-theme additions:**
+
+- `observatory`: Inter + Fraunces + JetBrains Mono; amber/cyan/green on navy.
+- `oreilly`: Source Serif Pro + Source Sans Pro + Fira Mono; cream + black + red rule.
+- `dummies`: Montserrat + Lora + JetBrains Mono; yellow + black wedge + sticker icons; `.cheatsheet` + `.in-this-chapter` + `.remember` + `.technical`.
+- `headfirst`: Caveat + Nunito + Lora + JetBrains Mono; cream + orange + teal; `.qa`, `.exercise`, `.handwritten`, `.marginalia`, `.brain`.
+
+See each theme's `theme.css` for the concrete styles.
 
 ## Step 5b: Convert HTML to PDF via Playwright
 
@@ -311,16 +367,18 @@ Unchanged — look for an existing sidecar of the same type + topic, bump versio
 ## Step 7: Write the Sidecar
 
 ```yaml
-generator: generate-book@0.2.0
+generator: generate-book@0.3.0
 generated-at: <UTC ISO 8601>
 template: book-default
+theme: "<observatory|oreilly|dummies|headfirst>"
 topic: "<raw topic argument>"
 flags:
   toc: ${TOC_FLAG:-true}
   cover: ${COVER_FLAG:-true}
+  sample: ${SAMPLE_FLAG:-false}
 cover:
   enabled: true|false
-  style: "<style-of-the-week>"
+  theme_prompt: ".claude/skills/generate-book/themes/<theme>/cover-prompt.md"
   path: "artifacts/book/<slug>-<date>.cover.png"
 mermaid:
   rendered: <N blocks>
@@ -334,6 +392,8 @@ version: <N>
 change-note: "<what changed or 'Initial version'>"
 replaces: "<prev slug or empty>"
 ```
+
+Bumped to `generate-book@0.3.0` because the new `theme:` field changes the artifact's shape and reproducibility contract.
 
 The shape matches `sites/docs/src/content/docs/reference/artifacts.md`. The new `cover:`, `mermaid:`, and `scope_filter:` blocks are additive — existing tooling ignores them.
 
@@ -378,10 +438,11 @@ git diff --cached --quiet || git commit -m "📚 book: generate <topic> ($(date 
 ```
 ✅ Book generated
    Topic:         <topic>
+   Theme:         <observatory|oreilly|dummies|headfirst>
    Pages in:      <N> (sorted, <M> sections scope-filtered out)
    Source hash:   <first 12 chars of hash>
    Mermaid:       <N> diagrams rendered
-   Cover:         <style-of-the-week> via Nano Banana  (or "skipped: no GEMINI_API_KEY")
+   Cover:         <theme> prompt via Nano Banana  (or "skipped: no GEMINI_API_KEY")
    Quality:       pass   (or warn: <list>)
    Cover image:   vaults/<vault>/artifacts/book/<slug>-<date>.cover.png
    HTML:          vaults/<vault>/artifacts/book/<slug>-<date>.html
@@ -393,11 +454,23 @@ git diff --cached --quiet || git commit -m "📚 book: generate <topic> ($(date 
    Suggestion: run `/verify-artifact book <topic>` for a full round-trip fidelity check.
 ```
 
+For sample mode, append a prompt:
+```
+Sample rendered. What next?
+  1. Render the full book in <theme>.
+  2. Pick a different theme and re-sample.
+  3. Done — exit.
+```
+
 ## Template Customisation
 
-- CSS lives at `.claude/skills/generate-book/templates/observatory.css`. Edit it to change the theme globally; per-vault overrides at `vaults/<vault>/.artifacts-templates/book.css`.
-- Pandoc LaTeX template at `.claude/skills/generate-book/templates/book.tex` (only used on Playwright fallback).
-- Cover prompt recipe lives in `quality-rubric.md §7`. Tune per-vault by dropping `vaults/<vault>/.artifacts-templates/cover-prompt.md`.
+- **Themes** live at `.claude/skills/generate-book/themes/<name>/` and own:
+  - `theme.css` — the full style sheet, injected into the HTML at render time.
+  - `cover-prompt.md` — the per-theme Nano Banana prompt template with `{{TITLE}}`/`{{TOPIC}}` placeholders.
+  - `bundle-hints.md` — pedagogy hints (voice, structure rules, engagement requirements) that shape Step 4's markdown bundle.
+- **Per-vault overrides** — drop a `vaults/<vault>/.artifacts-templates/book-<theme>.css` and it wins over the shared theme.css. Vault-level cover prompt override at `vaults/<vault>/.artifacts-templates/cover-prompt-<theme>.md`.
+- **Pandoc LaTeX template** at `.claude/skills/generate-book/templates/book.tex` (only used on Playwright fallback — loses theme styling).
+- **Adding a new theme** — create `.claude/skills/generate-book/themes/<name>/` with the three files above and it becomes available to `--theme <name>` and the Step 0 picker. No router changes needed.
 
 ## Known Limitations
 
@@ -412,6 +485,10 @@ git diff --cached --quiet || git commit -m "📚 book: generate <topic> ($(date 
 - `.claude/skills/generate/lib/quality-rubric.md` — THE canonical rubric for scope, depth, engagement, source refs, verification, covers.
 - `.claude/skills/generate/lib/render-mermaid.sh` — the mermaid pre-pass.
 - `.claude/skills/generate/lib/verify-quick.sh` — the mandatory close-the-loop check.
+- `.claude/skills/generate-book/themes/observatory/` — dark editorial theme (default) — `theme.css`, `cover-prompt.md`, `bundle-hints.md`.
+- `.claude/skills/generate-book/themes/oreilly/` — woodcut-animal reference theme.
+- `.claude/skills/generate-book/themes/dummies/` — yellow/black cheat-sheet theme.
+- `.claude/skills/generate-book/themes/headfirst/` — warm-cream Q&A-driven theme.
 - `.claude/skills/generate-book/html-to-pdf.mjs` — Playwright HTML → PDF converter.
 - `ro:generate-image` — Nano Banana wrapper used for the cover.
 - `.claude/skills/verify-artifact/SKILL.md` — opt-in full round-trip fidelity test.

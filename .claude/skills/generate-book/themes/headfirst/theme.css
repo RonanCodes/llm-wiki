@@ -1,0 +1,305 @@
+/* ============================================================
+ * Head First-style theme for generate-book
+ * Warm cream bg, playful serif + handwritten accents, sticker
+ * callouts, Q&A panels, heavy imagery. Brain-friendly pedagogy.
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@400;600;700;800&family=Lora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --hf-cream:       #faf4e7;
+  --hf-body:        #2a2118;
+  --hf-muted:       #6a5b48;
+  --hf-ink:         #1a140c;
+  --hf-accent:      #e8602e;   /* warm orange */
+  --hf-accent-2:    #277da1;   /* deep teal */
+  --hf-accent-3:    #e4b324;   /* sticker yellow */
+  --hf-soft:        #fff8e3;
+  --hf-rule:        #c9b892;
+}
+
+html, body {
+  background: var(--hf-cream);
+  color: var(--hf-body);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11pt;
+  line-height: 1.58;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--hf-ink);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+h1 { font-size: 2.8rem; margin: 2rem 0 1rem; }
+h2 {
+  font-size: 1.8rem;
+  color: var(--hf-accent);
+  margin-top: 2.3rem;
+  border-bottom: 3px dashed var(--hf-accent);
+  padding-bottom: .25rem;
+}
+h3 { font-size: 1.2rem; color: var(--hf-accent-2); }
+
+p { margin: 0 0 .9rem; }
+
+/* Handwritten notes in the margin */
+.handwritten, .marginalia {
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  color: var(--hf-accent-2);
+  transform: rotate(-1.5deg);
+  line-height: 1.25;
+}
+
+/* Cover — playful collage, warm background */
+.book-cover {
+  position: relative;
+  page-break-after: always;
+  height: 100vh;
+  background: var(--hf-cream);
+  overflow: hidden;
+}
+.book-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.95);
+}
+.book-cover .cover-title {
+  position: absolute;
+  top: 6%;
+  left: 5%;
+  right: 5%;
+  background: rgba(250,244,231, 0.88);
+  padding: 1.2rem 1.4rem 1rem;
+  border: 3px solid var(--hf-ink);
+  box-shadow: 8px 8px 0 var(--hf-accent);
+  transform: rotate(-1deg);
+}
+.book-cover .cover-title h1 {
+  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 3.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--hf-ink);
+  letter-spacing: -0.015em;
+}
+.book-cover .cover-subtitle {
+  font-family: 'Caveat', cursive;
+  font-size: 1.6rem;
+  color: var(--hf-accent-2);
+  margin-top: .4rem;
+}
+.book-cover .cover-strap {
+  position: absolute;
+  bottom: 7%;
+  right: 6%;
+  font-family: 'Nunito', sans-serif;
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--hf-cream);
+  background: var(--hf-ink);
+  padding: .4rem .8rem;
+  transform: rotate(2deg);
+}
+
+/* Chapter opener — taped-down photo vibe */
+.chapter-opener {
+  page-break-before: always;
+  padding: 2.2rem 0 1.4rem;
+  border-bottom: 3px dashed var(--hf-accent);
+  margin-bottom: 1.8rem;
+}
+.chapter-opener .eyebrow {
+  font-family: 'Caveat', cursive;
+  font-size: 1.4rem;
+  color: var(--hf-accent-2);
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+.chapter-opener h1 {
+  font-size: 2.8rem;
+  margin: .3rem 0 .4rem;
+  color: var(--hf-ink);
+}
+.chapter-opener .chapter-subtitle {
+  font-family: 'Caveat', cursive;
+  font-size: 1.4rem;
+  color: var(--hf-muted);
+}
+
+.dropcap::first-letter {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  float: left;
+  font-size: 4rem;
+  line-height: 0.9;
+  color: var(--hf-cream);
+  background: var(--hf-accent);
+  padding: .4rem .6rem;
+  margin: .1rem .55rem 0 0;
+  transform: rotate(-2deg);
+}
+
+/* Pull-quote — speech-bubble adjacent */
+.pullquote {
+  background: var(--hf-soft);
+  border: 2px solid var(--hf-ink);
+  box-shadow: 5px 5px 0 var(--hf-accent-3);
+  padding: 1rem 1.2rem;
+  margin: 1.4rem 0;
+  font-family: 'Lora', Georgia, serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--hf-ink);
+  transform: rotate(-0.5deg);
+}
+
+/* Callouts — sticker style */
+.note, .tip, .warn, .brain {
+  border: 2px solid var(--hf-ink);
+  background: var(--hf-soft);
+  padding: .9rem 1rem .9rem 3.2rem;
+  margin: 1.2rem 0;
+  position: relative;
+  box-shadow: 4px 4px 0 var(--hf-accent-2);
+}
+.note::before, .tip::before, .warn::before, .brain::before {
+  position: absolute;
+  left: .55rem; top: .6rem;
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  background: var(--hf-accent-3);
+  border: 2px solid var(--hf-ink);
+  padding: .35rem .5rem;
+  transform: rotate(-5deg);
+}
+.note::before  { content: "note"; }
+.tip::before   { content: "tip!";  background: var(--hf-accent); color: var(--hf-cream); }
+.warn::before  { content: "watch out!"; background: #c93e2b; color: var(--hf-cream); }
+.brain::before { content: "brain power"; background: var(--hf-accent-2); color: var(--hf-cream); }
+
+/* Q&A panel — Head First's signature */
+.qa {
+  border-top: 2px solid var(--hf-ink);
+  border-bottom: 2px solid var(--hf-ink);
+  padding: 1.1rem 1rem;
+  margin: 1.6rem 0;
+}
+.qa h4 {
+  font-family: 'Nunito', sans-serif;
+  font-size: .9rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--hf-accent);
+  margin: 0 0 .6rem;
+}
+.qa dt {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: var(--hf-ink);
+  margin-top: .7rem;
+}
+.qa dt::before {
+  content: "Q: ";
+  color: var(--hf-accent);
+}
+.qa dd {
+  margin: .3rem 0 .3rem 0;
+  font-family: 'Lora', Georgia, serif;
+}
+.qa dd::before {
+  content: "A: ";
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: var(--hf-accent-2);
+}
+
+/* Exercise / Sharpen Your Pencil */
+.exercise {
+  background: #fff;
+  border: 2px dashed var(--hf-ink);
+  padding: 1rem 1.1rem;
+  margin: 1.4rem 0;
+}
+.exercise::before {
+  content: "✏ Sharpen Your Pencil";
+  display: block;
+  font-family: 'Caveat', cursive;
+  font-size: 1.4rem;
+  color: var(--hf-accent);
+  margin-bottom: .4rem;
+}
+
+/* Key takeaways — "bullet points" from the brain */
+.key-takeaways {
+  background: var(--hf-soft);
+  border: 2px solid var(--hf-ink);
+  box-shadow: 5px 5px 0 var(--hf-accent);
+  padding: 1rem 1.2rem;
+  margin: 2rem 0 1.2rem;
+}
+.key-takeaways h4 {
+  font-family: 'Caveat', cursive;
+  font-size: 1.5rem;
+  color: var(--hf-accent);
+  margin: 0 0 .5rem;
+  transform: rotate(-1deg);
+  display: inline-block;
+}
+
+/* Code — old-school lined-paper feel */
+pre, code {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 9.6pt;
+}
+pre {
+  background: #fffbe8;
+  border: 2px solid var(--hf-ink);
+  border-left: 6px solid var(--hf-accent-2);
+  padding: .8rem 1rem;
+  overflow-x: auto;
+  box-shadow: 4px 4px 0 var(--hf-rule);
+}
+code { background: var(--hf-soft); color: var(--hf-ink); padding: 0 .3rem; border: 1px solid var(--hf-rule); border-radius: 2px; }
+
+.source-ref {
+  display: block;
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: var(--hf-muted);
+  margin: -.3rem 0 1rem;
+}
+
+/* Mermaid diagrams — taped snapshot look */
+img[alt^="diagram"] {
+  display: block;
+  margin: 1.4rem auto;
+  max-width: 94%;
+  border: 2px solid var(--hf-ink);
+  background: #fff;
+  padding: .6rem;
+  box-shadow: 6px 6px 0 var(--hf-accent-3);
+  transform: rotate(-0.6deg);
+}
+
+@page {
+  margin: 22mm 18mm 22mm 18mm;
+  @bottom-center {
+    content: counter(page);
+    font-family: 'Caveat', cursive;
+    font-size: 12pt;
+    color: var(--hf-accent);
+  }
+}
+
+a { color: var(--hf-accent-2); text-decoration: underline; text-decoration-thickness: 2px; }

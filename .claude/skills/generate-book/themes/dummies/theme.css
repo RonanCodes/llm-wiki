@@ -1,0 +1,278 @@
+/* ============================================================
+ * For Dummies-style theme for generate-book
+ * Yellow + black chrome, wedge accents, cheat-sheet panels,
+ * icon-driven callouts (Tip / Warning / Remember / Technical).
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lora:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --dummies-yellow:   #ffde2b;
+  --dummies-black:    #000000;
+  --dummies-paper:    #ffffff;
+  --dummies-body:     #111111;
+  --dummies-muted:    #555555;
+  --dummies-soft:     #fff7c8;
+  --dummies-rule:     #111111;
+  --dummies-pink:     #ff4e8e;   /* sidebar accent */
+  --dummies-blue:     #0070c0;   /* remember icon */
+}
+
+html, body {
+  background: var(--dummies-paper);
+  color: var(--dummies-body);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11pt;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', Arial, sans-serif;
+  color: var(--dummies-black);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+h1 { font-size: 2.6rem; margin: 2rem 0 1rem; }
+h2 {
+  font-size: 1.7rem;
+  background: var(--dummies-yellow);
+  padding: .35rem .6rem;
+  display: inline-block;
+  margin-top: 2rem;
+  border-bottom: 4px solid var(--dummies-black);
+}
+h3 { font-size: 1.15rem; border-left: 6px solid var(--dummies-yellow); padding-left: .55rem; }
+
+p { margin: 0 0 .85rem; }
+
+/* Cover — iconic yellow + black wedge */
+.book-cover {
+  position: relative;
+  page-break-after: always;
+  height: 100vh;
+  background: var(--dummies-yellow);
+  overflow: hidden;
+}
+.book-cover::before {
+  /* black triangle wedge bottom-right */
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 55vh 70vw;
+  border-color: transparent transparent var(--dummies-black) transparent;
+  z-index: 1;
+}
+.book-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  opacity: 0.95;
+  z-index: 2;
+}
+.book-cover .cover-title {
+  position: absolute;
+  top: 8%;
+  left: 6%;
+  right: 6%;
+  z-index: 3;
+}
+.book-cover .cover-title h1 {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 4.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--dummies-black);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.book-cover .cover-subtitle {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dummies-black);
+  margin-top: .8rem;
+}
+.book-cover .cover-strap {
+  position: absolute;
+  bottom: 5%;
+  right: 6%;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dummies-yellow);
+  letter-spacing: .15em;
+  z-index: 4;
+  text-transform: uppercase;
+}
+
+/* Chapter opener — yellow band + chapter number dingbat */
+.chapter-opener {
+  page-break-before: always;
+  background: var(--dummies-yellow);
+  border-bottom: 6px solid var(--dummies-black);
+  padding: 2rem 1.6rem 1.4rem;
+  margin: 0 -1.6rem 2rem;
+}
+.chapter-opener .eyebrow {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--dummies-black);
+}
+.chapter-opener h1 {
+  font-size: 2.7rem;
+  margin: .3rem 0 0;
+  color: var(--dummies-black);
+}
+.chapter-opener .in-this-chapter {
+  background: var(--dummies-paper);
+  border: 3px solid var(--dummies-black);
+  padding: .8rem 1rem;
+  margin-top: 1.2rem;
+  font-family: 'Lora', Georgia, serif;
+}
+.chapter-opener .in-this-chapter::before {
+  content: "✓ In This Chapter";
+  display: block;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: .08em;
+  margin-bottom: .4rem;
+  color: var(--dummies-black);
+}
+
+/* Dropcap — yellow square, black letter */
+.dropcap::first-letter {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 800;
+  float: left;
+  font-size: 3.6rem;
+  line-height: 1;
+  background: var(--dummies-yellow);
+  color: var(--dummies-black);
+  padding: .35rem .5rem;
+  margin: .15rem .5rem 0 0;
+  border: 2px solid var(--dummies-black);
+}
+
+/* Pull-quote — black band, yellow text */
+.pullquote {
+  background: var(--dummies-black);
+  color: var(--dummies-yellow);
+  padding: 1rem 1.2rem;
+  margin: 1.4rem 0;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+/* Callouts — classic Dummies icons, bright boxes */
+.note, .tip, .warn, .remember, .technical {
+  border: 3px solid var(--dummies-black);
+  background: var(--dummies-soft);
+  padding: .7rem .9rem .7rem 3.2rem;
+  margin: 1.1rem 0;
+  position: relative;
+  min-height: 2.6rem;
+}
+.note::before, .tip::before, .warn::before, .remember::before, .technical::before {
+  position: absolute;
+  left: .5rem; top: .5rem;
+  width: 2rem; height: 2rem;
+  border: 2px solid var(--dummies-black);
+  border-radius: 50%;
+  background: var(--dummies-yellow);
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 800;
+  font-size: .7rem;
+  text-align: center;
+  line-height: 1.85rem;
+  letter-spacing: .02em;
+}
+.tip::before      { content: "TIP"; }
+.note::before     { content: "NOTE"; }
+.warn::before     { content: "!";  background: #ff4040; color: #fff; font-size: 1.1rem; }
+.remember::before { content: "★";  background: var(--dummies-blue); color: #fff; }
+.technical::before{ content: "⚙";  background: var(--dummies-pink); color: #fff; }
+
+/* Cheat sheet — the Dummies signature "try this at home" panel */
+.cheatsheet {
+  border: 4px solid var(--dummies-black);
+  background: var(--dummies-yellow);
+  padding: 1rem 1.2rem;
+  margin: 1.8rem 0;
+}
+.cheatsheet h4 {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin: 0 0 .5rem;
+}
+
+/* Key takeaways */
+.key-takeaways {
+  background: var(--dummies-black);
+  color: var(--dummies-paper);
+  padding: 1rem 1.2rem;
+  margin: 2rem 0 1.2rem;
+}
+.key-takeaways h4 {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 800;
+  color: var(--dummies-yellow);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin: 0 0 .5rem;
+}
+.key-takeaways ul li::marker { color: var(--dummies-yellow); }
+
+/* Code — high-contrast block */
+pre, code {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 9.4pt;
+}
+pre {
+  background: #111;
+  color: #ffde2b;
+  border: 3px solid var(--dummies-black);
+  padding: .8rem 1rem;
+  overflow-x: auto;
+}
+code { background: var(--dummies-soft); color: var(--dummies-black); padding: 0 .3rem; border-radius: 2px; border: 1px solid #e6d76a; }
+
+.source-ref {
+  display: block;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: .78rem;
+  color: var(--dummies-muted);
+  margin: -.3rem 0 1rem;
+}
+
+/* Mermaid diagrams */
+img[alt^="diagram"] {
+  display: block;
+  margin: 1.2rem auto;
+  max-width: 96%;
+  border: 3px solid var(--dummies-black);
+  background: var(--dummies-paper);
+  padding: .5rem;
+}
+
+@page {
+  margin: 22mm 18mm 22mm 18mm;
+  @bottom-center { content: counter(page); font-family: 'Montserrat', sans-serif; font-size: 9pt; color: #000; font-weight: 700; }
+}
+
+a { color: var(--dummies-black); text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--dummies-yellow); }
