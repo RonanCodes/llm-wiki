@@ -53,3 +53,7 @@ curl -s "https://publish.x.com/oembed?url=<original-url>"
 ## Dependencies
 
 None — uses only `curl`.
+
+## See also
+
+- [`ronan-skills/x-scan`](https://github.com/RonanCodes/ronan-skills/blob/main/skills/x-scan/SKILL.md) — generic sibling for browsing tweets (URL, user timeline, topic search) without vault persistence. Use this skill when you want to keep the content.

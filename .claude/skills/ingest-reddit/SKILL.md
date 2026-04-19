@@ -99,3 +99,7 @@ curl -sL -H "User-Agent: llm-wiki-bot/1.0" \
 ## Dependencies
 
 None — uses only `curl`.
+
+## See also
+
+- [`ronan-skills/reddit-scan`](https://github.com/RonanCodes/ronan-skills/blob/main/skills/reddit-scan/SKILL.md) — generic sibling for browsing Reddit (thread URL, subreddit listing, topic search) without vault persistence. Use this skill when you want to keep the content.

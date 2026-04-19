@@ -81,3 +81,7 @@ Sections: **Author** (name + headline), **Post** (full text), **Key Takeaways** 
 
 - `curl` — HTTP requests
 - `firefox-cookies` skill — optional, for URL-based fetching
+
+## See also
+
+- [`ronan-skills/linkedin-scan`](https://github.com/RonanCodes/ronan-skills/blob/main/skills/linkedin-scan/SKILL.md) — generic sibling for reading LinkedIn posts (URL with cookie auth, pasted text, or profile feed) without vault persistence. Use this skill when you want to keep the content.

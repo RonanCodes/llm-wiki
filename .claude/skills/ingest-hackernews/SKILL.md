@@ -116,3 +116,7 @@ curl -s "https://hacker-news.firebaseio.com/v0/item/{kid_id}.json"
 ## Dependencies
 
 None — uses only `curl`.
+
+## See also
+
+- [`ronan-skills/hn-scan`](https://github.com/RonanCodes/ronan-skills/blob/main/skills/hn-scan/SKILL.md) — generic sibling for browsing HN (thread URL, topic search, front page, Show HN, Ask HN) without vault persistence. Use this skill when you want to keep the content.
