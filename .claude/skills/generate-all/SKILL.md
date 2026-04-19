@@ -9,16 +9,19 @@ allowed-tools: Bash(git *) Bash(ls *) Bash(mkdir *) Bash(date *) Bash(find *) Ba
 
 Run every available `generate-*` handler for a single topic in one go. This is the "give me the full bundle" command — useful when you want to produce a podcast, book, slides, quiz, flashcards, mindmap, and infographic for the same topic without typing ten commands.
 
+Every handler applies `.claude/skills/generate/lib/quality-rubric.md` independently — scope filter, depth floor, engagement techniques, source refs, close-the-loop verify. This meta-handler adds one extra step: after all handlers run, optionally invoke `/verify-artifact` on the fidelity-sensitive ones (book, pdf, slides, podcast).
+
 ## Usage (via /generate router)
 
 ```
-/generate all <topic> [--vault <name>] [--preset <name>] [--skip <list>] [--with <list>]
+/generate all <topic> [--vault <name>] [--preset <name>] [--skip <list>] [--with <list>] [--verify]
 ```
 
 - `<topic>` — same shape as any other handler (tag, folder path, single page path, or free-form phrase).
 - `--preset <name>` — skip the interactive prompt; one of `fast`, `html`, `everything`.
 - `--skip <list>` — comma-separated handler types to exclude (e.g. `--skip video,podcast`).
 - `--with <list>` — comma-separated handler types to force-include on top of the chosen preset.
+- `--verify` — after all handlers run, also invoke `/verify-artifact` on the fidelity-sensitive artifacts (book, pdf, slides, podcast). Off by default because round-trip verification is slow (~30s per artifact).
 
 ## Step 1: Resolve Vault + Topic
 
@@ -85,6 +88,22 @@ quiz            ⚠️ fail   —                                          5s (s
 ...
 ```
 
+## Step 4.5: Optional — Verify Fidelity-Sensitive Artifacts
+
+Each handler already ran `verify-quick.sh` (the cheap check) — those results are in each sidecar's `quality:` block. The heavy round-trip (`/verify-artifact`) is opt-in.
+
+If `--verify` was passed:
+
+```bash
+for type in book pdf slides podcast; do
+  if [[ " ${HANDLERS[*]} " == *" $type "* ]]; then
+    /verify-artifact "$type" "$TOPIC" --vault "$VAULT_NAME"
+  fi
+done
+```
+
+Record the result (coverage, Jaccard, normalised fidelity, pass/fail) in the summary table. Never abort the batch on a verify failure — the artifact is already written and is still usable even if round-trip fidelity dipped below target. Let the user decide.
+
 ## Step 5: Regenerate the Vault Portal
 
 After all handlers finish (success or fail), always call `generate-portal` for the same vault so the vault's `artifacts/portal/index.html` reflects the new artifacts:
@@ -120,10 +139,13 @@ Each handler commits its own artifact + sidecar. The portal regeneration in Step
 - **No registry.** Handler discovery uses the same directory-presence convention as `/generate`. Adding a new `.claude/skills/generate-<type>/` directory makes it automatically available to presets that include it.
 - **Presets are hints, not contracts.** If the user runs `--preset html --with podcast`, honour it — the preset is a starting point.
 - **Idempotent.** Running `/generate all <topic>` twice produces two versioned copies of each artifact (per the sidecar versioning convention in `generate-portal/SKILL.md`) — not duplicates that overwrite.
-- **Close-the-loop.** If `verify-artifact` is available, consider suggesting the user run it on one or two of the generated artifacts as a sanity check. Don't run it automatically — it's opt-in.
+- **Close-the-loop.** Every per-type handler runs `verify-quick.sh` on its own output (cheap, inline, mandatory). Pass `--verify` to this meta-handler to *also* run the heavy `/verify-artifact` round-trip on the fidelity-sensitive artifacts.
 
 ## See Also
 
+- `.claude/skills/generate/lib/quality-rubric.md` — canonical rubric every handler applies.
+- `.claude/skills/generate/lib/verify-quick.sh` — cheap close-the-loop check each handler runs inline.
+- `.claude/skills/verify-artifact/SKILL.md` — the opt-in round-trip invoked by `--verify`.
 - `.claude/skills/generate/SKILL.md` — router that dispatches here.
 - `.claude/skills/generate-portal/SKILL.md` — the vault portal this skill regenerates at the end, and the root portal (via `--root`).
 - All `generate-*/SKILL.md` handlers — the building blocks this skill chains together.

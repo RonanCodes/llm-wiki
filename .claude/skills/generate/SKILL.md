@@ -115,4 +115,5 @@ Entries without an existing handler skill will trip the "no handler registered" 
 - **Convention over registry.** `/ingest` uses a URL-pattern match table; `/generate` uses directory presence. Same spirit: no central list to keep in sync.
 - **Handlers must be self-contained.** Each handler skill owns its own install-checks, template, output path, sidecar, and commit. The router is a thin dispatcher.
 - **One artifact per invocation.** Like `/ingest`, stay involved per run. A batch mode can come later as a separate skill if needed.
-- **Close-the-loop.** Every artifact must be re-ingestable (or as close to it as recoverability allows). See `vaults/llm-wiki/wiki/concepts/close-the-loop-testing.md`.
+- **Quality rubric is shared.** Every handler applies `.claude/skills/generate/lib/quality-rubric.md` (scope, depth floor, engagement, source refs, close-the-loop). Read it alongside any handler you're editing — it's the single source of truth for "what makes an artifact good."
+- **Close-the-loop.** Every handler runs `.claude/skills/generate/lib/verify-quick.sh` on its own output (cheap, inline, stamps into sidecar). The heavy `/verify-artifact` round-trip is opt-in via `--verify`. See `vaults/llm-wiki/wiki/concepts/close-the-loop-testing.md`.

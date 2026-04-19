@@ -1,6 +1,6 @@
 ---
 name: generate-infographic
-description: Render a single-page SVG infographic summarising a topic. Uses a template library (stats-card, comparison-grid, timeline) and fills slots from wiki content. Optional PNG export via rsvg-convert. Used by /generate infographic. Not user-invocable directly — go through /generate.
+description: Render a single-page SVG infographic summarising a topic. Uses a template library (stats-card, comparison-grid, timeline) and fills slots from wiki content. Optional PNG export via rsvg-convert. Closes the loop via verify-quick.sh (mandatory) and optional /verify-artifact. Used by /generate infographic. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(brew *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(rsvg-convert *) Read Write Glob Grep
 ---
@@ -14,8 +14,12 @@ Artifact-first — output lands in `vaults/<vault>/artifacts/infographic/`.
 ## Usage (via /generate router)
 
 ```
-/generate infographic <topic> [--vault <name>] [--template <name>] [--no-png]
+/generate infographic <topic> [--vault <name>] [--template <name>] [--no-png] [--verify]
 ```
+
+The `--verify` flag runs the heavy `/verify-artifact infographic <topic>` round-trip after generation. `verify-quick.sh` runs unconditionally — see Step 10.
+
+The handler applies `.claude/skills/generate/lib/quality-rubric.md` — the canonical rubric for scope, depth, engagement, source refs, verification. Read it alongside this file. The §1 scope rule matters here: fill template slots with the *relevant* concepts, not the whole vault.
 
 Where `<topic>` is one of:
 
@@ -184,7 +188,34 @@ replaces: "$PREV_SLUG"
 EOF
 ```
 
-## Step 10: Commit to Vault Repo
+## Step 10: Close the Loop (Quality Verify) — MANDATORY
+
+Rubric §6 — every handler runs `verify-quick.sh` on its own output before reporting success.
+
+```bash
+.claude/skills/generate/lib/verify-quick.sh infographic "$SVG_OUT" "$META"
+QV_EXIT=$?
+```
+
+The check enforces:
+
+- SVG exists and has ≥ 5 populated `<text>` data points (rubric §2 floor).
+- At least some of the source pages' top concepts appear in the SVG text layer (rubric §3 engagement proxy — an infographic that lost its content is not engaging).
+- Sidecar has `generated-from` + `source-hash`.
+
+Surface warnings in Step 12's report and stamp them into the sidecar's `quality:` block. Common warning: "only 3 datapoints; try a richer template or widen the topic."
+
+### Optional: full round-trip (`--verify`)
+
+If `--verify` was passed, invoke:
+
+```bash
+/verify-artifact infographic "$TOPIC" --vault "$VAULT_NAME"
+```
+
+Infographic fidelity is low-target (0.25) by design — most context is lost, captions survive. The round-trip still tells you whether the captions you kept are the *right* ones.
+
+## Step 11: Commit to Vault Repo
 
 ```bash
 cd "$VAULT_DIR"
@@ -192,7 +223,7 @@ git add "artifacts/infographic/<slug>-<date>."{svg,png,meta.yaml} 2>/dev/null
 git diff --cached --quiet || git commit -m "🎨 infographic: generate <topic> ($(date +%Y-%m-%d))"
 ```
 
-## Step 11: Report to User
+## Step 12: Report to User
 
 ```
 ✅ Infographic generated
@@ -200,11 +231,14 @@ git diff --cached --quiet || git commit -m "🎨 infographic: generate <topic> (
    Template:    <template name>
    Pages in:    <N>
    Source hash: <first 12 chars>
+   Quality:     pass  (or warn: <list from verify-quick>)
    SVG:         vaults/<vault>/artifacts/infographic/<slug>-<date>.svg
    PNG:         vaults/<vault>/artifacts/infographic/<slug>-<date>.png  (if rsvg-convert available)
    Sidecar:     vaults/<vault>/artifacts/infographic/<slug>-<date>.meta.yaml
    Open with:   open <absolute path to svg>
 ```
+
+If `--verify` was used, append the round-trip result (coverage, Jaccard, normalised fidelity, pass/fail).
 
 ## Authoring New Templates
 
@@ -223,6 +257,9 @@ git diff --cached --quiet || git commit -m "🎨 infographic: generate <topic> (
 
 ## See Also
 
+- `.claude/skills/generate/lib/quality-rubric.md` — canonical rubric applied here.
+- `.claude/skills/generate/lib/verify-quick.sh` — the mandatory close-the-loop check.
+- `.claude/skills/verify-artifact/SKILL.md` — opt-in full round-trip fidelity test.
 - `.claude/skills/generate/SKILL.md` — router that dispatches here.
 - `.claude/skills/generate/lib/select-pages.sh` — shared topic resolution.
 - `.claude/skills/generate/lib/source-hash.sh` — shared provenance hash.

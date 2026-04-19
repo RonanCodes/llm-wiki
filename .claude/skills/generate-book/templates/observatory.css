@@ -1,0 +1,181 @@
+/* Observatory theme — beautifully-rendered LLM Wiki books.
+ * Injected into Pandoc's HTML output between <style> tags so the
+ * artifact is fully self-contained. Keep the palette in sync with
+ * .claude/skills/generate/lib/quality-rubric.md §5.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+html { background: #0b0f14; }
+
+body {
+  max-width: 1100px; margin: 0 auto; padding: 3rem 3.5rem;
+  background: #0f172a; color: #e8eef6;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 18px; line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings — role-coloured per the palette */
+h1 { color: #e0af40; font-size: 2.6rem; letter-spacing: -0.01em; margin: 3rem 0 1rem; font-weight: 700; }
+h2 { color: #5bbcd6; font-size: 1.8rem; margin-top: 2.5rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.4rem; font-weight: 600; }
+h3 { color: #7dcea0; font-size: 1.35rem; margin-top: 2rem; font-weight: 600; }
+h4 { color: #cbd5e1; font-size: 1.1rem; margin-top: 1.75rem; }
+
+p { margin: 0.9rem 0; }
+
+/* Book cover — first page */
+.book-cover {
+  position: relative; min-height: 90vh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 2rem; page-break-after: always;
+}
+.book-cover img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; border-radius: 0;
+}
+.cover-title {
+  position: relative; z-index: 2;
+  color: #e0af40; font-size: 3.6rem; line-height: 1.05;
+  background: rgba(11,15,20,0.72);
+  padding: 1.2rem 1.6rem;
+  backdrop-filter: blur(3px);
+  font-family: 'Fraunces', Georgia, serif;
+}
+.cover-subtitle {
+  position: relative; z-index: 2;
+  color: #e8eef6; font-size: 1.1rem;
+  background: rgba(11,15,20,0.72);
+  padding: 0.6rem 1.6rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* Chapter opener — amber top rule, number eyebrow, large title */
+.chapter-opener {
+  min-height: 70vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 4rem 2rem;
+  border-top: 6px solid #e0af40;
+  margin-top: 2rem;
+  page-break-before: always; page-break-after: always;
+}
+.chapter-number {
+  color: #64748b; letter-spacing: 0.25em;
+  text-transform: uppercase; font-size: 0.85rem; margin-bottom: 1rem;
+}
+.chapter-title {
+  color: #e0af40; font-size: 3rem; margin: 0 0 1rem;
+  font-weight: 700; font-family: 'Fraunces', Georgia, serif;
+}
+.chapter-synopsis {
+  color: #cbd5e1; font-size: 1.2rem;
+  font-style: italic; max-width: 36rem;
+}
+
+/* Drop cap — amber serif initial letter */
+.dropcap {
+  font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+  font-size: 4.2rem; line-height: 1;
+  float: left; color: #e0af40;
+  padding: 0.25rem 0.75rem 0 0; font-weight: 700;
+}
+
+/* Pull quote — amber left border, large italic */
+.pullquote, aside.pullquote {
+  margin: 2.5rem 2rem; padding: 1rem 1.5rem 1rem 2rem;
+  border-left: 4px solid #e0af40;
+  color: #f1f5f9; font-size: 1.3rem;
+  font-style: italic; line-height: 1.45;
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+/* Callouts — GitHub-style, coloured panels
+ * Pandoc renders `> [!NOTE]` as a regular <blockquote>, so we target
+ * blockquote and let the handler add a .note / .tip / .warn class
+ * during Step 4 markdown pre-processing.
+ */
+blockquote {
+  border-left: 3px solid #334155; margin: 1.5rem 0;
+  padding: 0.5rem 1.25rem; color: #cbd5e1;
+  background: rgba(255,255,255,0.02); border-radius: 4px;
+}
+blockquote.note { border-left-color: #5bbcd6; background: rgba(91,188,214,0.08); }
+blockquote.tip  { border-left-color: #7dcea0; background: rgba(125,206,160,0.08); }
+blockquote.warn { border-left-color: #e0af40; background: rgba(224,175,64,0.10); }
+blockquote p:first-child { margin-top: 0; }
+blockquote p:last-child  { margin-bottom: 0; }
+
+/* Key takeaways box — end-of-chapter summary */
+.key-takeaways {
+  margin: 3rem 0; padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(224,175,64,0.08), rgba(91,188,214,0.06));
+  border: 1px solid #1e293b; border-radius: 10px;
+  page-break-inside: avoid;
+}
+.key-takeaways h3 { color: #e0af40; margin-top: 0; border: none; }
+.key-takeaways ul { margin: 0; padding-left: 1.2rem; }
+.key-takeaways li { margin: 0.4rem 0; }
+
+/* Code blocks */
+pre {
+  background: #1e293b; border-left: 3px solid #5bbcd6;
+  border-radius: 6px; padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 0.92rem; line-height: 1.55;
+}
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(91,188,214,0.10);
+  color: #a7d8e6;
+  padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.92em;
+}
+pre code { background: transparent; padding: 0; color: #e8eef6; }
+
+/* Source-ref caption under a code snippet */
+.source-ref {
+  display: block; margin-top: -0.3rem;
+  font-size: 0.82rem; color: #94a3b8;
+}
+.source-ref a {
+  color: #5bbcd6; text-decoration: none;
+  border-bottom: 1px dotted #5bbcd6;
+}
+
+/* Mermaid / other rendered diagrams */
+img[alt^="diagram"] {
+  display: block; margin: 2rem auto;
+  max-width: 100%; height: auto;
+  border-radius: 8px; background: #0b0f14;
+  padding: 1rem;
+}
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+th { text-align: left; color: #e0af40; border-bottom: 2px solid #1e293b; padding: 0.5rem 0.75rem; }
+td { border-bottom: 1px solid #1e293b; padding: 0.5rem 0.75rem; vertical-align: top; }
+
+/* Links */
+a { color: #5bbcd6; text-decoration: none; border-bottom: 1px solid rgba(91,188,214,0.35); }
+a:hover { border-bottom-color: #5bbcd6; }
+
+/* TOC */
+#TOC, .toc {
+  border: 1px solid #1e293b; border-radius: 8px;
+  padding: 1.5rem 2rem; background: #0b0f14;
+  page-break-after: always;
+}
+#TOC a, .toc a { color: #cbd5e1; border: none; }
+#TOC a:hover { color: #5bbcd6; }
+#TOC ul { padding-left: 1.2rem; }
+
+/* Print overrides — Playwright honours these in PDF output */
+@media print {
+  html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  h1 { page-break-before: always; }
+  body > h1:first-of-type, .cover-title, .chapter-opener h1 { page-break-before: avoid; }
+  h1, h2, h3, h4 { page-break-after: avoid; }
+  pre, .key-takeaways, .pullquote { page-break-inside: avoid; }
+  tr { page-break-inside: avoid; }
+}

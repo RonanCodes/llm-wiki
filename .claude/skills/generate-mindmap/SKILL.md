@@ -1,6 +1,6 @@
 ---
 name: generate-mindmap
-description: Render an interactive Markmap HTML mind map from wiki pages matching a topic. Walks page headings to build the outline; preserves wikilinks as clickable nodes. Lazy-installs markmap-cli. Used by /generate mindmap. Not user-invocable directly — go through /generate.
+description: Render an interactive Markmap HTML mind map from wiki pages matching a topic. Walks page headings to build the outline; preserves wikilinks as clickable nodes. Lazy-installs markmap-cli. Closes the loop via verify-quick.sh (mandatory) and optional /verify-artifact. Used by /generate mindmap. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(npx *) Bash(pnpm *) Bash(npm *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Read Write Glob Grep
 ---
@@ -14,8 +14,12 @@ Artifact-first — output lands in `vaults/<vault>/artifacts/mindmap/`, never in
 ## Usage (via /generate router)
 
 ```
-/generate mindmap <topic> [--vault <name>] [--template <name>] [--include-wikilinks]
+/generate mindmap <topic> [--vault <name>] [--template <name>] [--include-wikilinks] [--verify]
 ```
+
+The `--verify` flag triggers the heavy `/verify-artifact mindmap <topic>` round-trip after generation. `verify-quick.sh` runs unconditionally — see Step 9.
+
+The handler also applies `.claude/skills/generate/lib/quality-rubric.md` — the canonical rubric for scope, depth, engagement, source refs, verification. Read it alongside this file.
 
 Where `<topic>` is one of:
 
@@ -185,7 +189,34 @@ EOF
 
 Schema matches `sites/docs/src/content/docs/reference/artifacts.md`.
 
-## Step 9: Commit to Vault Repo
+## Step 9: Close the Loop (Quality Verify) — MANDATORY
+
+Rubric §6 — every handler must run `verify-quick.sh` on its own output before reporting success.
+
+```bash
+.claude/skills/generate/lib/verify-quick.sh mindmap "$OUT" "$META"
+QV_EXIT=$?
+```
+
+The check enforces:
+
+- Outline has ≥ 12 leaf nodes and ≥ 3 levels of depth (rubric §2).
+- At least some wikilink / source preservation happened (rubric §3 engagement count).
+- Sidecar has `generated-from` + `source-hash`.
+
+Warnings don't abort the flow — they surface in Step 11's report and get stamped into the sidecar's `quality:` block. A mindmap with 4 shallow branches fails the depth check and earns a `warn`; the user decides whether to broaden the topic or accept it.
+
+### Optional: full round-trip (`--verify`)
+
+If `--verify` was passed, also invoke:
+
+```bash
+/verify-artifact mindmap "$TOPIC" --vault "$VAULT_NAME"
+```
+
+This re-ingests the HTML's text layer into a scratch vault and scores coverage + Jaccard vs the originals. Slow (tens of seconds); opt-in by design.
+
+## Step 10: Commit to Vault Repo
 
 ```bash
 cd "$VAULT_DIR"
@@ -193,7 +224,7 @@ git add "artifacts/mindmap/<slug>-<date>."{outline.md,html,md,meta.yaml} 2>/dev/
 git diff --cached --quiet || git commit -m "🧠 mindmap: generate <topic> ($(date +%Y-%m-%d))"
 ```
 
-## Step 10: Report to User
+## Step 11: Report to User
 
 ```
 ✅ Mindmap generated
@@ -201,11 +232,14 @@ git diff --cached --quiet || git commit -m "🧠 mindmap: generate <topic> ($(da
    Pages in:    <N> (sorted)
    Source hash: <first 12 chars>
    Renderer:    markmap  (or mermaid-fallback)
+   Quality:     pass  (or warn: <list from verify-quick>)
    Outline:     vaults/<vault>/artifacts/mindmap/<slug>-<date>.outline.md
    HTML:        vaults/<vault>/artifacts/mindmap/<slug>-<date>.html
    Sidecar:     vaults/<vault>/artifacts/mindmap/<slug>-<date>.meta.yaml
    Open with:   open <absolute path to html>
 ```
+
+If `--verify` was used, append the round-trip result (coverage, Jaccard, normalised fidelity, pass/fail).
 
 ## Embedding in Obsidian
 
@@ -229,6 +263,9 @@ The fallback `.md` (Mermaid) renders natively in Obsidian with no plugin.
 
 ## See Also
 
+- `.claude/skills/generate/lib/quality-rubric.md` — canonical rubric applied here.
+- `.claude/skills/generate/lib/verify-quick.sh` — the mandatory close-the-loop check.
+- `.claude/skills/verify-artifact/SKILL.md` — opt-in full round-trip fidelity test.
 - `.claude/skills/generate/SKILL.md` — router that dispatches here.
 - `.claude/skills/generate-slides/SKILL.md` — sibling presentation handler.
 - `.claude/skills/generate/lib/source-hash.sh` — shared provenance hash.
