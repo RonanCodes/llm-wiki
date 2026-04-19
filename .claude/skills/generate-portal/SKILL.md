@@ -1,23 +1,32 @@
 ---
 name: generate-portal
-description: Generate an HTML artifact portal (index page) for a vault. Auto-discovers all artifacts, groups by type, shows version history. Links open in new tabs. Regenerate after producing new artifacts to keep the portal current.
+description: Generate an HTML artifact portal. Two modes. Per-vault (default) scans a vault's artifacts/*/ and writes vaults/<name>/artifacts/portal/index.html. Root mode (--root) auto-discovers every vault under vaults/ and writes portal/index.html at the repo root, linking to each vault's per-vault portal. Regenerate after producing new artifacts.
 user-invocable: false
 allowed-tools: Bash(git *) Bash(ls *) Bash(mkdir *) Bash(date *) Bash(find *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(wc *) Read Write Glob Grep
 ---
 
 # Generate Portal
 
-Produce a self-contained HTML index page that links to every artifact in a vault. Auto-discovers artifacts by scanning `artifacts/*/`, groups them by type, and shows version history when multiple versions of the same artifact exist.
+Produce a self-contained HTML index page. Two modes:
 
-This is the "home page" for a vault's generated outputs — one link to open in a browser, everything else is navigable from there.
+- **Per-vault (default)** — links to every artifact in one vault. Written to `vaults/<name>/artifacts/portal/index.html`.
+- **Root (`--root`)** — links to every vault in the repo. Written to `portal/index.html` at the repo root. Each card opens that vault's per-vault portal.
+
+Together they form a two-level navigation: open the root portal → click a vault → click an artifact.
 
 ## Usage (via /generate router)
 
 ```
-/generate portal [--vault <name>]
+/generate portal [--vault <name>]   # per-vault mode
+/generate portal --root             # root mode — ignores --vault
 ```
 
-No topic argument needed — the portal always covers the entire vault.
+No topic argument in either mode — the portal always covers the entire vault (or the entire repo in root mode).
+
+## Mode Selection
+
+- If `--root` is present → **Root Mode** (jump to the Root Mode section below).
+- Otherwise → **Per-Vault Mode** (the steps that follow immediately).
 
 ## Step 1: Resolve Vault
 
@@ -187,7 +196,87 @@ When a generate-* handler creates an artifact and finds an existing artifact of 
 
 Small fixes (CSS tweaks, typo fixes) should update the file in-place without incrementing the version — use judgement based on whether the content meaningfully changed.
 
+## Root Mode (`--root`)
+
+When invoked with `--root`, the skill writes a repo-level portal that lists every vault and links to each vault's own per-vault portal. This is the "home page" of the whole LLM Wiki — one URL to bookmark, everything else is navigable from there.
+
+### Step R1: Discover Vaults
+
+```bash
+for dir in vaults/*/; do
+  [ -d "$dir/wiki" ] || continue                 # skip non-vault dirs
+  NAME=$(basename "$dir")
+  VAULTS+=("$NAME")
+done
+```
+
+Skip entries that don't look like vaults (no `wiki/` subdir, no `.git/`). Do not fail if `vaults/` is empty — still emit a portal with an empty state that says "No vaults yet — run `/vault-create <name>` to start."
+
+### Step R2: Gather Per-Vault Stats
+
+For each vault, collect:
+
+- **Display name** — read from `vaults/<name>/CLAUDE.md` frontmatter or first H1; fall back to the vault directory name with `llm-wiki-` stripped and dashes replaced with spaces.
+- **Domain** — from `vaults/<name>/CLAUDE.md` frontmatter `domain:` field if present.
+- **Icon** — from `vaults/<name>/CLAUDE.md` frontmatter `icon:` field (emoji) if present; otherwise pick a sensible default (📖 for `llm-wiki`, 🧪 for `skill-lab`, 🔬 for `research`, 🤝 for partnership vaults, 📚 generic fallback).
+- **One-line description** — from `vaults/<name>/CLAUDE.md` frontmatter `summary:` or first paragraph under the H1.
+- **Page count** — `find vaults/<name>/wiki -name '*.md' ! -name 'index.md' ! -name 'log.md' | wc -l`
+- **Artifact count** — count of renderable files under `vaults/<name>/artifacts/` excluding `portal/` and `.meta.yaml` sidecars.
+- **Has per-vault portal?** — test `vaults/<name>/artifacts/portal/index.html` exists.
+
+### Step R3: Build the Root HTML
+
+Write `portal/index.html` at the repo root (same path as the existing hand-crafted file — it is replaced in full).
+
+Design requirements match per-vault mode (Observatory dark theme, responsive grid, Inter font) with these differences:
+
+- **Header** reads "LLM Wiki Vaults" (amber "LLM Wiki", cyan "Vaults").
+- **Stats bar** aggregates across all vaults: vault count, total wiki pages, total artifacts, distinct domains.
+- **Cards** represent vaults, not artifacts. Each card has:
+  - Icon, display name, domain tag, description.
+  - Stats row: `<N> pages · <M> artifacts`.
+  - "Artifact Portal" link (green tag) → `../vaults/<name>/artifacts/portal/index.html` if it exists; otherwise a dashed-border `no-portal` card with "No portal yet" tag.
+  - "Obsidian" link (purple tag) → `obsidian://open?vault=<name>`.
+- **Footer** shows the generation timestamp and regenerate hint: `/generate portal --root`.
+
+Keep the styling consistent with the existing `portal/index.html` in the repo — use it as a reference template, but rebuild the grid and stats from live data rather than copying fixed numbers.
+
+### Step R4: Write Sidecar
+
+```bash
+META="portal/index.meta.yaml"
+cat > "$META" <<EOF
+generator: generate-portal@0.2.0
+mode: root
+generated-at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+vault-count: <N>
+vaults:
+$(for v in "${VAULTS[@]}"; do echo "  - $v"; done)
+EOF
+```
+
+### Step R5: Commit
+
+```bash
+git add portal/index.html portal/index.meta.yaml
+git diff --cached --quiet || git commit -m "✨ feat: regenerate root vault portal ($(date +%Y-%m-%d))"
+```
+
+(The root portal lives in the main repo, unlike per-vault portals which commit inside each vault's own git repo.)
+
+### Step R6: Report
+
+```
+✅ Root portal generated
+   Vaults:      <N>
+   Pages:       <total>
+   Artifacts:   <total>
+   Output:      portal/index.html
+   Open with:   open <absolute path>
+```
+
 ## See Also
 
 - `.claude/skills/generate/SKILL.md` — router that dispatches here.
+- `.claude/skills/generate-all/SKILL.md` — regenerates the per-vault portal at the end of every batch run, so vault portals stay fresh automatically.
 - All `generate-*/SKILL.md` handlers — produce the artifacts this portal indexes.

@@ -15,6 +15,9 @@ vaults/*
 # Claude Code local settings (contains machine-specific paths)
 .claude/settings.local.json
 
+# Claude Code runtime locks
+.claude/scheduled_tasks.lock
+
 # Reference repos (cloned for study)
 /.reference/
 

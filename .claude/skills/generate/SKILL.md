@@ -105,6 +105,8 @@ Keep this list in sync as handlers land. Discover at runtime via Glob; the list 
 | `quiz` | `generate-quiz` | 2D | Standalone HTML quiz |
 | `flashcards` | `generate-flashcards` | 2D | Anki `.apkg` flashcard deck |
 | `app` | `generate-app` | 2D | Scaffolded interactive web app |
+| `portal` | `generate-portal` | 2E | Per-vault artifact index HTML (and root-level vault index with `--root`) |
+| `all` | `generate-all` | 2E | Meta-generator — runs every handler for one topic in one pass |
 
 Entries without an existing handler skill will trip the "no handler registered" error in Step 3 — that's the intended behaviour.
 
