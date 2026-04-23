@@ -145,6 +145,7 @@ When the user discusses topics, route content to the correct vault:
 - **Every wiki page** must link back to its raw source via frontmatter `sources` field AND inline `## Sources` section.
 - **Domain tags** are inherited from the vault default and can be extended per-page.
 - **Cross-references** use Obsidian-compatible wikilinks: `[[page-name]]`.
+- **Cross-vault references** use the prefixed form `[[vault-short-name:page-name]]` — e.g. `[[personal-work:linkedin-profile-ronan-connolly]]` from a `career-moves` page. Vault short name drops the `llm-wiki-` prefix. Obsidian shows these as unresolved links (visually distinct from working wikilinks — desirable, flags the boundary). Fully grep-able; skills can resolve by reading the target vault. Pair with `([open](obsidian://open?vault=llm-wiki-<name>&file=<path>))` when clickability matters.
 - **Commit messages** use emoji conventional commit format: `✨ feat:`, `🐛 fix:`, `📝 docs:`, etc.
 - **Mermaid diagrams** in every doc that describes a flow, process, or architecture. See `.claude/skills/doc-standards/SKILL.md` for conventions and color theme.
 - **Observatory color theme** for diagrams: amber (#e0af40) for user/sources, cyan (#5bbcd6) for engine/skills, green (#7dcea0) for outputs/Obsidian.

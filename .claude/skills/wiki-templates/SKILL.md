@@ -36,6 +36,35 @@ related:
 - `related` lists wikilinks to related pages in the wiki.
 - `date-modified` updates whenever the page content changes.
 
+## Wikilinks
+
+**Same-vault:** `[[page-name]]` — standard Obsidian syntax. Use in the `related` frontmatter field and inline in prose when mentioning any entity/concept with its own page.
+
+**Cross-vault:** `[[vault-short-name:page-name]]` — prefixed form for pages in another vault. Drop the `llm-wiki-` prefix from the vault name.
+
+```yaml
+related:
+  - "[[recruiter-paloma]]"                              # same-vault
+  - "[[personal-work:linkedin-profile-ronan-connolly]]" # cross-vault
+  - "[[personal-work:ronan-connolly]]"
+```
+
+Inline example from a `career-moves` page:
+
+```markdown
+Per Paloma's feedback, simplify headline in [[personal-work:linkedin-profile-ronan-connolly]].
+```
+
+Obsidian renders cross-vault refs as unresolved links — this is desired, it visually flags the vault boundary and distinguishes them from same-vault wikilinks. Refs are grep-able across the repo and resolvable by skills (e.g. `generate-cv` expands them by reading the target vault).
+
+**Optional clickability** when jumping across vaults matters in Obsidian — pair with an Obsidian URI link:
+
+```markdown
+[[personal-work:linkedin-profile-ronan-connolly]] · [open](obsidian://open?vault=llm-wiki-personal-work&file=wiki/sources/linkedin-profile-ronan-connolly.md)
+```
+
+Only pair when the target is something you'll click often. Most refs need only the prefixed wikilink.
+
 ---
 
 ## Page Type: source-note
