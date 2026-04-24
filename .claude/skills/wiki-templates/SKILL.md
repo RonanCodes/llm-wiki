@@ -40,30 +40,34 @@ related:
 
 **Same-vault:** `[[page-name]]` — standard Obsidian syntax. Use in the `related` frontmatter field and inline in prose when mentioning any entity/concept with its own page.
 
-**Cross-vault:** `[[vault-short-name:page-name]]` — prefixed form for pages in another vault. Drop the `llm-wiki-` prefix from the vault name.
+**Cross-vault:** plain markdown link where the visible text is the cross-vault ref and the target is an `obsidian://open` URL. The visible text stays grep-able and visually flags the boundary (colon notation); the URL makes it click-through to the other vault.
+
+**Form:**
+```
+[vault-short:page-slug](obsidian://open?vault=llm-wiki-<vault-short>&file=<url-encoded-path-without-.md>)
+```
+
+Rules:
+- `vault-short` drops the `llm-wiki-` prefix (`llm-wiki-personal-work` → `personal-work`).
+- `page-slug` is the filename without the `.md` extension.
+- File path is URL-encoded: `/` → `%2F`, spaces → `%20`. Omit the `.md` extension from the URL.
 
 ```yaml
 related:
-  - "[[recruiter-paloma]]"                              # same-vault
-  - "[[personal-work:linkedin-profile-ronan-connolly]]" # cross-vault
-  - "[[personal-work:ronan-connolly]]"
+  - "[[recruiter-paloma]]"                              # same-vault (wikilink is fine)
+  - "[personal-work:linkedin-profile-ronan-connolly](obsidian://open?vault=llm-wiki-personal-work&file=wiki%2Fsources%2Flinkedin-profile-ronan-connolly)"  # cross-vault
+  - "[personal-work:ronan-connolly](obsidian://open?vault=llm-wiki-personal-work&file=wiki%2Fentities%2Fronan-connolly)"
 ```
 
 Inline example from a `career-moves` page:
 
 ```markdown
-Per Paloma's feedback, simplify headline in [[personal-work:linkedin-profile-ronan-connolly]].
+Per Paloma's feedback, simplify headline in [personal-work:linkedin-profile-ronan-connolly](obsidian://open?vault=llm-wiki-personal-work&file=wiki%2Fsources%2Flinkedin-profile-ronan-connolly).
 ```
 
-Obsidian renders cross-vault refs as unresolved links — this is desired, it visually flags the vault boundary and distinguishes them from same-vault wikilinks. Refs are grep-able across the repo and resolvable by skills (e.g. `generate-cv` expands them by reading the target vault).
+**Do NOT use the `[[vault-short:page]]` wikilink form.** It renders as a red unresolved link in Obsidian ("not created yet, click to create"), which is bad UX. Legacy wikilinks exist in older content and should be migrated via the `cross-vault-link-audit` skill.
 
-**Optional clickability** when jumping across vaults matters in Obsidian — pair with an Obsidian URI link:
-
-```markdown
-[[personal-work:linkedin-profile-ronan-connolly]] · [open](obsidian://open?vault=llm-wiki-personal-work&file=wiki/sources/linkedin-profile-ronan-connolly.md)
-```
-
-Only pair when the target is something you'll click often. Most refs need only the prefixed wikilink.
+**Grep for cross-vault refs** via `\[[a-z0-9-]+:[a-z0-9-]+\]\(obsidian://`. Skills can resolve the target by parsing the URL and reading the target vault.
 
 ---
 

@@ -136,6 +136,7 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 | Marketing playbooks, platform research (LinkedIn, TikTok, Instagram, YouTube), creator tactics, content-format studies | `llm-wiki-marketing` | Hub | Pure reusable marketing knowledge; specific campaigns live in the spoke vault they serve |
 | LinkedIn profile artefacts, CV, bio, cover banners, brand palette, personal positioning | `llm-wiki-personal-work` | Hub | Canonical self-entity; other vaults link in for bio/headline reuse |
 | Recruiter chats, company dossiers, interview prep, offers, salary research | `llm-wiki-career-moves` | Activity | Pipeline-style: chats, interviews, offers; status-stamped |
+| Trend scans (HN/Reddit/X/LinkedIn), theme lifecycle tracking, idea candidates for 12-in-12 | `llm-wiki-trend-radar` | Activity | Pipeline: spotted → shortlisted → picked/dropped/graduated |
 | Weekly builds, MVPs, connections-helper and future app-a-week projects | `llm-wiki-side-projects` | Spoke | Per-project `project-<slug>` domain tag; `/promote` out when a project graduates |
 | Simplicity x Taskforce partnership (e-commerce co-pilot) | `llm-wiki-simplicity-taskforce-partnership` | Spoke | Dedicated spoke for the venture; links into research + marketing hubs |
 | Startup strategy knowledge (pitching, ICP, moats, PMF, GTM, fundraising) | `llm-wiki-startup-strategy` | Hub | Feeds quizzes, grill sessions, cheat sheets for hackathons and pitches |
@@ -160,7 +161,11 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 - **Every wiki page** must link back to its raw source via frontmatter `sources` field AND inline `## Sources` section.
 - **Domain tags** are inherited from the vault default and can be extended per-page.
 - **Cross-references** use Obsidian-compatible wikilinks: `[[page-name]]`.
-- **Cross-vault references** use the prefixed form `[[vault-short-name:page-name]]` — e.g. `[[personal-work:linkedin-profile-ronan-connolly]]` from a `career-moves` page. Vault short name drops the `llm-wiki-` prefix. Obsidian shows these as unresolved links (visually distinct from working wikilinks — desirable, flags the boundary). Fully grep-able; skills can resolve by reading the target vault. Pair with `([open](obsidian://open?vault=llm-wiki-<name>&file=<path>))` when clickability matters.
+- **Cross-vault references** use a plain markdown link where the visible text is the cross-vault ref and the target is an `obsidian://open` URL. Form:
+  ```
+  [vault-short:page-slug](obsidian://open?vault=llm-wiki-<vault-short>&file=<url-encoded-path-without-.md>)
+  ```
+  Example: `[personal-work:linkedin-profile-ronan-connolly](obsidian://open?vault=llm-wiki-personal-work&file=wiki%2Fsources%2Flinkedin-profile-ronan-connolly)`. Vault short name drops the `llm-wiki-` prefix. Visible text IS the reference (colon notation flags the vault boundary); target makes it click-through to the other vault. Grep-able via `\[[a-z0-9-]+:[a-z0-9-]+\]\(obsidian://`. Do **not** use `[[wikilink]]` form for cross-vault refs; it renders as unresolved and adds friction for readers. Use the `cross-vault-link-audit` skill to migrate legacy `[[vault-short:page]]` wikilinks and to detect broken paths after file moves.
 - **Commit messages** use emoji conventional commit format: `✨ feat:`, `🐛 fix:`, `📝 docs:`, etc.
 - **Mermaid diagrams** in every doc that describes a flow, process, or architecture. See `.claude/skills/doc-standards/SKILL.md` for conventions and color theme.
 - **Observatory color theme** for diagrams: amber (#e0af40) for user/sources, cyan (#5bbcd6) for engine/skills, green (#7dcea0) for outputs/Obsidian.

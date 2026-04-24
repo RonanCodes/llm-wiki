@@ -176,7 +176,7 @@ Then report one paragraph: what got written, what paths, what the user can grep 
 - **Auto-commit** the ingest. The session note, index row, and log entry are always committed together so the paper trail is the commit. User can amend later if they want edits.
 - **Write in present tense** for decisions (`headline uses X`) and **past tense** for rejected paths (`considered Y, dropped because...`).
 - **No em-dashes, no banned AI-tell vocabulary.** Apply `/ro:write-copy` rules.
-- **Cross-vault refs** as `[[vault-short:page]]` where relevant.
+- **Cross-vault refs** as plain markdown links: `[vault-short:page-slug](obsidian://open?vault=llm-wiki-<short>&file=<url-encoded-path>)`. Do NOT use `[[vault:page]]` wikilink form (unresolved-red, bad UX).
 - **The calibration table is the most valuable artefact.** Fill it even if thin — one or two rows is better than none.
 - **Link every artefact the session produced** under `related` so the session note becomes a hub in the graph.
 - **Date in filename.** Format: `session-notes-<YYYY-MM-DD>-<slug>.md`. One session note per day per topic; if two sessions cover the same topic in one day, append `-a`, `-b`.
