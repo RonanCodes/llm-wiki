@@ -95,6 +95,27 @@ Count for the portal header:
 - Source documents: `find $VAULT_DIR/raw -type f ! -path '*/assets/*' | wc -l`
 - Meeting notes: `find $VAULT_DIR/meeting-notes -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l`
 
+## Safety Gate — MANDATORY before any write
+
+Portal output references **private vault names**. If it gets committed to a non-private repo, it leaks client/project identity (e.g. "llm-wiki-aviva" → Aviva is a client).
+
+Before writing ANY output file, verify the path is gitignored:
+
+```bash
+git check-ignore -q "$OUTPUT_PATH" || {
+  echo "❌ Refusing to write: $OUTPUT_PATH is not gitignored."
+  echo "   The portal references private vault names."
+  echo "   Add the output directory to .gitignore before running this skill."
+  exit 1
+}
+```
+
+Known safe output paths (already gitignored by project convention):
+- `vaults/<name>/artifacts/portal/index.html` — covered by `vaults/*`
+- `portal/index.html` at repo root (cross-vault landing, if implemented) — must be covered by `/portal/`
+
+If generating a cross-vault root portal at `portal/index.html`, the gate above catches a missing `/portal/` rule in `.gitignore` and aborts the write.
+
 ## Step 4: Build the Portal HTML
 
 Write `$ARTIFACTS_DIR/portal/index.html` — a self-contained HTML file with:
