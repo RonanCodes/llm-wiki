@@ -1,6 +1,6 @@
 ---
 name: ingest
-description: Ingest a source into an LLM Wiki vault. Detects source type (URL, PDF, YouTube, tweet, gist, text), extracts content, creates wiki pages, updates index and log. Use when user wants to ingest, add, import, or process a source into their wiki.
+description: Ingest a source into an LLM Wiki vault. Detects source type (URL, PDF, YouTube, tweet, gist, text, session), extracts content, creates wiki pages, updates index and log. Use when user wants to ingest, add, import, or process a source into their wiki. Supports ingesting the current Claude Code working session via /ingest session.
 argument-hint: <source> [--vault <name>]
 allowed-tools: Bash(git *) Bash(curl *) Bash(mkdir *) Read Write Edit Glob Grep
 ---
@@ -19,6 +19,7 @@ Process any source into wiki pages. This is the main entry point for adding know
 /ingest https://gist.github.com/user/abc123 --vault my-research
 /ingest https://github.com/owner/repo/discussions/123 --vault my-research
 /ingest "Some pasted text or notes" --vault my-research
+/ingest session --title linkedin-overhaul --vault personal-work
 ```
 
 ## Step 1: Parse Arguments
@@ -46,6 +47,7 @@ Identify the source type and delegate to the appropriate extraction method:
 | `*.pdf` (file path) | PDF | Extract text with `pdftotext`. Check `which pdftotext` first, install with `brew install poppler` if missing. See `ingest-pdf` skill. |
 | `*.docx`, `*.xlsx`, `*.pptx` (file path) | Office | Convert with `pandoc`. Check `which pandoc` first, install with `brew install pandoc` if missing. See `ingest-office` skill. |
 | `*.md` (file path) | Markdown | Read the file directly. |
+| `session` keyword (e.g. `/ingest session`, `/ingest session --title <slug>`) | Session Notes | Capture the current Claude Code working session's decisions, calibration notes, artefacts, and learnings. See `ingest-session` skill. |
 | Everything else | Text | Treat as pasted text/notes. |
 
 ## Step 3: Save Raw Source
