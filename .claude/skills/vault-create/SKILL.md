@@ -47,7 +47,7 @@ Examples: `research` (dev stack + tools), `marketing` (platform playbooks + crea
 Examples: `side-projects` (weekly builds, each with a `project-<slug>` domain tag), future graduated-product vaults (e.g. `simplicity-labs` once it earns its own).
 
 - Mixed content: sources, plans, comparisons, retros, decisions, tied to specific projects.
-- Heavy cross-vault-linking OUT into hubs: `[[research:remotion]]`, `[[marketing:linkedin-playbook]]`, etc.
+- Heavy cross-vault-linking OUT into hubs via plain markdown links: `[research:remotion](obsidian://open?vault=llm-wiki-research&file=wiki%2Fconcepts%2Fremotion)`, `[marketing:linkedin-playbook](obsidian://open?vault=llm-wiki-marketing&file=wiki%2Fconcepts%2Flinkedin-playbook)`, etc. (NOT the `[[wikilink]]` form.)
 - Each project within the vault carries a `project-<slug>` domain tag so the vault can be filtered per project.
 - A project may start as one entity inside a bigger spoke vault and later graduate out via `/promote` when it becomes a real product.
 - Signs it's a spoke: pages are specific to one project or a family of projects; reusable knowledge surfaces get extracted into hubs rather than kept here.
@@ -80,9 +80,10 @@ Examples: `career-moves` (recruiter chats → interviews → offers, pipeline-st
 
 ### Cross-vault linking pattern
 
-- Spoke / activity vaults link INTO hubs: `[[research:remotion]]`, `[[marketing:linkedin-playbook]]`, `[[personal-work:ronan-connolly]]`.
+- Spoke / activity vaults link INTO hubs using the plain markdown link form: `[research:remotion](obsidian://open?vault=llm-wiki-research&file=wiki%2Fconcepts%2Fremotion)`, `[marketing:linkedin-playbook](obsidian://open?vault=llm-wiki-marketing&file=wiki%2Fconcepts%2Flinkedin-playbook)`, etc. Visible text = `vault-short:page-slug`, target = `obsidian://open?vault=llm-wiki-<short>&file=<url-encoded-path-without-.md>`.
 - Hub vaults add a "Used by" or "Projects using this" section listing spokes that reference them, once they have at least one real reference. This makes the hub navigable in both directions.
-- Obsidian shows cross-vault links as unresolved, visually distinct from intra-vault wikilinks. That is intentional: the dim styling flags the vault boundary and makes the hub/spoke structure legible in the graph view.
+- Do NOT use `[[vault-short:page]]` wikilink form for cross-vault — Obsidian renders it as an unresolved red link which is bad UX. The markdown-link form is click-through and still visually flags the boundary via the colon-notation and external-link icon.
+- Run the `cross-vault-link-audit` skill periodically (and after any file move) to catch broken targets and migrate any legacy wikilinks.
 
 ## Step 0: Interview (if no arguments provided)
 
