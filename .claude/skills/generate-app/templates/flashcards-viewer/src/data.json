@@ -1,0 +1,22 @@
+{
+  "title": "Example Deck",
+  "topic": "example",
+  "deck_id": "example-deck-v1",
+  "generated_at": "2026-04-24",
+  "cards": [
+    {
+      "id": "c1",
+      "front": "What is spaced repetition?",
+      "back": "A learning technique that schedules review of material at increasing intervals to combat the forgetting curve.",
+      "source": "wiki/concepts/spaced-repetition.md",
+      "tags": ["srs", "learning"]
+    },
+    {
+      "id": "c2",
+      "front": "Which algorithm does this viewer use?",
+      "back": "FSRS (Free Spaced Repetition Scheduler) via the ts-fsrs library. Newer and more accurate than Anki's default SM-2.",
+      "source": "wiki/concepts/fsrs.md",
+      "tags": ["srs", "fsrs"]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "flashcards-viewer data",
+  "type": "object",
+  "required": ["title", "topic", "deck_id", "generated_at", "cards"],
+  "properties": {
+    "title": { "type": "string", "description": "Human-readable deck title" },
+    "topic": { "type": "string", "description": "Raw topic slug (stable; used in UI subtitle)" },
+    "deck_id": { "type": "string", "description": "Stable ID — keys localStorage so re-renders preserve review history" },
+    "generated_at": { "type": "string", "description": "ISO date yyyy-mm-dd" },
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "front", "back", "source"],
+        "properties": {
+          "id": { "type": "string", "description": "Stable card id — required for scheduler state persistence" },
+          "front": { "type": "string" },
+          "back": { "type": "string" },
+          "source": { "type": "string", "description": "Relative wiki page path" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

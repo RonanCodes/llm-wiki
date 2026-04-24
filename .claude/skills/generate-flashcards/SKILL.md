@@ -14,11 +14,12 @@ Artifact-first — output lands in `vaults/<vault>/artifacts/flashcards/`.
 ## Usage (via /generate router)
 
 ```
-/generate flashcards <topic> [--vault <name>] [--count <n>] [--difficulty easy|medium|hard]
+/generate flashcards <topic> [--vault <name>] [--count <n>] [--difficulty easy|medium|hard] [--no-viewer]
 ```
 
 - `--count` — number of cards (default 20).
 - `--difficulty` — nudges card style. Easy = term↔definition; medium = concept↔application; hard = comparison and synthesis cards.
+- `--no-viewer` — skip scaffolding the companion FSRS web viewer. Default: the viewer is scaffolded alongside the `.apkg` so the user has a shareable link without needing Anki installed.
 
 ## Pipeline
 
@@ -131,6 +132,55 @@ cp "$CSV_PATH" "${APKG_OUT%.apkg}.cards.csv"
 
 `.apkg` is a SQLite file and awkward to parse. The CSV is what Phase 2E's `verify-artifact` re-ingests for fidelity testing.
 
+## Step 5.5: Scaffold the Companion Viewer (opt-out via `--no-viewer`)
+
+The `.apkg` is the portable export — desktop Anki, AnkiMobile, AnkiDroid. But Anki's UI is dated and requires an install. So by default we also scaffold a modern FSRS-backed web viewer alongside, using the shared `flashcards-viewer` template:
+
+```bash
+if [ "${NO_VIEWER:-0}" = "0" ]; then
+  VIEWER_DIR="$VAULT_DIR/artifacts/app/flashcards-$TOPIC_SLUG-$(date +%Y-%m-%d)"
+  TEMPLATE_DIR=".claude/skills/generate-app/templates/flashcards-viewer"
+
+  mkdir -p "$VIEWER_DIR"
+  cp -R "$TEMPLATE_DIR/." "$VIEWER_DIR/"
+
+  # Convert cards.csv → data.json. Stable deck_id = sha256(DECK_NAME) so
+  # re-renders preserve the viewer's localStorage review history the same
+  # way Anki preserves its SQLite history via the stable .apkg deck_id.
+  python3 - "$CSV_PATH" "$VIEWER_DIR/src/data.json" "$TITLE" "$TOPIC" "$DECK_NAME" <<'PY'
+import csv, hashlib, json, sys, datetime
+csv_path, out_path, title, topic, deck_name = sys.argv[1:6]
+deck_id = hashlib.sha256(deck_name.encode()).hexdigest()[:16]
+cards = []
+with open(csv_path, newline="") as f:
+    for i, row in enumerate(csv.DictReader(f)):
+        cards.append({
+            "id": f"c{i+1}",
+            "front": row["front"],
+            "back": row["back"],
+            "source": row["source"],
+            "tags": (row.get("tags") or "").split(),
+        })
+with open(out_path, "w") as f:
+    json.dump({
+        "title": title,
+        "topic": topic,
+        "deck_id": deck_id,
+        "generated_at": datetime.datetime.utcnow().strftime("%Y-%m-%d"),
+        "cards": cards,
+    }, f, indent=2)
+PY
+
+  # Rename the scaffolded package so multiple decks don't collide
+  sed -i.bak "s/\"flashcards-viewer\"/\"flashcards-$TOPIC_SLUG\"/" "$VIEWER_DIR/package.json"
+  rm "$VIEWER_DIR/package.json.bak"
+
+  VIEWER_SCAFFOLDED="$VIEWER_DIR"
+fi
+```
+
+The user runs `pnpm install && pnpm dev` in the scaffolded directory to view the deck in a browser. The same `deck_id` scheme means the viewer's FSRS state (localStorage) and Anki's review history (SQLite) stay independent but parallel — change the card content, both re-ingest cleanly, both preserve history.
+
 ## Step 6: Version Detection
 
 Before writing the sidecar, check for an existing artifact of the same type and topic:
@@ -158,13 +208,14 @@ Small fixes (CSS tweaks, typo corrections) should update the file in-place witho
 ```bash
 META="${APKG_OUT%.apkg}.meta.yaml"
 cat > "$META" <<EOF
-generator: generate-flashcards@0.1.0
+generator: generate-flashcards@0.2.0
 generated-at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 topic: "<raw topic argument>"
 difficulty: ${DIFFICULTY:-medium}
 count: $COUNT
 deck-name: $DECK_NAME
 genanki-version: $(python3 -c "import genanki; print(genanki.__version__)")
+viewer: ${VIEWER_SCAFFOLDED:-null}
 generated-from:
 $(for p in "${PAGES[@]}"; do echo "  - $p"; done)
 source-hash: $HASH
@@ -194,9 +245,11 @@ git diff --cached --quiet || git commit -m "🃏 flashcards: generate <topic> ($
    APKG:        vaults/<vault>/artifacts/flashcards/<slug>-<date>.apkg
    CSV:         vaults/<vault>/artifacts/flashcards/<slug>-<date>.cards.csv
    Sidecar:     vaults/<vault>/artifacts/flashcards/<slug>-<date>.meta.yaml
+   Viewer:      vaults/<vault>/artifacts/app/flashcards-<slug>-<date>/   (skipped with --no-viewer)
 
-   Import:      Anki → File → Import → select the .apkg
+   Anki:        File → Import → select the .apkg
    Mobile:      AirDrop / share the .apkg to AnkiMobile / AnkiDroid
+   Web viewer:  cd <viewer path> && pnpm install && pnpm dev
 ```
 
 ## Importing into Anki
