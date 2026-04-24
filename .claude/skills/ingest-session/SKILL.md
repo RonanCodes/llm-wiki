@@ -165,13 +165,15 @@ date-accessed: <date>
 - Add a row to `wiki/index.md` under `## Sources` with `[[session-notes-<date>-<slug>]]`, a one-line summary, domain tags, date.
 - Append an entry to `log.md`: `## [<date>] ingest | Session notes — <topic>` with the source link and a paragraph of context.
 
-## Step 7: Report
+## Step 7: Commit and report
 
-One paragraph: what got written, what paths, what the user can grep for later. Offer to commit if they want.
+Auto-commit in the vault's repo using the standard emoji + conventional-commit format from `~/CLAUDE.md` (`✨ feat: ingest ...`). Add only the files just written: the source-note, `wiki/index.md`, and `log.md`. Respect the weekday commit-timestamp rule (`GIT_AUTHOR_DATE` / `GIT_COMMITTER_DATE` outside 08:30–18:00 Mon–Fri).
+
+Then report one paragraph: what got written, what paths, what the user can grep for later, and the commit SHA.
 
 ## Rules
 
-- **Never auto-commit.** The user decides when to commit session notes (they may want to review or edit first).
+- **Auto-commit** the ingest. The session note, index row, and log entry are always committed together so the paper trail is the commit. User can amend later if they want edits.
 - **Write in present tense** for decisions (`headline uses X`) and **past tense** for rejected paths (`considered Y, dropped because...`).
 - **No em-dashes, no banned AI-tell vocabulary.** Apply `/ro:write-copy` rules.
 - **Cross-vault refs** as `[[vault-short:page]]` where relevant.
