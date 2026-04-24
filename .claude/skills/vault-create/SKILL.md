@@ -2,7 +2,7 @@
 name: vault-create
 description: Create a new LLM Wiki vault with proper directory structure, index, log, and conventions. Use when user wants to create a vault, start a new wiki, or set up a new knowledge base.
 argument-hint: <vault-name> [--domain <domain>]
-allowed-tools: Bash(mkdir *) Bash(git init *) Bash(git add *) Bash(git commit *) Write
+allowed-tools: Bash(mkdir *) Bash(git *) Bash(python3 *) Bash(cp *) Bash(ls *) Bash(open *) Bash(date *) Read Write
 ---
 
 # Create Vault
@@ -210,39 +210,58 @@ See the [engine repo](https://github.com/RonanCodes/llm-wiki) for setup and usag
 artifacts/
 ```
 
-8. **Initialize git repo**:
+8. **Initialize git repo** — automatic, no prompt:
+
+Use absolute paths (or `git -C`) because the Bash tool doesn't persist `cd` between calls.
 
 ```bash
-cd vaults/<name>
-git init
-git add .
-git commit -m "✨ feat: initialize <name> vault"
+VAULT_DIR="/absolute/path/to/vaults/<name>"
+git -C "$VAULT_DIR" init
+git -C "$VAULT_DIR" add .
+git -C "$VAULT_DIR" commit -m "✨ feat: initialize <name> vault"
 ```
 
-9. **Register in Obsidian** (ask user first):
-
-Register the vault in Obsidian's vault registry so it appears in the vault switcher:
+**Before committing, report the git identity being used** so the user can see which email the first commit will carry:
 
 ```bash
+echo "Committing as: $(git -C "$VAULT_DIR" config user.name) <$(git -C "$VAULT_DIR" config user.email)>"
+```
+
+If the user flags the identity as wrong, set the vault-local override before re-committing:
+
+```bash
+git -C "$VAULT_DIR" config user.email "other@example.com"
+```
+
+9. **Register in Obsidian** — automatic, no prompt:
+
+Back up the Obsidian config first (safety net), then register the vault in Obsidian's vault registry so it appears in the vault switcher:
+
+```bash
+OBS_CONFIG="$HOME/Library/Application Support/obsidian/obsidian.json"
+cp "$OBS_CONFIG" "/tmp/obsidian-json-backup-$(date +%s).json"
+
 python3 -c "
-import json, time, hashlib
-path = '$HOME/Library/Application Support/obsidian/obsidian.json'
-with open(path) as f:
-    data = json.load(f)
-vault_path = '$(pwd)/vaults/<name>'
+import json, time, hashlib, os
+path = os.path.expanduser('~/Library/Application Support/obsidian/obsidian.json')
+vault_path = '/absolute/path/to/vaults/<name>'
 vault_id = hashlib.md5(vault_path.encode()).hexdigest()[:16]
-data['vaults'][vault_id] = {'path': vault_path, 'ts': int(time.time() * 1000)}
-with open(path, 'w') as f:
-    json.dump(data, f)
+with open(path) as f: data = json.load(f)
+if vault_id not in data.get('vaults', {}):
+    data.setdefault('vaults', {})[vault_id] = {'path': vault_path, 'ts': int(time.time() * 1000)}
+    with open(path, 'w') as f: json.dump(data, f)
+    print(f'Registered: {vault_id} -> {vault_path}')
+else:
+    print(f'Already registered: {vault_id}')
 "
 ```
 
-Then open it:
+Works on macOS. **Tell the user:** they need to fully quit Obsidian (Cmd+Q, not just close the window) and reopen it for the new vault to appear in the switcher. Obsidian only reads its config on startup.
+
+Optionally open the vault (will be a no-op until Obsidian restarts):
 ```bash
 open "obsidian://open?vault=<name>"
 ```
-
-Works on macOS. **Important:** Tell the user they need to fully quit Obsidian (Cmd+Q, not just close the window) and reopen it for the new vault to appear in the vault switcher. Obsidian only reads its config on startup.
 
 10. **Report success** with next steps:
    - Vault is open in Obsidian (or tell them to open it)
