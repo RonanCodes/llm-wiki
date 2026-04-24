@@ -123,15 +123,30 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 
 ## Vault Routing
 
-When the user discusses topics, route content to the correct vault:
+When the user discusses topics, route content to the correct vault. Vaults fall into three archetypes (see `.claude/skills/vault-create/SKILL.md` § Vault Archetypes for the full taxonomy):
 
-| Topic | Vault | Why |
-|-------|-------|-----|
-| Skill ideas, skill design, skill provenance, patterns, workflows, hooks, source profiles | `llm-wiki-skill-lab` | Tracks skill lifecycle from idea to implementation |
-| Tech stack decisions, tool evaluations, framework comparisons, deployment strategies, general research | `llm-wiki-research` | General-purpose research and decision-making |
-| LLM Wiki project knowledge, architecture decisions, development context | `llm-wiki` (project vault) | Project-specific knowledge |
+- **Hub** = pure reusable knowledge (one coherent domain, grows from ingests + syntheses, referenced by many other vaults)
+- **Spoke** = applied project work (mixed content tied to specific projects; cross-vault-links OUT into hubs)
+- **Activity** = pipeline or flow-scoped (content moves through status stages over time)
 
-**Rule of thumb:** If it's about *building or designing a Claude Code skill*, it goes in `skill-lab`. If it's about *evaluating a tool or making a tech decision*, it goes in `research`. If it's about *this project specifically*, it goes in the project vault.
+| Topic | Vault | Archetype | Why |
+|-------|-------|-----------|-----|
+| Skill ideas, skill design, skill provenance, patterns, workflows, hooks, source profiles | `llm-wiki-skill-lab` | Hub | Catalogues skill lifecycle from idea to implementation |
+| Tech stack decisions, tool evaluations, framework comparisons, deployment strategies, general dev research | `llm-wiki-research` | Hub | General-purpose dev research and decision-making |
+| Marketing playbooks, platform research (LinkedIn, TikTok, Instagram, YouTube), creator tactics, content-format studies | `llm-wiki-marketing` | Hub | Pure reusable marketing knowledge; specific campaigns live in the spoke vault they serve |
+| LinkedIn profile artefacts, CV, bio, cover banners, brand palette, personal positioning | `llm-wiki-personal-work` | Hub | Canonical self-entity; other vaults link in for bio/headline reuse |
+| Recruiter chats, company dossiers, interview prep, offers, salary research | `llm-wiki-career-moves` | Activity | Pipeline-style: chats, interviews, offers; status-stamped |
+| Weekly builds, MVPs, connections-helper and future app-a-week projects | `llm-wiki-side-projects` | Spoke | Per-project `project-<slug>` domain tag; `/promote` out when a project graduates |
+| Simplicity x Taskforce partnership (e-commerce co-pilot) | `llm-wiki-simplicity-taskforce-partnership` | Spoke | Dedicated spoke for the venture; links into research + marketing hubs |
+| Startup strategy knowledge (pitching, ICP, moats, PMF, GTM, fundraising) | `llm-wiki-startup-strategy` | Hub | Feeds quizzes, grill sessions, cheat sheets for hackathons and pitches |
+| LLM Wiki project knowledge, architecture decisions, development context | `llm-wiki` (engine repo) | Meta | The engine itself; not a vault, stays in this repo |
+
+**Rule of thumb:**
+
+- Pure reusable knowledge (a technique, a platform playbook, a tool evaluation, a brand asset) goes to the relevant Hub.
+- Applied work on one project (plans, specific campaigns, retros, decisions) goes to a Spoke; cross-vault-link into the Hub for any reference material.
+- Pipeline state over time (this conversation, that interview, this week's status) goes to an Activity vault.
+- If unsure, ask. New vaults should follow the archetype taxonomy; see `.claude/skills/vault-create/SKILL.md` for when to split vs when to keep as a concept page in an existing vault.
 
 ## Conventions
 

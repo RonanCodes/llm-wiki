@@ -26,6 +26,64 @@ All vaults are prefixed with `llm-wiki-` so they're easy to identify in Obsidian
 
 If the user provides a name that already starts with `llm-wiki-`, don't double-prefix.
 
+## Vault Archetypes
+
+Three archetypes emerge in practice. Pick one when scaffolding a new vault. It shapes the `CLAUDE.md` body, the domain-tag pattern, and how other vaults link into this one. If unsure, ask the user which archetype fits.
+
+### 1. Hub vault (pure reusable knowledge)
+
+Examples: `research` (dev stack + tools), `marketing` (platform playbooks + creator research), `personal-work` (LinkedIn / CV / bio / brand artefacts), `skill-lab` (skill design patterns).
+
+- One coherent domain, high purity. Content is reference material, not applied work.
+- Grows from ingests + syntheses.
+- Referenced BY many other vaults via cross-vault wikilinks. Other vaults add links here; this vault rarely links outward.
+- Entity pages are cheap to create and become stable anchors.
+- Signs it's a hub: 3+ other vaults will cite it; content would dilute signal if mixed with project-specific work.
+
+**CLAUDE.md flavour:** add a "Keep this pure" section. Applied work (project plans, specific campaigns, specific builds) belongs in spoke/activity vaults and cross-vault-links into this one. This vault catalogues knowledge; it does not host project plans.
+
+### 2. Spoke vault (applied project work)
+
+Examples: `side-projects` (weekly builds, each with a `project-<slug>` domain tag), future graduated-product vaults (e.g. `simplicity-labs` once it earns its own).
+
+- Mixed content: sources, plans, comparisons, retros, decisions, tied to specific projects.
+- Heavy cross-vault-linking OUT into hubs: `[[research:remotion]]`, `[[marketing:linkedin-playbook]]`, etc.
+- Each project within the vault carries a `project-<slug>` domain tag so the vault can be filtered per project.
+- A project may start as one entity inside a bigger spoke vault and later graduate out via `/promote` when it becomes a real product.
+- Signs it's a spoke: pages are specific to one project or a family of projects; reusable knowledge surfaces get extracted into hubs rather than kept here.
+
+**CLAUDE.md flavour:** add a "Per-project domain tag" rule (every project page carries `project-<slug>`), a "Graduation rule" (when a project earns its own vault via `/promote`), and a "Cross-vault link to hubs; don't duplicate" directive.
+
+### 3. Activity vault (flow or pipeline-scoped)
+
+Examples: `career-moves` (recruiter chats → interviews → offers, pipeline-style).
+
+- Pipeline-style: content moves through status stages over time.
+- Long-lived but process-driven, not project-driven.
+- Cross-vault-links to hubs for reference material (bio in `personal-work`, tech stack notes in `research`).
+- Signs it's an activity vault: the content is "what happened in conversation X" or "what's the status of Y", not "what is Z".
+
+**CLAUDE.md flavour:** document status/stage fields in the frontmatter spec; index.md grouped by status (e.g. Active / Archived). Add a rule that ephemeral/stage detail stays here, while any reusable learning extracted from an interaction gets promoted to the relevant hub.
+
+### When to split a new vault
+
+- Knowledge cross-cuts 3+ existing vaults → hub candidate.
+- Different cadence or mental mode than existing vaults (dev thinking vs marketing thinking vs interviewing thinking) → own vault.
+- Expected volume is significant (user says "lots of info on X, Y, Z") → own vault.
+- Process that accumulates and archives over time → activity candidate.
+
+### When NOT to split
+
+- Natural extension of an existing vault's purpose.
+- Low expected volume (under ~10 pages).
+- Only one other vault will ever cite it. Keep as concept/entity pages in that single consuming vault.
+
+### Cross-vault linking pattern
+
+- Spoke / activity vaults link INTO hubs: `[[research:remotion]]`, `[[marketing:linkedin-playbook]]`, `[[personal-work:ronan-connolly]]`.
+- Hub vaults add a "Used by" or "Projects using this" section listing spokes that reference them, once they have at least one real reference. This makes the hub navigable in both directions.
+- Obsidian shows cross-vault links as unresolved, visually distinct from intra-vault wikilinks. That is intentional: the dim styling flags the vault boundary and makes the hub/spoke structure legible in the graph view.
+
 ## Step 0: Interview (if no arguments provided)
 
 If the user runs `/vault-create` with no arguments, interview them to figure out the right vault setup. Use AskUserQuestion for each question.
