@@ -5,7 +5,7 @@ user-invocable: false
 allowed-tools: Bash(curl *)
 content-pipeline:
   - pipeline:scan
-  - platform:blog
+  - platform:devto
   - role:scanner
 ---
 
