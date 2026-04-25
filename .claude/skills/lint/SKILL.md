@@ -101,6 +101,83 @@ Check `wiki/index.md` against actual pages:
 
 **Auto-fix (with --fix):** Add missing entries, remove stale entries.
 
+### 3i. Backlink Density
+
+Count incoming wikilinks per page to surface graph-health issues. Orphans (zero incoming) are already flagged by 3b — this check adds two more signals.
+
+```bash
+# For each page, count distinct other-page files that wikilink to it.
+for page in $(find "$VAULT/wiki" -name "*.md" ! -name "index.md" -type f); do
+  slug=$(basename "$page" .md)
+  count=$(grep -rl "\[\[$slug\]\]" "$VAULT/wiki/" --include="*.md" | grep -v "/$slug.md$" | wc -l | tr -d ' ')
+  echo "$count $page"
+done | sort -rn
+```
+
+Flag levels:
+- **Hub** (≥15 incoming): `💡` candidate for the L1 Topic Map section. High-traffic pages should appear in the progressive index's L1 tier.
+- **Near-orphan** (exactly 1 incoming, page-type ≠ stub/source-note): `⚠️` fragile — losing the one referrer makes it an orphan. Worth a second backlink or a merge.
+- **Orphan** (0 incoming): already covered by 3b.
+
+**Auto-fix:** Cannot auto-fix — report only.
+
+### 3j. Near-Duplicate Pages (compaction detector)
+
+Surface page pairs that look like they cover the same ground. **Detect-only** — no auto-merge, no fix. The user reviews flagged pairs in Obsidian and decides whether to keep both, manually merge, or leave a redirect stub.
+
+Conservative thresholds (high precision, low recall — better to under-flag than to confuse the user with false pairs):
+
+A pair `(A, B)` is flagged when ALL of:
+- Same `page-type` (entity vs entity, concept vs concept).
+- ≥2 shared `domain` tags.
+- ≥3 shared `tags`.
+- Title token Jaccard ≥0.5 (after dropping stopwords like `vs`, `and`, `the`, `a`).
+
+When `qmd` is available, additionally flag pairs where each ranks in the other's top-3 search results for its own title — strong signal of content overlap.
+
+```bash
+# Build a (slug, page-type, domain[], tags[], title-tokens) table by scanning frontmatter.
+# For each pair within the same page-type, compute Jaccard on title tokens and shared-tag counts.
+# (Implementation sketch — full bash is verbose; the LLM can iterate explicitly.)
+```
+
+Report each flagged pair with:
+- Both page paths
+- Shared tags list
+- Title-Jaccard score
+- A one-line "why this might be a duplicate" hint
+
+**Auto-fix:** None. Compaction is a deliberate, human-in-the-loop operation. See `wiki-templates` § Progressive Index for why naive merging is dangerous (wikilink breakage, cross-vault link breakage, provenance loss, identity churn). If the user wants to act on a flagged pair, they manually edit and use `cross-vault-link-audit` to handle inbound link rewrites.
+
+### 3k. Index Tier Budget
+
+The progressive index spec (see `wiki-templates` § Progressive Index) defines token budgets per tier. This check measures the actual tokens in each section of `index.md` and warns when budgets are exceeded.
+
+Approximate tokens as `wc -w × 1.3` (close enough for guidance). Section boundaries are H2 headings: `## Purpose`, `## Topic Map`, `## Full Index`. If the file has been sharded (`index-l1.md`, `index-l2.md` exist), measure each shard against its tier budget.
+
+| Section / file | Soft budget | Warn at |
+|----------------|-------------|---------|
+| `## Purpose` (L0) | 500 tokens | ≥750 |
+| `## Topic Map` (L1) | 2000 tokens | ≥3000 |
+| `## Full Index` (L2) | 8000 tokens | ≥10K |
+| `index.md` total | 10K tokens | ≥10K — suggest sharding into `index-l1.md` / `index-l2.md` |
+
+```bash
+INDEX="$VAULT/wiki/index.md"
+# Extract each section by H2 boundary and count words. Multiply by 1.3 for token estimate.
+awk '/^## Purpose/{p=1;next} /^## /{p=0} p' "$INDEX" | wc -w
+awk '/^## Topic Map/{p=1;next} /^## /{p=0} p' "$INDEX" | wc -w
+awk '/^## Full Index/{p=1;next} /^## /{p=0} p' "$INDEX" | wc -w
+```
+
+Flag thresholds:
+- L0 over 750 tokens: `⚠️` shrink to anchor entities + one-paragraph purpose.
+- L1 over 3K tokens: `⚠️` Topic Map is bloating — promote some entries to L2-only or shard.
+- L2 over 10K tokens: `💡` shard into `index-l2.md`.
+- `index.md` total over 10K: `💡` shard into separate `index-l1.md` / `index-l2.md` files. Suggest the split, do not perform it.
+
+**Auto-fix:** None. Sharding is a deliberate restructuring the user runs when they actually want it.
+
 ## Step 4: Report
 
 Output a markdown report grouped by severity:
@@ -116,14 +193,19 @@ Output a markdown report grouped by severity:
 - ❌ [[missing-page]] — referenced by [[page-1]], [[page-2]] but doesn't exist
 - ❌ wiki/sources/article.md — no source link (empty sources frontmatter)
 
-### Warning (orphans, missing metadata)
+### Warning (orphans, missing metadata, fragile pages, index bloat)
 - ⚠️ wiki/entities/old-tool.md — orphan (no inbound links)
 - ⚠️ wiki/concepts/some-idea.md — missing domain tag
+- ⚠️ wiki/concepts/lonely-concept.md — near-orphan (1 incoming link, fragile)
+- ⚠️ index.md L0 section over budget (820 tokens, target ≤500)
 
 ### Info (suggestions)
 - 💡 "machine learning" mentioned 8 times but has no concept page
 - 💡 Consider ingesting more sources on <topic> (only 1 source-note)
 - 💡 wiki/sources/old-article.md may be stale (not modified in 30+ days)
+- 💡 wiki/entities/popular-tool.md — hub (22 incoming links). Promote to L1 Topic Map.
+- 💡 Possible duplicate pair: wiki/concepts/llm-wikis.md ↔ wiki/concepts/llm-knowledge-bases.md (shared tags: llm, wiki, knowledge-base; title-Jaccard 0.67). Review manually — see check 3j for why no auto-fix.
+- 💡 index.md total over 10K tokens. Consider sharding: keep L0 in index.md, move L1 to index-l1.md, L2 to index-l2.md.
 ```
 
 ## Step 5: Suggest Next Actions

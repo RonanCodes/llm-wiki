@@ -141,24 +141,42 @@ vaults/<name>/
 └── .gitignore              # Ignore Obsidian ephemeral state, .DS_Store, artifacts/
 ```
 
-3. **Create `wiki/index.md`** with this template:
+3. **Create `wiki/index.md`** with this progressive-tier template (see `wiki-templates` § Progressive Index for the full spec):
 
 ```markdown
 # <Vault Name> — Wiki Index
 
-## Sources
+<!-- Three-tier structure. Skills load progressively: L0 always, L1 for synthesis, L2 for structural passes. Token budgets are guidelines — /lint warns when exceeded and suggests sharding into index-l1.md / index-l2.md once total exceeds ~10K tokens. -->
+
+## Purpose (L0)
+
+<!-- Target ≤500 tokens. What this vault is for, primary domain, stable anchor entities once they exist. Always loaded by every skill. -->
+
+<One-paragraph statement of vault purpose. Default domain: `<domain>`.>
+
+## Topic Map (L1)
+
+<!-- Target ≤2000 tokens. One line per entity or concept page. Sorted by domain. /ingest appends here as new pages are created. -->
+
+_(empty; populated as pages are added)_
+
+## Full Index (L2)
+
+<!-- Target ≤8000 tokens. Detailed tables grouped by page-type. Loaded only when L0+L1 are insufficient. -->
+
+### Sources
 | Page | Summary | Domain | Date Added |
 |------|---------|--------|------------|
 
-## Entities
+### Entities
 | Page | Summary | Type | Domain | Date Added |
 |------|---------|------|--------|------------|
 
-## Concepts
+### Concepts
 | Page | Summary | Domain | Date Added |
 |------|---------|--------|------------|
 
-## Comparisons
+### Comparisons
 | Page | Summary | Domain | Date Added |
 |------|---------|--------|------------|
 ```

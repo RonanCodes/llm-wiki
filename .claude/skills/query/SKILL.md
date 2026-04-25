@@ -3,7 +3,7 @@ name: query
 description: Ask questions against an LLM Wiki vault and get synthesized answers with citations. Optionally save answers back into the wiki. Use when user wants to query, ask, search, or explore their knowledge base.
 argument-hint: "<question>" [--vault <name>] [--save]
 disable-model-invocation: true
-allowed-tools: Bash(git *) Read Write Edit Glob Grep
+allowed-tools: Bash(git *) Bash(which *) Bash(qmd *) Read Write Edit Glob Grep
 ---
 
 # Query Wiki
@@ -24,19 +24,41 @@ Ask questions against a vault's wiki and get synthesized answers with citations.
 - `--vault <name>` — target vault (if omitted, use sole vault or ask)
 - `--save` — file the answer back into the wiki as a new page
 
-## Step 2: Read the Index
+## Step 2: Read the Index Progressively
 
-Read `vaults/<vault>/wiki/index.md` to get an overview of all pages in the wiki. This is the primary discovery mechanism.
+The vault's `index.md` is structured in tiers (see `wiki-templates` § Progressive Index). Load only what the question warrants — this keeps `/query` fast as vaults grow past ~200 pages.
+
+1. **Always read L0** (`## Purpose` section of `index.md`) — vault context, primary domain, anchor entities.
+2. **Read L1** (`## Topic Map`) for any synthesis or cross-page question.
+3. **Read L2** (`## Full Index`) only if L0+L1 don't surface enough candidate pages, or the question is structural ("what's missing", "list all X").
+
+If the vault has been sharded into separate files (`index-l1.md`, `index-l2.md`), apply the same read-order to those files.
 
 ```bash
-cat "vaults/<vault>/wiki/index.md"
+VAULT="vaults/<vault>"
+# Always: read index.md (which contains L0, and L1+L2 unless sharded)
+cat "$VAULT/wiki/index.md"
+# If sharded: cat "$VAULT/wiki/index-l1.md" only when L1 needed, "$VAULT/wiki/index-l2.md" only when L2 needed
 ```
+
+## Step 2b: Search with qmd (if available)
+
+If `qmd` is installed, run a hybrid BM25 + vector search to surface relevant pages directly. Prepend qmd's top results to the candidate list from Step 2 — they typically beat title-based discovery on questions that reference content rather than page names.
+
+```bash
+if which qmd >/dev/null 2>&1; then
+  qmd search "$VAULT/wiki" "<question>" --limit 10 --format json
+fi
+```
+
+Parse the JSON for `path` and `score`. Use the top 3-5 as starting candidates. If qmd isn't installed, skip silently — the index-based discovery in Step 2 is sufficient at smaller scale.
 
 ## Step 3: Identify Relevant Pages
 
-Based on the question and the index, identify which wiki pages are most likely to contain relevant information. Consider:
-- Pages whose titles or summaries relate to the question
-- Entity pages for people/tools mentioned in the question
+Combine qmd results (Step 2b) with index-derived candidates (Step 2). Deduplicate and prioritise:
+- qmd's top-3 pages (when available) — high recall on content-similar pages
+- Pages whose index entries semantically match the question (titles, one-line summaries)
+- Entity pages for people/tools named in the question
 - Concept pages for ideas/patterns in the question
 - Comparison pages if the question asks for comparisons
 - Source-notes that cover the topic

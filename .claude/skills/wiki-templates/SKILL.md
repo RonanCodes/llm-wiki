@@ -71,6 +71,33 @@ Per Paloma's feedback, simplify headline in [personal-work:linkedin-profile-rona
 
 ---
 
+## Progressive Index
+
+The vault's `wiki/index.md` is structured in tiers so skills load only what they need. Token budgets are guidelines, not hard limits — `/lint` warns when exceeded and suggests sharding once a vault outgrows a single file.
+
+| Tier | Section / file | Token budget | Contents |
+|------|----------------|--------------|----------|
+| L0 | `## Purpose` (top of `index.md`) | ~500 | What this vault is for, primary domain, stable anchor entities. Always loaded. |
+| L1 | `## Topic Map` (middle of `index.md`) | ~2000 | Flat list of entity/concept pages, one line each: `[[page-name]] — one-line summary`. Loaded for query/lint. |
+| L2 | `## Full Index` (bottom of `index.md`) | ~8000 | Detailed tables grouped by page-type (Sources, Entities, Concepts, Comparisons). Loaded only when L0+L1 are insufficient. |
+| L3 | Individual pages | unbounded | Page bodies, read on demand. |
+
+When `index.md` total exceeds ~10K tokens, `/lint` suggests sharding: keep L0 in `index.md`, move L1 to `index-l1.md`, move L2 to `index-l2.md`. Skills then progressively load deeper tiers only when the question warrants. This is the Karpathy-pattern scaling answer (community comment #354 on the gist proposed L0–L3 token budgets).
+
+**Where new pages get filed by `/ingest`:**
+- New entity or concept → append a one-line entry to L1, plus the full table row in L2.
+- New source-note → L2 only (Sources table).
+- New comparison or summary → L1 (one line) + L2 (Comparisons table).
+
+**Read order for `/query` and `/lint`:**
+1. Always read L0.
+2. Read L1 if the question is about cross-page synthesis or the answer needs more than 1-2 anchor pages.
+3. Read L2 only when L0+L1 don't surface enough candidate pages, or when running a structural lint pass.
+
+When sharded into separate files (`index.md`, `index-l1.md`, `index-l2.md`), the same read-order applies. The shard split is a `/lint` recommendation, not an automatic action — the user runs it deliberately.
+
+---
+
 ## Page Type: source-note
 
 A summary of one ingested source. One source-note per source.
