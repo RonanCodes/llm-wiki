@@ -3,6 +3,10 @@ name: ingest-devto
 description: Extract article content from dev.to posts for wiki ingestion. Uses dev.to public API, no auth required.
 user-invocable: false
 allowed-tools: Bash(curl *)
+content-pipeline:
+  - pipeline:scan
+  - platform:blog
+  - role:scanner
 ---
 
 # Ingest Dev.to Article

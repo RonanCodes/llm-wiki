@@ -3,6 +3,10 @@ name: generate-portal
 description: Generate an HTML artifact portal. Two modes. Per-vault (default) scans a vault's artifacts/*/ and writes vaults/<name>/artifacts/portal/index.html. Root mode (--root) auto-discovers every vault under vaults/ and writes portal/index.html at the repo root, linking to each vault's per-vault portal. Regenerate after producing new artifacts.
 user-invocable: false
 allowed-tools: Bash(git *) Bash(ls *) Bash(mkdir *) Bash(date *) Bash(find *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(wc *) Read Write Glob Grep
+content-pipeline:
+  - pipeline:review
+  - platform:agnostic
+  - role:orchestrator
 ---
 
 # Generate Portal

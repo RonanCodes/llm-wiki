@@ -3,6 +3,10 @@ name: ingest-video
 description: Ingest local video files (meetings, screen recordings, presentations). Transcribes audio, extracts keyframes, creates structured wiki pages.
 user-invocable: false
 allowed-tools: Bash(*) Read Write Edit Glob Grep
+content-pipeline:
+  - pipeline:input
+  - platform:agnostic
+  - role:primitive
 ---
 
 # Ingest Local Video

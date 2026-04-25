@@ -3,6 +3,10 @@ name: ingest-github-discussions
 description: Extract content from GitHub Discussion threads for wiki ingestion. Uses gh CLI GraphQL API, authenticated via gh auth.
 user-invocable: false
 allowed-tools: Bash(gh *)
+content-pipeline:
+  - pipeline:scan
+  - platform:agnostic
+  - role:scanner
 ---
 
 # Ingest GitHub Discussion

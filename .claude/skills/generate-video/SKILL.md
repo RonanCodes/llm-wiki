@@ -3,6 +3,10 @@ name: generate-video
 description: Render an animated explainer MP4 for a topic. Picks a Remotion composition from the local remotion-studio (auto-detected, cached in ~/.claude/remotion.env, or via $REMOTION_STUDIO_DIR), parameterises it from wiki pages, optionally muxes generate-podcast voiceover. Used by /generate video. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(brew *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(ffmpeg *) Bash(node *) Bash(npm *) Bash(pnpm *) Bash(npx *) Read Write Glob Grep
+content-pipeline:
+  - pipeline:video
+  - platform:agnostic
+  - role:adapter
 ---
 
 # Generate Video
