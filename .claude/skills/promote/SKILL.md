@@ -1,21 +1,103 @@
 ---
 name: promote
-description: Graduate reusable knowledge from one vault to another (typically project vault to meta). Identifies cross-cutting learnings and files them into the target vault. Use when user wants to promote, graduate, transfer, or share knowledge between vaults.
-argument-hint: <from-vault> [--to <target-vault>]
+description: Graduate knowledge — either between vaults (project vault → hub) or within a vault (scratchpad/ drafts → wiki/). Use when user wants to promote, graduate, transfer, or share knowledge between vaults, or to clean up rough notes into proper wiki pages.
+argument-hint: <vault> [--to <target-vault>] | <vault> --from-drafts [<file>]
 disable-model-invocation: true
-allowed-tools: Bash(git *) Read Write Edit Glob Grep
+allowed-tools: Bash(git *) Bash(mv *) Read Write Edit Glob Grep
 ---
 
 # Promote Knowledge
 
-Transfer reusable, cross-cutting knowledge from a project vault to another vault (typically meta).
+Two modes:
+1. **Vault-to-vault** (`--to <target>`) — graduate reusable knowledge from one vault to another (typically project → hub).
+2. **Drafts-to-wiki** (`--from-drafts`) — promote a `scratchpad/` draft into the proper `wiki/` location with frontmatter and an index entry.
 
 ## Usage
 
 ```
 /promote my-research --to meta
-/promote project-alpha                  # defaults to meta vault
+/promote project-alpha                                      # defaults to meta vault
+/promote my-research --from-drafts                           # interactive — pick a draft to promote
+/promote my-research --from-drafts scratchpad/2026-04-23-stx.md   # promote a specific draft
 ```
+
+## Mode routing
+
+If `--from-drafts` is passed → run **Drafts-to-wiki Mode** (Steps DA–DE below). Skip the cross-vault flow.
+Otherwise → run the cross-vault flow (Steps 1–8 below).
+
+---
+
+## Drafts-to-wiki Mode
+
+Used to graduate a `scratchpad/` file into a proper `wiki/` page. See `wiki-templates` § KB + Drafts Layers for the contract this enforces.
+
+### Step DA: Discover candidate drafts
+
+```bash
+ls "vaults/<vault>/scratchpad/"*.md 2>/dev/null
+```
+
+If a specific file path was passed, skip listing and use that. If no file specified and only one draft exists, use it. Otherwise show the user the list and ask which to promote.
+
+### Step DB: Read the draft and decide page-type
+
+Read the file. Based on content, decide:
+- Meeting notes / session captures / dossiers → `page-type: source-note`, target dir `wiki/sources/`
+- Person, organisation, tool, framework profile → `page-type: entity`, target dir `wiki/entities/`
+- Idea, pattern, technique writeup → `page-type: concept`, target dir `wiki/concepts/`
+- Side-by-side comparison or synthesis → `page-type: comparison`, target dir `wiki/comparisons/`
+
+If unclear, ask via AskUserQuestion. Do not guess — promotion is a deliberate operation, not an automatic one.
+
+### Step DC: Normalise to wiki form
+
+Add full frontmatter per the chosen page-type (see `wiki-templates`). Fill in:
+- `title` from the draft's H1 or filename
+- `date-created` and `date-modified` (today's date)
+- `domain` from vault default (read `CLAUDE.md`) plus any inferred from the draft
+- `tags` based on content
+- `sources` — if the draft references external URLs or raw files, list them; otherwise the source is the draft itself (`scratchpad/<filename>.md`)
+- `related` — wikilinks to existing wiki pages mentioned in the draft
+
+If the draft has a "Raw notes" divider (created by `rough-notes cleanup`), keep only the cleaned-up portion above the divider; the raw notes stay in the original file as historical record.
+
+### Step DD: Write to wiki/ and update the index
+
+```bash
+SLUG=<derive kebab-case slug from title>
+mv "vaults/<vault>/scratchpad/<file>.md" "vaults/<vault>/wiki/<dir>/<SLUG>.md"
+# OR if keeping the raw notes in scratchpad: write the cleaned page to wiki/, edit scratchpad/ to leave a stub
+```
+
+Update `wiki/index.md` per the progressive index spec:
+- Add a one-line entry to L1 (`## Topic Map`).
+- Add a row to the appropriate L2 table (Sources / Entities / Concepts / Comparisons).
+
+### Step DE: Append to log + commit
+
+Append to `log.md`:
+```markdown
+## [YYYY-MM-DD] promote-draft | <draft-name> → wiki/<page>
+- Source: scratchpad/<file>.md
+- Target: wiki/<dir>/<SLUG>.md (page-type: <type>)
+- Index updated: yes
+---
+```
+
+Commit:
+```bash
+git -C "vaults/<vault>" add .
+git -C "vaults/<vault>" commit -m "✨ feat: promote <slug> from drafts to wiki"
+```
+
+Skip the rest of this skill (Steps 1–8) — those are for cross-vault promotion only.
+
+---
+
+## Vault-to-Vault Mode
+
+Transfer reusable, cross-cutting knowledge from one vault to another (typically project → hub).
 
 ## When to Use
 

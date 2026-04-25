@@ -178,6 +178,21 @@ Flag thresholds:
 
 **Auto-fix:** None. Sharding is a deliberate restructuring the user runs when they actually want it.
 
+### 3l. Drafts Staleness
+
+If the vault has a `scratchpad/` directory (the Drafts layer — see `wiki-templates` § KB + Drafts Layers), flag any draft files unmodified for over 30 days. Stale drafts are either ready to promote (run `/promote --vault <name> --from-drafts`) or no longer needed (delete them).
+
+```bash
+SCRATCH="$VAULT/scratchpad"
+if [ -d "$SCRATCH" ]; then
+  find "$SCRATCH" -name "*.md" -type f -mtime +30
+fi
+```
+
+For each stale file, suggest the action: promote vs delete. Don't recommend silently — the point of a Drafts layer is human-driven thinking, so /lint asks the user, doesn't decide.
+
+**Auto-fix:** None. Drafts are user-managed; lint just surfaces them.
+
 ## Step 4: Report
 
 Output a markdown report grouped by severity:

@@ -16,6 +16,7 @@ Ask questions against a vault's wiki and get synthesized answers with citations.
 /query "What deployment patterns have we seen?" --vault my-research
 /query "Compare framework A vs B" --vault my-research --save
 /query "Who are the key people in this space?" --vault my-research
+/query "What's our current LinkedIn voice?" --all-vaults    # search every vault under vaults/
 ```
 
 ## Step 1: Parse Arguments
@@ -23,6 +24,7 @@ Ask questions against a vault's wiki and get synthesized answers with citations.
 - Extract the question (quoted string)
 - `--vault <name>` — target vault (if omitted, use sole vault or ask)
 - `--save` — file the answer back into the wiki as a new page
+- `--all-vaults` — query every vault under `vaults/` and synthesise across them. Mutually exclusive with `--vault`. Useful when the question crosses domains (e.g. "what does my personal-work vault say about my LinkedIn voice, and how does that line up with the marketing playbooks I've ingested?").
 
 ## Step 2: Read the Index Progressively
 
@@ -53,10 +55,28 @@ fi
 
 Parse the JSON for `path` and `score`. Use the top 3-5 as starting candidates. If qmd isn't installed, skip silently — the index-based discovery in Step 2 is sufficient at smaller scale.
 
+## Step 2c: Build the context pack
+
+Apply the algorithm from the `context-pack` reference skill — extract seed signals (tags, domains, named entities, page-type hint) from the question, score every wiki page, and return the top 5 with a "why" column. This is the deterministic answer to "which pages should I read?" and replaces ad-hoc title-matching.
+
+The pack table feeds directly into Step 3 below — qmd hits and pack picks are merged, deduped, and prioritised together.
+
+## Step 2d: Multi-vault discovery (`--all-vaults` only)
+
+When `--all-vaults` is set, repeat Steps 2 / 2b / 2c for **every** `vaults/<name>/wiki/` directory. Track results per-vault so the final answer can cite cross-vault pages with the proper `[vault-short:page]` link form (see `wiki-templates` § Wikilinks).
+
+Order of operations:
+1. List vaults: `ls vaults/` (filter to directories that contain a `wiki/` subdirectory).
+2. For each vault: read `wiki/index.md` L0 (always), L1 if the question is broad, run qmd if installed (qmd accepts a path argument so it queries each vault's wiki separately), build a context pack scoped to that vault.
+3. Aggregate: keep top 3-5 pages per vault, label each with its vault short name.
+
+The context pack from each vault is its own block — do **not** mix across vaults at the candidate-finding stage, because tag/domain overlap is a per-vault signal. Cross-vault synthesis happens in Step 5.
+
 ## Step 3: Identify Relevant Pages
 
-Combine qmd results (Step 2b) with index-derived candidates (Step 2). Deduplicate and prioritise:
-- qmd's top-3 pages (when available) — high recall on content-similar pages
+Combine qmd results (Step 2b), context-pack picks (Step 2c), and (if applicable) per-vault packs (Step 2d). Deduplicate and prioritise:
+- Context-pack top-3 — score-ranked, deterministic
+- qmd top-3 (when available) — high recall on content-similar pages
 - Pages whose index entries semantically match the question (titles, one-line summaries)
 - Entity pages for people/tools named in the question
 - Concept pages for ideas/patterns in the question
@@ -82,6 +102,14 @@ Provide a comprehensive answer that:
 - **Suggests follow-ups** — related questions worth exploring, sources to ingest
 
 Format the answer in clean markdown with headings and structure appropriate to the question.
+
+### `--all-vaults` synthesis
+
+When in multi-vault mode, the answer is structured around the cross-cut:
+- **Per-vault citations use the cross-vault link form**, not bare wikilinks. Example: `[personal-work:linkedin-profile-ronan-connolly](obsidian://open?vault=llm-wiki-personal-work&file=wiki%2Fsources%2Flinkedin-profile-ronan-connolly)`. See `wiki-templates` § Wikilinks for the canonical form.
+- **Group by theme, not by vault.** Don't write four sections "what personal-work says" / "what marketing says". Synthesise across, then flag where vaults agree, disagree, or are silent.
+- **Surface tensions explicitly.** If two vaults have contradicting facts, say so and link both.
+- **Suggest cross-vault links the user should add.** If the answer reveals that personal-work would benefit from linking to a marketing concept page, recommend the link as a follow-up.
 
 ## Step 6: Save (if --save flag)
 

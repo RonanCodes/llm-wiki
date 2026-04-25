@@ -98,6 +98,35 @@ When sharded into separate files (`index.md`, `index-l1.md`, `index-l2.md`), the
 
 ---
 
+## KB + Drafts Layers
+
+A vault has two writing surfaces:
+
+- **`wiki/`** — the **KB** layer. Machine-managed. Every page has full frontmatter, a clear page-type, lives in the index, and is treated as canonical reference material. Skills like `/query` and `/generate-*` only read from here.
+- **`scratchpad/`** — the **Drafts** layer. Human-managed. Rough notes, meeting captures, half-formed thoughts, work-in-progress. No frontmatter requirement, no index entry, no auto-link expectations. The `rough-notes` skill is the canonical writer here.
+
+The split exists so the KB stays clean while you still have a place to think out loud. You should never feel bad about messy notes; you should also never get confused by messy notes appearing in `/query` answers.
+
+**Promotion path: `scratchpad/` → `wiki/`**
+
+When a draft has stabilised enough to be reference material, promote it via `/promote --from-drafts`. The skill:
+1. Adds proper frontmatter (title, dates, page-type, domain, tags, sources, related).
+2. Moves the file from `scratchpad/<file>.md` to the appropriate `wiki/{sources,entities,concepts,comparisons}/<slug>.md`.
+3. Updates `index.md` (L1 and L2 entries per the progressive index spec).
+4. Optionally leaves a redirect stub in `scratchpad/` pointing to the new location.
+
+**What does NOT belong in scratchpad/**
+
+- Finished source-notes from external sources — those go straight to `wiki/sources/` via `/ingest`.
+- Entity or concept pages — those are KB material from inception.
+- Anything you'd want `/query` to find. If it's worth being found, it's worth being in `wiki/`.
+
+**Hygiene**
+
+`/lint` flags scratchpad files unmodified for over 30 days as stale candidates — either promote them or delete. Drafts left to rot defeat the point of the split.
+
+---
+
 ## Page Type: source-note
 
 A summary of one ingested source. One source-note per source.
