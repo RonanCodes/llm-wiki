@@ -36,7 +36,7 @@ Examples:
 vaults/<vault>/wiki/sources/session-notes-<YYYY-MM-DD>-<slug>.md
 ```
 
-Plus rows appended to `wiki/index.md` Sources table and `log.md`.
+Plus rows appended to `wiki/index.md` Sources table and `log.md`, **and an update to `ROADMAP.md`** (see Step 6 below).
 
 ## Step 1: Resolve vault + title + date
 
@@ -164,6 +164,12 @@ date-accessed: <date>
 
 - Add a row to `wiki/index.md` under `## Sources` with `[[session-notes-<date>-<slug>]]`, a one-line summary, domain tags, date.
 - Append an entry to `log.md`: `## [<date>] ingest | Session notes — <topic>` with the source link and a paragraph of context.
+- **Update `ROADMAP.md`** (if the file exists — most vaults will have it):
+  1. Append a one-line entry to `## Recently completed`: `- <date>: <topic one-liner> ([[session-notes-<date>-<slug>]])`. Prune the list to the most recent 10.
+  2. Scan `## In progress` for any checkboxes describing the work that just completed. Remove them (don't just tick them — the rolling "Recently completed" already captures that).
+  3. Ask the user: "Any new `Next up` items from this session?" — if yes, insert at the top of `## Next up`. If no, leave it.
+  4. Update the `_Last updated:_` date near the top of the file.
+  If `ROADMAP.md` doesn't exist (e.g. older vault), skip without error and mention in the report that it would be worth creating one via `/pickup <vault>`.
 
 ## Step 7: Commit and report
 

@@ -135,6 +135,7 @@ vaults/<name>/
 │   └── comparisons/        # Comparison and synthesis pages
 ├── artifacts/              # GITIGNORED — generated outputs (books, pdfs, slides, …)
 ├── log.md                  # Chronological activity log
+├── ROADMAP.md              # In-progress, next-up, blocked, recently completed
 ├── CLAUDE.md               # Vault conventions (thin config)
 ├── README.md               # Overview for GitHub (what's inside, stats, purpose)
 └── .gitignore              # Ignore Obsidian ephemeral state, .DS_Store, artifacts/
@@ -176,7 +177,40 @@ Chronological record of all vault activity. Each entry is parseable:
 ---
 ```
 
-5. **Create `CLAUDE.md`** with this template:
+5. **Create `ROADMAP.md`** with this template:
+
+```markdown
+# Roadmap — <Vault Name>
+
+_Maintained by hand + auto-updated by `/ingest session`. Read at session start via `/pickup <vault-short>`._
+
+_Last updated: <today's date>_
+
+## In progress
+<!-- Things actively being worked on. Move to "Recently completed" when done. Checkboxes so status is legible at a glance. -->
+
+- _(empty; nothing in flight yet)_
+
+## Next up
+<!-- Priority-ordered open tasks / decisions / explorations. Top item is what /pickup suggests. -->
+
+1. _(empty; no queued work yet)_
+
+## Blocked / waiting on
+<!-- Include the reason and what unblocks. Revisit every session. -->
+
+- _(empty)_
+
+## Recently completed (rolling last 10)
+<!-- /ingest session appends here on close. Pruned to 10 most recent. Keep it terse. -->
+
+- <today's date>: vault initialized
+---
+```
+
+The ROADMAP is deliberately thin — it is a session-bridge document, not a planning doc. Detail lives in entity pages and plan concepts. ROADMAP entries should be one line each with links to where the full context lives.
+
+6. **Create `CLAUDE.md`** with this template:
 
 ```markdown
 # <Vault Name>

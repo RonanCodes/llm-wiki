@@ -46,6 +46,7 @@ If this is a fresh Claude Code session, here's what you can do:
 6. **Ask a question:** `/query "What do we know about X?" --vault my-research`
 7. **Health-check:** `/lint --vault my-research`
 8. **Graduate knowledge:** `/promote my-research --to meta`
+9. **Resume a vault:** `/pickup my-research` — session-start briefing (reads vault ROADMAP.md, recent log entries, in-flight entities).
 
 For the full daily workflow, read `docs/workflow.md`.
 For the project roadmap and what's built vs planned, read `docs/roadmap.md`.
@@ -157,6 +158,7 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 - **Private skills**: either use `.private/` overlay OR add `.local` to the skill name (e.g. `my-company.local/SKILL.md`) — both are gitignored.
 - **Shared skills** (ralph, frontend-design, etc.) come from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills). Install via `npx skills add` or clone + symlink.
 - **Tool dependencies** are listed in `tools.json` — the `/setup` skill reads this.
+- **Every vault has a `ROADMAP.md`** at the vault root alongside `log.md` and `index.md`. Four sections: `In progress`, `Next up`, `Blocked / waiting on`, `Recently completed (rolling last 10)`. Thin, link-heavy, one line per item — detail lives in entity pages. This is the session-bridge artifact: `/pickup <vault>` reads it at session start; `/ingest session` maintains it at session end. New vaults get this seeded automatically by `/vault-create`.
 - **Every wiki page** must have YAML frontmatter with: title, dates, page-type, domain, tags, sources, related.
 - **Every wiki page** must link back to its raw source via frontmatter `sources` field AND inline `## Sources` section.
 - **Domain tags** are inherited from the vault default and can be extended per-page.

@@ -9,6 +9,8 @@ allowed-tools: Bash(find *) Bash(git *) Bash(grep *) Bash(wc *) Bash(ls *) Bash(
 
 Show an overview of all vaults and their current state.
 
+**Sibling skill:** for a session-start briefing ("where did I leave off?") use `/pickup <vault>` instead. This skill is for vault health / catalogue stats; `/pickup` is for resuming work.
+
 ## Usage
 
 ```
@@ -35,6 +37,9 @@ grep "Domain" "$VAULT/CLAUDE.md" | head -1
 
 # Last log entry
 grep "^## \[" "$VAULT/log.md" | tail -1
+
+# Open ROADMAP items (count of unchecked checkboxes in In progress + Next up)
+test -f "$VAULT/ROADMAP.md" && grep -cE "^- \[ \]|^[0-9]+\." "$VAULT/ROADMAP.md" || echo "no-roadmap"
 
 # Git status
 cd "$VAULT" && git status --porcelain | wc -l  # 0 = clean
