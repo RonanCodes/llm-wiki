@@ -127,12 +127,13 @@ After the interview, proceed to Step 1 with the gathered info.
 vaults/<name>/
 ├── raw/                    # Immutable source documents
 │   └── assets/             # Downloaded images, attachments
-├── wiki/                   # LLM-generated markdown (the wiki)
-│   ├── index.md            # Catalog of all pages
+├── wiki/                   # KB layer — LLM-managed reference markdown
+│   ├── index.md            # Progressive index (Purpose / Topic Map / Full Index)
 │   ├── concepts/           # Concept pages (ideas, patterns, techniques)
 │   ├── entities/           # Entity pages (people, orgs, tools, frameworks)
 │   ├── sources/            # Source summaries (one per ingested source)
 │   └── comparisons/        # Comparison and synthesis pages
+├── scratchpad/             # Drafts layer — rough notes, meeting captures, WIP. Promoted into wiki/ via `/promote --from-drafts`.
 ├── artifacts/              # GITIGNORED — generated outputs (books, pdfs, slides, …)
 ├── log.md                  # Chronological activity log
 ├── ROADMAP.md              # In-progress, next-up, blocked, recently completed
@@ -140,6 +141,8 @@ vaults/<name>/
 ├── README.md               # Overview for GitHub (what's inside, stats, purpose)
 └── .gitignore              # Ignore Obsidian ephemeral state, .DS_Store, artifacts/
 ```
+
+See `wiki-templates` § KB + Drafts Layers for the contract: `wiki/` is canonical, `scratchpad/` is rough, the only path between them is a deliberate `/promote --from-drafts` invocation.
 
 3. **Create `wiki/index.md`** with this progressive-tier template (see `wiki-templates` § Progressive Index for the full spec):
 

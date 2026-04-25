@@ -73,6 +73,17 @@ Read the vault's `CLAUDE.md` to get:
 
 Read `wiki-templates` skill (at `.claude/skills/wiki-templates/SKILL.md`) for page type definitions and frontmatter requirements.
 
+## Step 4b: Build the Context Pack
+
+Apply the algorithm from the `context-pack` reference skill — extract seed signals from the source title, body, and any explicit tags, then surface the top 3 related pages by tag/domain/backlink/qmd score. Read those pages **before** Step 5.
+
+The pack guards against three failure modes that uncatched ingests fall into:
+- **Near-duplicate creation.** If a similar source-note or concept page already exists, the pack surfaces it. Decide between creating new and extending existing before you write.
+- **Missed cross-references.** Related entity pages get auto-linked into the new source-note's `related` frontmatter and inline mentions, instead of needing a follow-up `/lint --fix`.
+- **Drift from prior decisions.** A new tech-decision source-note that contradicts an existing one should explicitly call out the change (and update the older page with a forward pointer), not silently disagree.
+
+Default pack size for ingest is 3 pages — smaller than `/query` because the source body itself is also being read.
+
 ## Step 5: Create/Update Wiki Pages
 
 Based on the extracted content, create or update pages following the wiki-templates:
