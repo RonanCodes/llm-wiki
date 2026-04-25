@@ -3,6 +3,10 @@ name: ingest-hackernews
 description: Extract Hacker News threads (post + comments) for wiki ingestion. Uses Algolia HN API, no auth required.
 user-invocable: false
 allowed-tools: Bash(curl *)
+content-pipeline:
+  - pipeline:scan
+  - platform:agnostic
+  - role:scanner
 ---
 
 # Ingest Hacker News Thread

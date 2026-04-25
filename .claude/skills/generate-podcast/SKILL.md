@@ -3,6 +3,10 @@ name: generate-podcast
 description: Render a spoken-word MP3 podcast from wiki pages — single-host by default or two-voice dialogue. Piper TTS default (local, free); falls back to ElevenLabs / OpenAI TTS when their API keys are present. Used by /generate podcast. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(brew *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Bash(ffmpeg *) Bash(piper *) Bash(curl *) Bash(npm *) Bash(pnpm *) Bash(npx *) Read Write Glob Grep
+content-pipeline:
+  - pipeline:audio
+  - platform:agnostic
+  - role:adapter
 ---
 
 # Generate Podcast

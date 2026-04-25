@@ -3,6 +3,10 @@ name: generate-linkedin-content
 description: Generate calibrated LinkedIn content (headline, top-fold bio, About section, optionally paired ringed profile photo) from a vault's personal-work entities. Honest-calibration pass by default — challenges overclaiming language before writing. Honours /ro:write-copy rules. Pairs with /generate linkedin-cover for consistent banner + headline + bio. Used by /generate linkedin-content. Not user-invocable directly, go through /generate.
 user-invocable: false
 allowed-tools: AskUserQuestion, Read, Write, Edit, Bash(python3 *), Bash(mkdir *), Bash(date *), Bash(open *), Bash(git *), Glob, Grep
+content-pipeline:
+  - pipeline:copy
+  - platform:linkedin
+  - role:adapter
 ---
 
 # Generate LinkedIn Content

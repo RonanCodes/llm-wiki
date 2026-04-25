@@ -3,6 +3,10 @@ name: generate-all
 description: Meta-generator that runs every generate-* handler for a topic in one pass. Asks the user to pick a preset (fast, html-only, everything), then dispatches to each handler sequentially and regenerates the vault portal at the end. Used by /generate all.
 user-invocable: false
 allowed-tools: Bash(git *) Bash(ls *) Bash(mkdir *) Bash(date *) Bash(find *) Bash(cat *) Bash(grep *) Bash(awk *) Bash(wc *) Read Write Glob Grep
+content-pipeline:
+  - pipeline:orchestrator
+  - platform:agnostic
+  - role:orchestrator
 ---
 
 # Generate All

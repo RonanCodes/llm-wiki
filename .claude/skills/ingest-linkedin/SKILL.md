@@ -3,6 +3,10 @@ name: ingest-linkedin
 description: Ingest LinkedIn posts into the wiki. Supports pasted text or cookie-based auth for URL fetching.
 user-invocable: false
 allowed-tools: Bash(curl *) Read Write Edit Glob Grep
+content-pipeline:
+  - pipeline:scan
+  - platform:linkedin
+  - role:scanner
 ---
 
 # Ingest LinkedIn Post

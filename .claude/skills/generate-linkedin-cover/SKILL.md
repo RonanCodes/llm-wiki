@@ -3,6 +3,10 @@ name: generate-linkedin-cover
 description: Render a LinkedIn banner (1584x396, 4:1) via Google Gemini Nano Banana 2 at native 21:9 aspect, composed to read on desktop and mobile. Output is a timestamped PNG in a vault's artifacts/linkedin-covers/ with a prompt sidecar. Reads brand colours and positioning from vault entity pages. Honours /ro:write-copy rules for any text in the banner. Used by /generate linkedin-cover. Not user-invocable directly, go through /generate.
 user-invocable: false
 allowed-tools: Bash(curl *) Bash(sips *) Bash(which *) Bash(mkdir *) Bash(date *) Bash(cp *) Bash(open *) Bash(python3 *) Bash(git *) Read Write Edit Glob Grep
+content-pipeline:
+  - pipeline:image
+  - platform:linkedin
+  - role:adapter
 ---
 
 # Generate LinkedIn Cover

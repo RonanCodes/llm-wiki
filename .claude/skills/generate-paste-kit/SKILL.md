@@ -3,6 +3,10 @@ name: generate-paste-kit
 description: Build a one-click copy-paste HTML tool from any vault markdown source. Each block offers Plain and Rich copy so the user can paste into either plain-text fields (LinkedIn About, profile forms) or rich-text editors (Gmail, Docs, Notion, blog posts). Source format is a markdown file with `## Section` headers and fenced code blocks. Used by `/generate paste-kit`.
 user-invocable: false
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir *), Bash(date *), Bash(open *), Bash(git *)
+content-pipeline:
+  - pipeline:review
+  - platform:agnostic
+  - role:adapter
 ---
 
 # Generate Paste Kit

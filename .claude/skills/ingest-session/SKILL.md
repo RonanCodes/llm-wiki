@@ -177,6 +177,18 @@ Auto-commit in the vault's repo using the standard emoji + conventional-commit f
 
 Then report one paragraph: what got written, what paths, what the user can grep for later, and the commit SHA.
 
+## Step 8: Skill-catalog drift audit (after every session close)
+
+Run the skill-lab catalog audit so any drift the session may have introduced (renamed skill, new skill missing from catalog, archived skill still pointed at) is surfaced before it accumulates:
+
+```bash
+python3 ~/Dev/ai-projects/llm-wiki/.claude/skills/lint-skill-lab/audit.py
+```
+
+If the audit reports broken pointers (exit code 1), append a brief drift summary to the end of the report and ask the user whether to fix it now or defer. If the audit is clean (exit 0), include a single-line note in the report so the user knows the catalog is healthy.
+
+Reasoning: the catalog is a separate index that drifts silently from production unless something forces a check. Running this on every session close means drift never lasts more than one session.
+
 ## Rules
 
 - **Auto-commit** the ingest. The session note, index row, and log entry are always committed together so the paper trail is the commit. User can amend later if they want edits.

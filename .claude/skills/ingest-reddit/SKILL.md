@@ -3,6 +3,10 @@ name: ingest-reddit
 description: Extract post and comments from Reddit threads for wiki ingestion. Appends .json to any Reddit URL, no auth required for public subreddits.
 user-invocable: false
 allowed-tools: Bash(curl *)
+content-pipeline:
+  - pipeline:scan
+  - platform:reddit
+  - role:scanner
 ---
 
 # Ingest Reddit Thread
