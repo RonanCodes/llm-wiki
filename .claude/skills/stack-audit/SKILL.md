@@ -18,13 +18,23 @@ Read-side companion to `/stack-update`. Walks a target repo against the **Audit 
 /stack-audit ~/Dev/foo --no-doc-staleness   # skip the meta-staleness check
 ```
 
-## Step 1: Parse arguments
+## Step 1: Parse arguments + collect fuzzy-conditional answers up front
 
 - `<repo-path>` (positional, optional, default `$PWD`): the repo to audit. Must be a directory.
 - `--ingest`: also write a markdown report to `vaults/llm-wiki-research/wiki/audits/<repo-name>-<YYYY-MM-DD>.md` and update the audits index.
 - `--no-doc-staleness`: skip the doc-staleness meta-check (Step 5).
 
 Resolve the repo path to an absolute path. Verify it is a git repo (warn if not, continue).
+
+**Then**, before running checks, ask the user via `AskUserQuestion` for the fuzzy `only-if` triggers that cannot be reliably inferred from the filesystem. Bundle them into one multi-question prompt:
+
+1. **Public-facing?** (drives `opt-seo`, `opt-a11y-ci`, OG-image checks)
+2. **Daily-return utility?** (drives `opt-pwa`)
+3. **Multi-step UI with > 3 primary actions?** (drives `opt-keyboard-shortcuts`)
+4. **Already deployed to production?** (drives `obs-sentry`, `obs-uptimerobot`, `obs-posthog`)
+5. **Has user accounts / login?** (drives `opt-auth-better-auth`)
+
+Skip a question if the filesystem already answers it (e.g. if `wrangler.toml` has a custom-domain route binding, treat as deployed). Default each question to "yes" when ambiguous; flagging false-positives is cheaper than missing real gaps.
 
 ## Step 2: Load the canon
 
@@ -67,8 +77,8 @@ For each parsed check, evaluate the `signal` against the target repo. The signal
 | `<file>/<.jsonc> exists` | check both extensions |
 | `<dir> exists` | `test -d <repo>/<dir>` |
 | `<file> contains <pattern>` | `grep -q '<pattern>' <repo>/<file>` |
-| `tsconfig.json has <key>: <value>` | `jq -e '.compilerOptions["<key>"] == <value>' <repo>/tsconfig.json` |
-| `wrangler.toml/.jsonc has <key>` | grep across both extensions |
+| `tsconfig.json has <key>: <value>` | `tsconfig.json` is JSONC (comments + trailing commas), so plain `jq` fails. Use `pnpm exec tsc --showConfig 2>/dev/null \| jq` from the repo root, OR `node -e 'console.log(JSON.stringify(require("strip-json-comments")(require("fs").readFileSync(p,"utf8"))))'`, OR a tolerant grep on the raw file. |
+| `wrangler.toml/.jsonc has <key>` | check BOTH extensions; signal patterns in the canon use TOML form (`[[d1_databases]]`) but the JSONC form (`"d1_databases": [...]`) is equally valid. Grep for the key name itself (`d1_databases`) rather than the syntax wrapper. |
 | `gh api repos/<owner>/<repo>` | resolve owner/repo from `git remote get-url origin`, then run `gh api` |
 | `UptimeRobot API returns ...` | requires `UPTIMEROBOT_API_KEY`; if unset, mark check `skipped (no API key)` |
 
