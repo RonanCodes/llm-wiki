@@ -193,6 +193,46 @@ For each stale file, suggest the action: promote vs delete. Don't recommend sile
 
 **Auto-fix:** None. Drafts are user-managed; lint just surfaces them.
 
+### 3m. Auto-Promote Candidates (cross-vault inbound traffic)
+
+Pages that other vaults frequently link to are good candidates for promotion to a hub vault — they've earned reuse status. This check counts inbound cross-vault references and flags pages above the threshold.
+
+Scope: scan every `vaults/*/wiki/**/*.md` **outside** the current target vault for cross-vault links (`obsidian://open?vault=llm-wiki-<this-vault-short>&file=...`) pointing at pages in this vault. Cross-vault links use the markdown form documented in `wiki-templates` § Wikilinks; grep for the canonical pattern.
+
+```bash
+THIS_VAULT_SHORT=${VAULT##*llm-wiki-}   # strip the prefix
+THIS_VAULT_DIR="$VAULT/wiki"
+
+for page in $(find "$THIS_VAULT_DIR" -name "*.md" ! -name "index*.md" -type f); do
+  rel="${page#$THIS_VAULT_DIR/}"
+  slug="${rel%.md}"
+  # URL-encoded path: '/' → '%2F'
+  encoded="wiki%2F${slug//\//%2F}"
+  pattern="obsidian://open?vault=llm-wiki-${THIS_VAULT_SHORT}&file=${encoded}"
+
+  # Count distinct OTHER-vault files referencing this page
+  count=$(grep -rl --include="*.md" "$pattern" vaults/ 2>/dev/null \
+    | grep -v "^$VAULT/" | wc -l | tr -d ' ')
+
+  if [[ "$count" -ge 2 ]]; then
+    echo "$count $page"
+  fi
+done | sort -rn
+```
+
+Flag levels:
+- **≥2 inbound from other vaults** → `💡 promote candidate`. The page has earned cross-vault reuse signal — likely belongs in a hub vault (`llm-wiki-research`, `llm-wiki-marketing`, etc.). Recommend running `/promote <this-vault> --to <hub-vault>` for the page.
+- **≥5 inbound from other vaults** → `⚠️ strong promote candidate`. The page is acting as a de facto hub already. Promotion should be near-automatic.
+
+The check itself doesn't move anything — `/promote` is the user-driven action. This is purely a discoverability signal for "what should I graduate next?"
+
+**Caveats and rejected designs:**
+- This **cannot** detect promotion candidates from within the same vault (intra-vault wikilink density is what check 3i covers). Auto-promote is specifically about cross-vault traffic.
+- We do not score by qmd similarity across vaults here — too noisy at typical small vault counts (<10), and cross-vault retrieval isn't yet wired in `/query --all-vaults`.
+- Threshold of 2 is intentionally low. Adjust upward if false-positive rate is a problem.
+
+**Auto-fix:** None. Promotion is a deliberate cross-vault operation.
+
 ## Step 4: Report
 
 Output a markdown report grouped by severity:
@@ -221,6 +261,7 @@ Output a markdown report grouped by severity:
 - 💡 wiki/entities/popular-tool.md — hub (22 incoming links). Promote to L1 Topic Map.
 - 💡 Possible duplicate pair: wiki/concepts/llm-wikis.md ↔ wiki/concepts/llm-knowledge-bases.md (shared tags: llm, wiki, knowledge-base; title-Jaccard 0.67). Review manually — see check 3j for why no auto-fix.
 - 💡 index.md total over 10K tokens. Consider sharding: keep L0 in index.md, move L1 to index-l1.md, L2 to index-l2.md.
+- 💡 wiki/concepts/voice-extraction-methodology.md — promote candidate (3 cross-vault inbounds: marketing, personal-work, side-projects). Likely belongs in a hub. Run `/promote <this-vault> --to llm-wiki-research`.
 ```
 
 ## Step 5: Suggest Next Actions
