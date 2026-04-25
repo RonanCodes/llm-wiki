@@ -133,7 +133,8 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 | Topic | Vault | Archetype | Why |
 |-------|-------|-----------|-----|
 | Skill ideas, skill design, skill provenance, patterns, workflows, hooks, source profiles | `llm-wiki-skill-lab` | Hub | Catalogues skill lifecycle from idea to implementation |
-| Tech stack decisions, tool evaluations, framework comparisons, deployment strategies, general dev research | `llm-wiki-research` | Hub | General-purpose dev research and decision-making |
+| Tech stack decisions, tool evaluations, framework comparisons, deployment strategies, dev tooling research, Golden Stack canon | `llm-wiki-research` | Hub | Decision-driven dev research; "is this a decision I'll act on this quarter?" |
+| AI/LLM paradigm pieces, model commentary, agent theory, prompting deep-dives, AI essays, creator-economy meta on AI | `llm-wiki-ai-research` | Hub | "Is this shaping how I think about AI?" — pure-knowledge AI hub. Workflows go to skill-lab; stack decisions go to research |
 | Marketing playbooks, platform research (LinkedIn, TikTok, Instagram, YouTube), creator tactics, content-format studies | `llm-wiki-marketing` | Hub | Pure reusable marketing knowledge; specific campaigns live in the spoke vault they serve |
 | LinkedIn profile artefacts, CV, bio, cover banners, brand palette, personal positioning | `llm-wiki-personal-work` | Hub | Canonical self-entity; other vaults link in for bio/headline reuse |
 | Recruiter chats, company dossiers, interview prep, offers, salary research | `llm-wiki-career-moves` | Activity | Pipeline-style: chats, interviews, offers; status-stamped |
