@@ -34,3 +34,12 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - HF chapter-1 strategies vary: Design Patterns opens with problem-friction; JavaScript Programming opens with "superpowers" pitch; Java opens with historical-context + nostalgia. The unifying thread is "psychological investment before technical instruction".
   - For future O'Reilly fetches (US-204): use the same style-analysis approach.
 ---
+
+## [2026-04-26] - US-203: Phase 2 — Fetch Manning In Action samples
+- 3 Manning chapter-1 style analyses saved to raw/samples/inaction/.
+- **Learnings:**
+  - livebook.manning.com chapter URLs follow predictable pattern: /book/<slug>/chapter-N/
+  - Manning's brand voice is more uniform than expected: "In Action" subbrand and architecture-patterns books share the same scaffolding ("This chapter covers" bullets, numbered hierarchical sections).
+  - Microservices in Action wasn't available; Microservices Patterns substituted. Same publisher voice = same value as exemplar.
+  - Manning chapter 1 = "why and what"; code-heavy material deferred to chapter 2+. Useful structural insight for a generated In Action book: don't pack code in chapter 1.
+---
