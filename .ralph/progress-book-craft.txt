@@ -51,3 +51,13 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - hpbn.co serves clean HTML per chapter; no wget on this machine, so curl-per-chapter (7 chapters) was the path. Total ~450KB. Open source so it can be ingested in full (vs other O'Reilly samples which are only fair-use analyses).
   - Phase 2 closed: 4 stories done, 12 sample files + 7 HPBN chapters in raw/samples/ and raw/hpbn/.
 ---
+
+## [2026-04-26] - US-301: Phase 3 — Ingest Eloquent JavaScript
+- wiki/sources/eloquent-javascript.md: ~120 lines covering voice (literary register, anthropomorphism, second-person), pedagogy (epigraphs, exercises, project chapters), what's portable to /generate book.
+- index.md L1 + L2 updated.
+- **Learnings:**
+  - Each source-note ingest takes ~120-200 lines. With 7 more open books to ingest (US-302..308) this becomes the bulk of the run.
+  - Epigraph-at-chapter-open is high-value pattern. Recommended addition to bundle-hints for observatory + opinionated-O'Reilly variants.
+  - End-of-chapter exercises are NOT in /generate book today — flagging as gap. Should map to a `.exercise` block per theme. Head First's `.exercise` panel already exists in dummies/headfirst CSS but bundle-hints doesn't currently emit them programmatically.
+  - "Project chapter" pattern (a chapter that BUILDS instead of explains) is a future generate-book mode (`--with-project <task>`). Flagged for Phase 6 / future.
+---

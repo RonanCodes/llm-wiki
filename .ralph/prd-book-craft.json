@@ -80,8 +80,8 @@
         "Push if remote configured."
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26. wiki/sources/eloquent-javascript.md created (~120 lines). Voice characteristics + portable patterns documented. Index updated."
     },
     {
       "id": "US-302",
