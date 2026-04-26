@@ -78,8 +78,22 @@ Once qmd works, register the vault as a collection (idempotent) and search:
 
 ```bash
 VAULT_WIKI="vaults/<vault>/wiki"
-qmd collection list 2>/dev/null | grep -q "$VAULT_WIKI" || qmd collection add "$VAULT_WIKI"
+qmd collection list 2>/dev/null | grep -q "$VAULT_WIKI" || qmd collection add --name "<vault>" "$VAULT_WIKI"
 qmd search "<question>"
+```
+
+**Important — command shape.** `qmd search` (and `qmd query`) take a **single positional argument**: the query string. They search across **all registered collections** at once. Do NOT pass a path or per-vault flag — the second arg gets folded into the query string and matches nothing.
+
+```bash
+# ❌ WRONG
+qmd search "<query>" "vaults/<vault>/wiki"
+qmd search --vault <vault> "<query>"
+
+# ✅ RIGHT
+qmd search "<query>"
+
+# ✅ To scope results to one vault, filter by URI prefix:
+qmd search "<query>" 2>&1 | grep -B 1 -A 5 "qmd://<vault>/"
 ```
 
 `qmd search` is BM25-only — fast, no model required. Use the **first** invocation per session. If BM25 returns nothing useful, escalate to `qmd query <text>` for hybrid query expansion + LLM reranking — note that the **first** `qmd query` triggers a 1.28 GB GGUF model download (cached at `~/.cache/qmd/models/` for future runs).
