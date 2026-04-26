@@ -24,3 +24,13 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - Voice signatures observed across all 3: definitional vocabulary lists, troubleshooting-checklist numbered steps, comparison tables ("Do This in X / Do This in Y"), reference resource link clusters at the end.
   - The Robotics Python cheat sheet had a long function-reference section — useful for understanding how Dummies handles "API reference" within a beginner book.
 ---
+
+## [2026-04-26] - US-202: Phase 2 — Fetch Head First samples
+- Fetched 3 HF chapter-1 style analyses via WebFetch (fair-use mode).
+- Saved to vaults/llm-wiki-book-craft/raw/samples/headfirst/.
+- **Learnings for future iterations:**
+  - WebFetch refuses substantial reproduction of copyrighted O'Reilly text (Head First). Switch prompt to "describe the style + 5-10 short illustrative quotes" — this captures the voice signal cleanly without triggering the guard.
+  - Voice consistency across HF titles is very high — 3 samples are plenty for synthesis. No need to fetch more HF chapters.
+  - HF chapter-1 strategies vary: Design Patterns opens with problem-friction; JavaScript Programming opens with "superpowers" pitch; Java opens with historical-context + nostalgia. The unifying thread is "psychological investment before technical instruction".
+  - For future O'Reilly fetches (US-204): use the same style-analysis approach.
+---
