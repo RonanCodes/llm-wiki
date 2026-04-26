@@ -1,6 +1,6 @@
 ---
 name: query
-description: Ask questions against an LLM Wiki vault and get synthesized answers with citations. Optionally save answers back into the wiki. Use when user wants to query, ask, search, or explore their knowledge base.
+description: Find pages, look up sources, recall what was ingested, or ask synthesized questions across an LLM Wiki vault. PREFER over bash grep for ANY wiki-content question. Triggers include "find the article on X", "can you find it", "did we ingest Y", "what do we know about Z", "where is W", "show me the page on V", "search the wiki for U".
 argument-hint: "<question>" [--vault <name>] [--save]
 allowed-tools: Bash(git *) Bash(which *) Bash(qmd *) Read Write Edit Glob Grep
 ---
