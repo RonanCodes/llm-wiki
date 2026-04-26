@@ -74,7 +74,23 @@ qmd collection list 2>/dev/null | grep -q "$VAULT_WIKI" || qmd collection add "$
 qmd search "<query>" 2>&1
 ```
 
-`qmd search` does pure full-text BM25 ranking. It's fast and needs no model. Output is plain text with `qmd://collection/path:line` headers, scores, and snippets. **This is the default for `/search`.**
+`qmd search` does pure full-text BM25 ranking across **all registered collections at once**. It's fast and needs no model. Output is plain text with `qmd://<collection>/<path>:<line>` headers, scores, and snippets. **This is the default for `/search`.**
+
+**Important — command shape.** `qmd search` takes a single positional argument: the query string. It does NOT take a path or `--collection` flag. Do NOT do this:
+
+```bash
+# ❌ WRONG — qmd search treats the second arg as part of the query and matches nothing
+qmd search "<query>" "vaults/<name>/wiki"
+qmd search --collection llm-wiki-research "<query>"
+```
+
+To scope results to one vault, filter the output by URI prefix:
+
+```bash
+qmd search "<query>" 2>&1 | grep -A 5 "qmd://llm-wiki-research/"
+```
+
+Or read the full output and let the LLM pick out the relevant collection's hits.
 
 ### Optional: Hybrid query with reranking (`qmd query`)
 
