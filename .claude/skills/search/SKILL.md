@@ -21,13 +21,33 @@ Search vault wiki pages using qmd (hybrid BM25/vector search with LLM re-ranking
 - Extract search query (quoted string)
 - `--vault <name>` — target vault (if omitted, use sole vault or ask)
 
-## Step 2: Check for qmd
+## Step 2: Ensure qmd is installed (auto-install if missing)
+
+qmd is the primary backend. Grep is an emergency fallback only — never the default. qmd is published as an npm package (`@tobilu/qmd`), not a Homebrew formula. If qmd isn't installed, install it now:
 
 ```bash
-which qmd >/dev/null 2>&1
+if ! which qmd >/dev/null 2>&1; then
+  echo "qmd not installed — installing now (one-time)..."
+  if which pnpm >/dev/null 2>&1; then
+    pnpm add -g @tobilu/qmd
+  elif which npm >/dev/null 2>&1; then
+    npm install -g @tobilu/qmd
+  elif which bun >/dev/null 2>&1; then
+    bun add -g @tobilu/qmd
+  else
+    echo ""
+    echo "ERROR: neither pnpm, npm, nor bun is available."
+    echo "Install Node.js first (Homebrew is the easiest route on macOS):"
+    echo "  brew install node"
+    echo "Then re-run this command."
+    exit 1
+  fi
+fi
 ```
 
-If qmd is installed, use it (Step 3a). If not, offer to install or fall back to grep (Step 3b).
+Tell the user what happened in one line if you just installed it ("Installed qmd via pnpm"). If qmd was already present, no message needed.
+
+Only fall through to Step 3b (grep) if no Node-package-manager is available AND the user can't install Node. That's a real edge case, not the default.
 
 ## Step 3a: Search with qmd
 
@@ -79,9 +99,9 @@ Suggest re-indexing if the vault has been modified since last index:
 qmd index "$VAULT/wiki" --update
 ```
 
-## Step 3b: Fallback — Grep-based Search
+## Step 3b: Emergency Fallback — Grep-based Search
 
-If qmd is not installed:
+**Only reach this step if qmd auto-install in Step 2 failed.** Grep is not the default; it's the last resort when Homebrew can't be installed on the machine.
 
 ```bash
 VAULT="vaults/<vault-name>"
@@ -95,7 +115,7 @@ For each matching file, extract:
 
 Display in same table format, ordered by match count.
 
-Note to user: "Install qmd for better ranked results: `brew install qmd` or `cargo install qmd`"
+Tell the user: "qmd auto-install failed (no brew/cargo). Falling back to grep. To get hybrid BM25+vector search, install Homebrew and re-run."
 
 ## Step 4: Offer Follow-up
 
@@ -105,14 +125,21 @@ After showing results, suggest:
 
 ## Installing qmd
 
-### Via Homebrew (recommended):
+qmd is published on npm as `@tobilu/qmd` (Tobi Lutke's repo: github.com/tobi/qmd).
+
+### Via pnpm (recommended on the canonical stack):
 ```bash
-brew install qmd
+pnpm add -g @tobilu/qmd
 ```
 
-### Via Cargo (Rust):
+### Via npm:
 ```bash
-cargo install qmd
+npm install -g @tobilu/qmd
+```
+
+### Via bun:
+```bash
+bun add -g @tobilu/qmd
 ```
 
 ### As MCP Server (for native tool access):

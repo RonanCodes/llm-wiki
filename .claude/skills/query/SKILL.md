@@ -42,17 +42,39 @@ cat "$VAULT/wiki/index.md"
 # If sharded: cat "$VAULT/wiki/index-l1.md" only when L1 needed, "$VAULT/wiki/index-l2.md" only when L2 needed
 ```
 
-## Step 2b: Search with qmd (if available)
+## Step 2b: Search with qmd (auto-install if missing)
 
-If `qmd` is installed, run a hybrid BM25 + vector search to surface relevant pages directly. Prepend qmd's top results to the candidate list from Step 2 — they typically beat title-based discovery on questions that reference content rather than page names.
+qmd is the primary content-discovery backend. If it isn't installed, install it now — don't skip silently.
+
+qmd is published as an npm package (`@tobilu/qmd`), not a Homebrew formula.
 
 ```bash
-if which qmd >/dev/null 2>&1; then
-  qmd search "$VAULT/wiki" "<question>" --limit 10 --format json
+if ! which qmd >/dev/null 2>&1; then
+  echo "qmd not installed — installing now (one-time)..."
+  if which pnpm >/dev/null 2>&1; then
+    pnpm add -g @tobilu/qmd
+  elif which npm >/dev/null 2>&1; then
+    npm install -g @tobilu/qmd
+  elif which bun >/dev/null 2>&1; then
+    bun add -g @tobilu/qmd
+  else
+    echo ""
+    echo "WARNING: no Node package manager (pnpm/npm/bun) available. Falling back to index-only discovery."
+    echo "For hybrid BM25+vector search, install Node first:"
+    echo "  brew install node"
+    echo "Then re-run this query."
+  fi
 fi
 ```
 
-Parse the JSON for `path` and `score`. Use the top 3-5 as starting candidates. If qmd isn't installed, skip silently — the index-based discovery in Step 2 is sufficient at smaller scale.
+Once qmd is available, build the index for the target vault if it doesn't exist, then run the search:
+
+```bash
+qmd index --check "$VAULT/wiki" 2>/dev/null || qmd index "$VAULT/wiki"
+qmd search "$VAULT/wiki" "<question>" --limit 10 --format json
+```
+
+Parse the JSON for `path` and `score`. Use the top 3-5 as starting candidates. Only skip qmd if both brew and cargo are unavailable (true edge case) — the index-based discovery in Step 2 is the fallback then, NOT the default.
 
 ## Step 2c: Build the context pack
 
