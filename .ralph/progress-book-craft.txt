@@ -70,3 +70,16 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - YDKJS pattern that DOES NOT exist in other voice exemplars: NOTE blocks rendered as inline tables (not asides). Worth having as a callout option.
   - YDKJS has NO end-of-chapter exercises — different pedagogy from Eloquent JS. Confirms that exercises are theme-specific, not universal.
 ---
+
+## [2026-04-26] - US-303..308 (batched): Phase 3 — Ingest 6 open books
+- Ingested Crafting Interpreters, Pro Git, Rust Book, Linux Command Line, Dive Into Python, SICP as 6 source-notes (~70 lines each).
+- Batched commit because the analysis depth fits comfortably in one context — each book is a well-known voice and the pattern is established (peek one canonical chapter + write).
+- Bidirectional cross-link landed: companion-repo-per-book ↔ crafting-interpreters.
+- **Learnings:**
+  - Three exemplars (Eloquent JS, Crafting Interpreters, Dive Into Python) all use chapter epigraphs. Strong signal — this is a portable pattern, not idiosyncratic. Should be a `--epigraphs` flag or theme default.
+  - Three exemplars converge on per-chapter "Further Reading" or sources-block closer — Pro Git, Linux Command Line, Dive Into Python. /generate book already does similar via the wiki-page sources field.
+  - O'Reilly variant taxonomy (4 sub-variants) holds: reference (Definitive Guide), friendly (Learning JS), opinionated (YDKJS), practitioner-academic (DDIA).
+  - Beginner-rigorous (Shotts) is its own voice class — distinct from Dummies, HF, and reference O'Reilly. The rubric should support "beginner-rigorous" as a target voice.
+  - Listing-numbered code samples (Rust Book) are the cleanest convention for cross-chapter code references. /generate book could auto-emit "Listing N-N" labels.
+  - Phase 3 ingests complete: 8/8 done. Now ready for Phase 3 syntheses (US-309..314) which combine these inputs into per-template voice contracts.
+---
