@@ -1,7 +1,6 @@
 ---
 name: vault-status
 description: Show status of all LLM Wiki vaults — page counts, source counts, last activity, and git status. Use when user wants to see vault status, list vaults, or check wiki health.
-disable-model-invocation: true
 allowed-tools: Bash(find *) Bash(git *) Bash(grep *) Bash(wc *) Bash(ls *) Bash(tail *) Glob Grep Read
 ---
 

@@ -2,7 +2,6 @@
 name: promote
 description: Graduate knowledge — either between vaults (project vault → hub) or within a vault (scratchpad/ drafts → wiki/). Use when user wants to promote, graduate, transfer, or share knowledge between vaults, or to clean up rough notes into proper wiki pages.
 argument-hint: <vault> [--to <target-vault>] | <vault> --from-drafts [<file>]
-disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(mv *) Read Write Edit Glob Grep
 ---
 

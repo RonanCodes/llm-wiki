@@ -2,7 +2,6 @@
 name: search
 description: Search wiki pages using qmd (hybrid BM25/vector search) or grep fallback. Use when user wants to search, find, or look up content across their wiki vault.
 argument-hint: "<query>" [--vault <name>]
-disable-model-invocation: true
 allowed-tools: Bash(which *) Bash(brew *) Bash(cargo *) Bash(qmd *) Bash(grep *) Read Glob Grep
 ---
 

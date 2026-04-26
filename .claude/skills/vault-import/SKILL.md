@@ -2,7 +2,6 @@
 name: vault-import
 description: Import an existing Obsidian vault, markdown folder, or git repo as an llm-wiki vault. Moves content into vaults/, adds missing structure (index, log, CLAUDE.md, frontmatter). Use when user wants to import, adopt, migrate, or bring in an existing knowledge base.
 argument-hint: <path-or-repo-url> [--name <vault-name>] [--domain <domain>]
-disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(mv *) Bash(cp *) Bash(mkdir *) Bash(find *) Read Write Edit Glob Grep
 ---
 

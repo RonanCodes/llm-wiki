@@ -2,7 +2,6 @@
 name: read-gist
 description: Read raw content of a GitHub gist from a URL or gist ID. Use when user shares a gist.github.com link, asks to read a gist, or references a gist ID.
 argument-hint: <gist-url-or-id>
-disable-model-invocation: true
 ---
 
 # Read Gist

@@ -2,7 +2,6 @@
 name: read-tweet
 description: Read full text of an X/Twitter post from a URL. Use when user shares an x.com or twitter.com link, asks to read a tweet, or needs tweet content extracted.
 argument-hint: <tweet-url>
-disable-model-invocation: true
 ---
 
 # Read Tweet

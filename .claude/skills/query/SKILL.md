@@ -2,7 +2,6 @@
 name: query
 description: Ask questions against an LLM Wiki vault and get synthesized answers with citations. Optionally save answers back into the wiki. Use when user wants to query, ask, search, or explore their knowledge base.
 argument-hint: "<question>" [--vault <name>] [--save]
-disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(which *) Bash(qmd *) Read Write Edit Glob Grep
 ---
 
