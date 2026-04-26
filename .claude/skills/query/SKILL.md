@@ -46,20 +46,22 @@ cat "$VAULT/wiki/index.md"
 
 qmd is the primary content-discovery backend. If it isn't installed, install it now — don't skip silently.
 
-qmd is published as an npm package (`@tobilu/qmd`), not a Homebrew formula.
+qmd is published as an npm package (`@tobilu/qmd`).
+
+**Install via npm, not pnpm.** pnpm's default config skips post-install build scripts, which means `better-sqlite3` (qmd's native dep) doesn't compile its binding and qmd fails at runtime.
 
 ```bash
 if ! which qmd >/dev/null 2>&1; then
   echo "qmd not installed — installing now (one-time)..."
-  if which pnpm >/dev/null 2>&1; then
-    pnpm add -g @tobilu/qmd
-  elif which npm >/dev/null 2>&1; then
+  if which npm >/dev/null 2>&1; then
     npm install -g @tobilu/qmd
   elif which bun >/dev/null 2>&1; then
     bun add -g @tobilu/qmd
+  elif which pnpm >/dev/null 2>&1; then
+    pnpm add -g @tobilu/qmd && pnpm approve-builds -g
   else
     echo ""
-    echo "WARNING: no Node package manager (pnpm/npm/bun) available. Falling back to index-only discovery."
+    echo "WARNING: no Node package manager available. Falling back to index-only discovery."
     echo "For hybrid BM25+vector search, install Node first:"
     echo "  brew install node"
     echo "Then re-run this query."
@@ -67,14 +69,22 @@ if ! which qmd >/dev/null 2>&1; then
 fi
 ```
 
-Once qmd is available, build the index for the target vault if it doesn't exist, then run the search:
-
+If qmd is already installed but errors with `Could not locate the bindings file`, it was installed via pnpm without build approval — fix:
 ```bash
-qmd index --check "$VAULT/wiki" 2>/dev/null || qmd index "$VAULT/wiki"
-qmd search "$VAULT/wiki" "<question>" --limit 10 --format json
+pnpm rm -g @tobilu/qmd && npm install -g @tobilu/qmd
 ```
 
-Parse the JSON for `path` and `score`. Use the top 3-5 as starting candidates. Only skip qmd if both brew and cargo are unavailable (true edge case) — the index-based discovery in Step 2 is the fallback then, NOT the default.
+Once qmd works, register the vault as a collection (idempotent) and search:
+
+```bash
+VAULT_WIKI="vaults/<vault>/wiki"
+qmd collection list 2>/dev/null | grep -q "$VAULT_WIKI" || qmd collection add "$VAULT_WIKI"
+qmd search "<question>"
+```
+
+`qmd search` is BM25-only — fast, no model required. Use the **first** invocation per session. If BM25 returns nothing useful, escalate to `qmd query <text>` for hybrid query expansion + LLM reranking — note that the **first** `qmd query` triggers a 1.28 GB GGUF model download (cached at `~/.cache/qmd/models/` for future runs).
+
+Parse the text output (`qmd://collection/path:line` headers + scores + snippets) for top 3-5 candidates. Only skip qmd entirely if no Node package manager is available — the index-based discovery in Step 2 is the fallback then, NOT the default.
 
 ## Step 2c: Build the context pack
 

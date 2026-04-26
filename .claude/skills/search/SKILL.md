@@ -23,20 +23,23 @@ Search vault wiki pages using qmd (hybrid BM25/vector search with LLM re-ranking
 
 ## Step 2: Ensure qmd is installed (auto-install if missing)
 
-qmd is the primary backend. Grep is an emergency fallback only — never the default. qmd is published as an npm package (`@tobilu/qmd`), not a Homebrew formula. If qmd isn't installed, install it now:
+qmd is the primary backend. Grep is an emergency fallback only — never the default. qmd is published as an npm package (`@tobilu/qmd`), not a Homebrew formula.
+
+**Install via npm, not pnpm.** pnpm's default config skips post-install build scripts, which means `better-sqlite3` (qmd's native dep) doesn't compile its binding and qmd fails at runtime. npm runs build scripts by default.
 
 ```bash
 if ! which qmd >/dev/null 2>&1; then
   echo "qmd not installed — installing now (one-time)..."
-  if which pnpm >/dev/null 2>&1; then
-    pnpm add -g @tobilu/qmd
-  elif which npm >/dev/null 2>&1; then
+  if which npm >/dev/null 2>&1; then
     npm install -g @tobilu/qmd
   elif which bun >/dev/null 2>&1; then
     bun add -g @tobilu/qmd
+  elif which pnpm >/dev/null 2>&1; then
+    # Last resort — pnpm needs build approval for native deps
+    pnpm add -g @tobilu/qmd && pnpm approve-builds -g
   else
     echo ""
-    echo "ERROR: neither pnpm, npm, nor bun is available."
+    echo "ERROR: no Node package manager (npm/bun/pnpm) available."
     echo "Install Node.js first (Homebrew is the easiest route on macOS):"
     echo "  brew install node"
     echo "Then re-run this command."
@@ -45,37 +48,53 @@ if ! which qmd >/dev/null 2>&1; then
 fi
 ```
 
-Tell the user what happened in one line if you just installed it ("Installed qmd via pnpm"). If qmd was already present, no message needed.
+If qmd is already installed but throws `Could not locate the bindings file` errors at runtime, that means it was installed via pnpm without build-script approval. Fix by reinstalling via npm:
 
-Only fall through to Step 3b (grep) if no Node-package-manager is available AND the user can't install Node. That's a real edge case, not the default.
+```bash
+pnpm rm -g @tobilu/qmd 2>/dev/null
+npm install -g @tobilu/qmd
+```
 
 ## Step 3a: Search with qmd
 
-### First-time setup: Index the vault
+### First-time setup: Add the vault as a collection
 
-Check if the vault has been indexed:
-```bash
-VAULT="vaults/<vault-name>"
-qmd index --check "$VAULT/wiki" 2>/dev/null
-```
-
-If not indexed (or first run):
-```bash
-qmd index "$VAULT/wiki"
-```
-
-This creates a search index over all markdown files in the wiki. Re-index after significant changes.
-
-### Query
+qmd uses **collections** (named indexed folders), not per-query path arguments. Register the vault once:
 
 ```bash
-qmd search "$VAULT/wiki" "<query>" --limit 10 --format json
+VAULT_WIKI="vaults/<vault-name>/wiki"
+qmd collection list 2>/dev/null | grep -q "$VAULT_WIKI" || qmd collection add "$VAULT_WIKI"
 ```
 
-qmd returns results ranked by relevance using hybrid BM25 + vector search. Parse the JSON output for:
-- File path
-- Relevance score
-- Matching snippet
+`qmd collection add` indexes all markdown files under the path. Re-run `qmd update` after significant changes (or `qmd update --pull` to git-pull-then-index).
+
+### Query (BM25, instant, default)
+
+```bash
+qmd search "<query>" 2>&1
+```
+
+`qmd search` does pure full-text BM25 ranking. It's fast and needs no model. Output is plain text with `qmd://collection/path:line` headers, scores, and snippets. **This is the default for `/search`.**
+
+### Optional: Hybrid query with reranking (`qmd query`)
+
+`qmd query` uses query expansion + vector similarity + LLM reranking — better for fuzzy "what about X" questions but requires a one-time **1.28 GB model download** on first run (saved to `~/.cache/qmd/models/`).
+
+Only use `qmd query` if:
+- The user explicitly asks for "smart" or "semantic" search
+- BM25 returned no useful results
+
+For most "find this page" queries, `qmd search` is enough.
+
+```bash
+qmd query "<question>"      # hybrid, slower first run, smarter ranking
+qmd vsearch "<query>"       # vector only (also needs the model)
+```
+
+Parse text output for:
+- File path (the `qmd://` URI)
+- Score (BM25 or hybrid score)
+- Matching snippet (with surrounding context)
 
 ### Display Results
 
@@ -94,9 +113,10 @@ Read the top results' frontmatter to get page-type and domain tags.
 
 ### Re-indexing
 
-Suggest re-indexing if the vault has been modified since last index:
+Re-index after significant changes:
 ```bash
-qmd index "$VAULT/wiki" --update
+qmd update                  # re-scan all collections
+qmd update --pull           # git-pull each collection then re-scan
 ```
 
 ## Step 3b: Emergency Fallback — Grep-based Search
