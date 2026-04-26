@@ -316,8 +316,8 @@
         "Push to engine repo origin if configured."
       ],
       "priority": 19,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26. Working scoring engine. Smoke test on Golden Stack book hard-gate-failed on em-dashes \u2014 validates close-the-loop value."
     },
     {
       "id": "US-402",
@@ -341,8 +341,8 @@
         "Push if remote configured."
       ],
       "priority": 20,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26. Working scoring engine. Smoke test on Golden Stack book hard-gate-failed on em-dashes \u2014 validates close-the-loop value."
     },
     {
       "id": "US-403",
@@ -359,8 +359,8 @@
         "Push if remote configured."
       ],
       "priority": 21,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26. Working scoring engine. Smoke test on Golden Stack book hard-gate-failed on em-dashes \u2014 validates close-the-loop value."
     },
     {
       "id": "US-404",
