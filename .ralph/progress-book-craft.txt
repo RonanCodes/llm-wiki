@@ -43,3 +43,11 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - Microservices in Action wasn't available; Microservices Patterns substituted. Same publisher voice = same value as exemplar.
   - Manning chapter 1 = "why and what"; code-heavy material deferred to chapter 2+. Useful structural insight for a generated In Action book: don't pack code in chapter 1.
 ---
+
+## [2026-04-26] - US-204: Phase 2 — Fetch O'Reilly + HPBN
+- 3 O'Reilly chapter-1 style analyses + 7 HPBN chapters mirrored.
+- **Learnings:**
+  - O'Reilly is NOT a single voice — it has at least 3 sub-variants (friendly-rigorous, reference-grade, practitioner-academic). Future bundle-hints.md for /generate book oreilly should support an --oreilly-variant flag or auto-detect from topic class.
+  - hpbn.co serves clean HTML per chapter; no wget on this machine, so curl-per-chapter (7 chapters) was the path. Total ~450KB. Open source so it can be ingested in full (vs other O'Reilly samples which are only fair-use analyses).
+  - Phase 2 closed: 4 stories done, 12 sample files + 7 HPBN chapters in raw/samples/ and raw/hpbn/.
+---
