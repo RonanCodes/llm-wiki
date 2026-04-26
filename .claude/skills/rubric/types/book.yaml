@@ -1,0 +1,233 @@
+type: book
+version: 1
+description: "Quality rubric for /generate book artifacts. Read by /rubric audit, by verify-quick.sh, and by /ralph autonomous loops."
+
+overall:
+  policy: any-hard-fail-fails
+  warn_count_for_warn: 1
+
+dimensions:
+
+  # ----- Dimension 1: scope-fidelity -----
+  - name: scope-fidelity
+    weight: 1.0
+    hard_gate: false
+    how_measured: jaccard
+    args:
+      compare: topic               # compare bundle H1 chapter titles to the topic argument
+      target: bundle.md
+    gates:
+      pass: ">=0.5"
+      warn: ">=0.3"
+    description: |
+      Does the book cover only the topic, no off-topic drift?
+      Measured: Jaccard similarity between (lower-cased word set of H1 chapter titles) and (topic words).
+      Threshold ≥0.5 means at least half the topic vocabulary appears in chapter titles.
+
+  # ----- Dimension 2: depth -----
+  - name: depth
+    weight: 1.0
+    hard_gate: false
+    how_measured: depth_book
+    args:
+      target: bundle.md
+      word_floor: 3000
+      chapter_floor: 3
+    gates:
+      pass: ">=3000 words & >=3 chapters"
+      warn: ">=2000 words & >=2 chapters"
+    description: |
+      Meets the per-type depth floor. Books require ≥3000 words AND ≥3 chapters.
+      Below floor on either = warn. Below 2000 words OR <2 chapters = fail (soft).
+
+  # ----- Dimension 3: voice-fit -----
+  - name: voice-fit
+    weight: 1.0
+    hard_gate: false
+    how_measured: voice_signatures
+    args:
+      target: bundle.md
+      theme_field: theme           # read sidecar.theme to pick the signature set
+      signatures:
+        observatory:
+          present:
+            - 'reference-grade noun-phrase H2'
+            - regex: '(?m)^## [A-Z][^\n]+\n'
+              count: ">=3"
+          absent:
+            - regex: '<span class="dropcap">'    # Observatory says no drop caps
+              count: 0
+        dummies:
+          present:
+            - regex: 'In This Chapter'
+              count: ">=1"
+            - regex: 'class="cheatsheet"|Cheat Sheet'
+              count: ">=1"
+            - regex: 'class="(tip|warn|note|remember|technical)"'
+              count: ">=2"
+        headfirst:
+          present:
+            - regex: 'class="qa"|There are no Dumb Questions'
+              count: ">=1"
+            - regex: 'class="exercise"|Sharpen Your Pencil|Brain Power'
+              count: ">=1"
+        oreilly:
+          present:
+            - regex: 'class="(tip|note|warn)"'
+              count: ">=2"
+          absent:
+            - regex: '<span class="dropcap">'
+              count: 0
+        inaction:
+          present:
+            - regex: 'This chapter covers'
+              count: ">=1"
+            - regex: 'Listing \d'
+              count: ">=1"
+    gates:
+      pass: "all signatures match"
+      warn: ">=70% signatures match"
+    description: |
+      Does the bundle exhibit the chosen template's signature elements?
+      Per-theme signature lists (present + absent regexes).
+
+  # ----- Dimension 4: template-fit (structural) -----
+  - name: template-fit
+    weight: 1.0
+    hard_gate: false
+    how_measured: template_structure
+    args:
+      target: bundle.md
+      required:
+        - chapter_opener_per_chapter   # every # H1 must be preceded by a chapter-opener div
+        - key_takeaways_per_chapter    # every chapter ends with .key-takeaways
+        - source_refs_present          # ≥1 source ref or sources block somewhere
+    gates:
+      pass: "all required structural elements present"
+      warn: "1 missing"
+    description: |
+      Required structural elements per chapter (regardless of theme).
+      Stricter than voice-fit: ALL chapters must have these.
+
+  # ----- Dimension 5: layout (PDF render quality) -----
+  - name: layout
+    weight: 1.0
+    hard_gate: false
+    how_measured: pdf_layout
+    args:
+      target: artifact            # the .pdf itself
+      widow_threshold_pct: 5
+      overflow_check: true        # flag if any line is wider than the page text-width
+    gates:
+      pass: "widow_rate <=5% AND overflow_count == 0"
+      warn: "widow_rate <=10% OR overflow_count <=2"
+    description: |
+      Typography + page boundaries behave: low widow rate, no overflow off the page.
+      Measured via pdftotext -layout + per-line width inspection.
+
+  # ----- Dimension 6: cover -----
+  - name: cover
+    weight: 0.5
+    hard_gate: false
+    how_measured: cover_quality
+    args:
+      sidecar_field: cover.path
+      min_bytes: 100000           # >100KB cover image
+      preferred_aspect: "1024:1536"   # portrait 2:3
+      tolerance_pct: 5
+    gates:
+      pass: "exists AND >=100KB AND aspect within tolerance"
+      warn: "exists AND >=50KB"
+    description: |
+      Cover image present and reasonable. Sub-aspirational at small sizes
+      (likely a placeholder) or wrong aspect ratio.
+
+  # ----- Dimension 7: ai-slop (HARD GATE) -----
+  - name: ai-slop
+    weight: 1.0
+    hard_gate: true
+    how_measured: blacklist_scan
+    args:
+      target: bundle.md
+      blacklist:
+        # Em-dash and en-dash (NEVER allowed per /ro:write-copy)
+        - '—'
+        - '–'
+        # AI-tell vocabulary
+        - '\bdelve\b'
+        - '\bleverage\b'
+        - '\brobust\b'
+        - '\bseamless\b'
+        - '\btapestry\b'
+        - '\blandscape\b'
+        - '\belevate\b'
+        - '\bempower\b'
+        - '\bunlock\b'
+        - '\bstreamline\b'
+        # Filler phrases
+        - "in today's fast-paced world"
+        - 'at the intersection of'
+        # Rhetorical-reversal filler
+        - 'not only [^.]+but also'
+        - "it's not just [^.]+it's"
+    gates:
+      pass: "==0"
+      warn: "==1 (still a fail at hard-gate level)"
+    description: |
+      HARD GATE. Any em-dash, en-dash, AI-tell vocabulary, filler phrase,
+      or rhetorical-reversal pattern fails this dimension and the overall.
+      Ban list inherited from /ro:write-copy + project CLAUDE.md.
+
+  # ----- Dimension 8: source-coverage -----
+  - name: source-coverage
+    weight: 1.0
+    hard_gate: false
+    how_measured: paragraph_coverage
+    args:
+      target: bundle.md
+      sources_field: generated-from   # sidecar field listing source paths
+      sample_size: 20                 # sample N paragraphs to test
+      min_substring_len: 10           # match shortest substring of N words
+    gates:
+      pass: ">=80% of sampled paragraphs have a substring match in a source page"
+      warn: ">=60%"
+    description: |
+      How much of the generated prose is grounded in the source pages?
+      Below 60% suggests heavy confabulation.
+      Sample-based: pulls 20 paragraphs at random, attempts to find a contiguous
+      substring (≥10 words) in any source page. Counts hits.
+
+  # ----- Dimension 9: engagement-diversity -----
+  - name: engagement-diversity
+    weight: 0.75
+    hard_gate: false
+    how_measured: engagement_count
+    args:
+      target: bundle.md
+      theme_field: theme
+      targets_per_theme:
+        observatory: 6
+        dummies: 7
+        headfirst: 9
+        oreilly: 6
+        inaction: 7
+      techniques:
+        - mermaid           # !\[diagram[^\]]*\]\(
+        - callouts          # blockquote\.tip|class="(tip|note|warn|remember|technical|brain)"
+        - dropcap           # class="dropcap"
+        - cheatsheet        # class="cheatsheet"
+        - key_takeaways     # class="key-takeaways"
+        - chapter_opener    # class="chapter-opener"
+        - in_this_chapter   # In This Chapter|This chapter covers
+        - listing_numbered  # Listing \d
+        - qa_block          # class="qa"|There are no Dumb Questions
+        - exercise          # class="exercise"|Sharpen Your Pencil|Brain Power
+        - source_refs       # source-ref|file_path:line_number
+        - pull_quote        # class="pullquote"
+        - epigraph          # class="epigraph"|<blockquote class="quote">
+    gates:
+      pass: ">= target_per_theme"
+      warn: ">= 75% of target_per_theme"
+    description: |
+      Distinct engagement techniques per chapter, measured against per-theme target.
+      Source: pedagogy-techniques.md cross-template matrix.
