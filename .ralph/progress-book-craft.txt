@@ -96,3 +96,26 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - Drop caps inheritance is a known bug (Observatory says no, Dummies says yes; bundle-hints currently treats default-on). Flag for Phase 6.
   - `obsidian://open` URLs in PDF render as plain text. Need a fallback. Flag for Phase 6.
 ---
+
+## [2026-04-26] - US-401..403: Phase 4 — /rubric skill scaffolded + book.yaml + scoring engine
+- Built .claude/skills/rubric/{SKILL.md, types/book.yaml, lib/score-rubric.sh}.
+- 9 dimensions in book.yaml: scope-fidelity, depth, voice-fit, template-fit, layout, cover, ai-slop (HARD GATE), source-coverage, engagement-diversity.
+- Smoke test on golden-stack-2026-04-26.pdf:
+  - ✓ depth (7528 words, 5 chapters)
+  - ✓ voice-fit (3/3 dummies signatures match)
+  - ✓ layout (0% widows, 50 pages)
+  - ✓ cover (696KB, theme-themed)
+  - ✓ engagement-diversity (7/7 techniques)
+  - ⚠ template-fit (no source-refs in bundle.md)
+  - ✗ scope-fidelity (jaccard=0.11 — topic was 2 words vs 18 title words, expected fail)
+  - ✗ source-coverage (0/20 — bug in path-joining for relative generated-from paths)
+  - ✗ ai-slop (HARD GATE) — 69 em-dashes + 9 en-dashes — **MAJOR FINDING**
+  - Overall: ❌ FAIL
+- **CRITICAL FINDING:** the Golden Stack book violates the project's own no-em-dash rule. /generate book OR Pandoc OR the bundle author (me) introduced these. Phase 6 must fix this before re-rendering.
+- US-404 (wire verify-quick to /rubric) + US-405 (audit subcommand) remaining for next session. The audit subcommand handler is documented in SKILL.md but not tested as a slash-command path.
+- **Learnings:**
+  - PyYAML had to be lazy-installed; consider bundling. Most macOS Pythons don't ship with it.
+  - Pandoc renders bundle.md with em-dash-substitution turned ON by default. The bundle source had `--`/`---` which Pandoc converted. Need to disable smart-typography in /generate book pipeline.
+  - The rubric's hard-gate on ai-slop is the highest-value dimension. Even with 7/9 dimensions passing, one hard-gate fail is correctly fatal.
+  - paragraph_coverage path-joining needs work — `generated-from` is relative to repo root; engine assumes this but should resolve more carefully.
+---
