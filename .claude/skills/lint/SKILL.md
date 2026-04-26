@@ -2,7 +2,6 @@
 name: lint
 description: Health-check an LLM Wiki vault for issues — orphan pages, missing links, contradictions, stale content, frontmatter problems. With --artifacts, walks artifacts/ for .meta.yaml sidecars and flags any whose source-hash has drifted since generation. Use when user wants to lint, check, audit, or health-check their wiki, or check for stale artifacts.
 argument-hint: [--vault <name>] [--fix] [--artifacts] [--verify]
-disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(bash *) Bash(find *) Bash(awk *) Read Write Edit Glob Grep
 ---
 

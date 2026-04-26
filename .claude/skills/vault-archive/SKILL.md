@@ -2,7 +2,6 @@
 name: vault-archive
 description: Archive a completed vault by moving it out of the active vaults/ directory. Optionally promote reusable knowledge first. Use when user wants to archive, shelve, or finish a project vault.
 argument-hint: <vault-name> [--promote-first]
-disable-model-invocation: true
 allowed-tools: Bash(mv *) Bash(mkdir *) Bash(git *) Bash(ls *) Read Write Edit Glob Grep
 ---
 

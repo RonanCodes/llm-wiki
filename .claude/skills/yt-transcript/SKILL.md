@@ -2,7 +2,6 @@
 name: yt-transcript
 description: Extract transcript from a YouTube video as clean readable text. Use when user shares a youtube.com or youtu.be link and wants the transcript, content summary, or to read what was said.
 argument-hint: <youtube-url>
-disable-model-invocation: true
 allowed-tools: Bash(yt-dlp *) Bash(cat *) Bash(sed *) Read
 ---
 

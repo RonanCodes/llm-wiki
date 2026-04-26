@@ -1,7 +1,6 @@
 ---
 name: setup
 description: First-time setup for the llm-wiki system. Checks tools, skills, and Obsidian. Use when setting up llm-wiki on a new machine.
-disable-model-invocation: true
 allowed-tools: Bash(brew *) Bash(which *) Bash(npm *) Bash(pnpm *) Bash(ls *) Read Glob
 ---
 

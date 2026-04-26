@@ -2,7 +2,6 @@
 name: slides
 description: Deprecated — /slides has moved to /generate slides. This shim prints a short redirect and forwards to the new handler. Use when a user types the old /slides command.
 argument-hint: "<topic>" [--vault <name>]
-disable-model-invocation: true
 allowed-tools: Read
 ---
 
