@@ -181,6 +181,38 @@ After the report, suggest concrete next actions:
 - For every critical fail, suggest the exact command (already in the `Fix` column of the canon).
 - If multiple critical fails point at one orchestrator skill (e.g. `/ro:new-tanstack-app`), suggest running it.
 - If the repo is on a non-canonical stack (no TanStack, no CF Workers), suggest `/ro:migrate-to-tanstack` once and stop reporting per-check fails for the migration items.
+- **Even if the user wants to KEEP a non-TanStack framework** (Astro, Vite static, Remix, etc.) and only migrate the host to CF Workers, **the host-swap + hygiene + GH-Actions + secrets steps are identical to canon**. Reference `/ro:migrate-to-tanstack` § "Custom domain: pre-delete conflicting DNS" and `/ro:new-tanstack-app` §13 (CI workflow + `gh secret set --env production`) — those patterns transfer 1:1. Do **not** re-derive them.
+
+## Step 8: When the user asks you to actually execute a fix
+
+This skill is **read-only by design** (Anti-patterns), but the recommendations it produces often get acted on in the same conversation. Before pasting any "create CF API token" or "set GH secret" instructions, **first grep `~/.claude/.env` for existing creds**:
+
+```bash
+grep -iE "^(CLOUDFLARE_|SENTRY_|POSTHOG_|UPTIMEROBOT_|NEON_|GH_TOKEN|GITHUB_TOKEN)=" ~/.claude/.env
+```
+
+If a needed token is already there (it usually is for already-onboarded providers), source it and use it directly — do not ask the user to paste a token they already have. Pattern:
+
+```bash
+unset GH_TOKEN GITHUB_TOKEN  # ~/.claude/.env's GITHUB_TOKEN shadows gh CLI keychain auth — must unset
+CF_TOKEN=$(grep "^CLOUDFLARE_API_TOKEN=" ~/.claude/.env | cut -d= -f2-)
+CF_ACC=$(grep "^CLOUDFLARE_ACCOUNT_ID=" ~/.claude/.env | cut -d= -f2-)
+
+# Create the GH production env (idempotent) before setting secrets that reference it
+gh api -X PUT repos/$OWNER/$REPO/environments/production
+
+# Set deploy creds + telemetry placeholders
+printf '%s' "$CF_TOKEN" | gh secret set CLOUDFLARE_API_TOKEN --env production -R $OWNER/$REPO
+printf '%s' "$CF_ACC"   | gh secret set CLOUDFLARE_ACCOUNT_ID --env production -R $OWNER/$REPO
+printf '%s' ""          | gh secret set SENTRY_DSN            --env production -R $OWNER/$REPO
+printf '%s' ""          | gh secret set POSTHOG_PROJECT_KEY   --env production -R $OWNER/$REPO
+
+# Non-secret default
+gh api -X POST repos/$OWNER/$REPO/environments/production/variables \
+  -f name=POSTHOG_INGEST_HOST -f value=https://eu.i.posthog.com
+```
+
+Empty string secrets are intentional: the canon `src/lib/{sentry,posthog}.ts` SDKs gracefully no-op when keys are missing/empty, so deploys succeed before SaaS accounts exist.
 
 ## Heuristics
 
