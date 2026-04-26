@@ -96,7 +96,14 @@ qmd search "<query>"
 qmd search "<query>" 2>&1 | grep -B 1 -A 5 "qmd://<vault>/"
 ```
 
-`qmd search` is BM25-only — fast, no model required. Use the **first** invocation per session. If BM25 returns nothing useful, escalate to `qmd query <text>` for hybrid query expansion + LLM reranking — note that the **first** `qmd query` triggers a 1.28 GB GGUF model download (cached at `~/.cache/qmd/models/` for future runs).
+`qmd search` is BM25-only — instant (<1s), no model required. **Use this first.** BM25 surfaces the right pages for the vast majority of "find this" questions; reading the top 2-3 hits is faster than waiting on the hybrid path.
+
+Escalate to `qmd query <text>` (hybrid query expansion + reranking) only when BM25's top hits are bunched at similar scores or look semantically wrong. Cost when escalating:
+- One-time setup (per machine): ~328 MB embedding model + ~639 MB reranker model + `qmd embed` runs ~1 minute over the indexed corpus.
+- Per-query: ~25 seconds even with models cached (embedding + reranking run every time).
+- Quality: top hit jumps from "lexically plausible" to "actually the right page" — ranking spreads from 80-82% bunch to 92% → 54% → 43% ladder.
+
+Pick BM25 by default. Don't escalate unless the model judges BM25 results insufficient.
 
 Parse the text output (`qmd://collection/path:line` headers + scores + snippets) for top 3-5 candidates. Only skip qmd entirely if no Node package manager is available — the index-based discovery in Step 2 is the fallback then, NOT the default.
 
