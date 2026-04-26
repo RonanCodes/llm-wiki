@@ -97,8 +97,8 @@
         "Push if remote configured."
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26. wiki/sources/ydkjs-series.md (~120 lines). Defined 4-variant O'Reilly voice taxonomy (reference, friendly, opinionated, practitioner-academic)."
     },
     {
       "id": "US-303",
