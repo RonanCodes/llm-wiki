@@ -211,8 +211,8 @@
         "Push if remote configured."
       ],
       "priority": 13,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26 batched. Tighter scope (~100-150 lines each focused on actionable bundle-hints recommendations + rubric-input)."
     },
     {
       "id": "US-310",
@@ -229,8 +229,8 @@
         "Push if remote configured."
       ],
       "priority": 14,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26 batched. Tighter scope (~100-150 lines each focused on actionable bundle-hints recommendations + rubric-input)."
     },
     {
       "id": "US-311",
@@ -246,8 +246,8 @@
         "Push if remote configured."
       ],
       "priority": 15,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26 batched. Tighter scope (~100-150 lines each focused on actionable bundle-hints recommendations + rubric-input)."
     },
     {
       "id": "US-312",
@@ -263,8 +263,8 @@
         "Push if remote configured."
       ],
       "priority": 16,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26 batched. Tighter scope (~100-150 lines each focused on actionable bundle-hints recommendations + rubric-input)."
     },
     {
       "id": "US-313",
@@ -280,8 +280,8 @@
         "Push if remote configured."
       ],
       "priority": 17,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26 batched. Tighter scope (~100-150 lines each focused on actionable bundle-hints recommendations + rubric-input)."
     },
     {
       "id": "US-314",
@@ -298,8 +298,8 @@
         "Push if remote configured."
       ],
       "priority": 18,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26 batched. Tighter scope (~100-150 lines each focused on actionable bundle-hints recommendations + rubric-input)."
     },
     {
       "id": "US-401",

@@ -83,3 +83,16 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - Listing-numbered code samples (Rust Book) are the cleanest convention for cross-chapter code references. /generate book could auto-emit "Listing N-N" labels.
   - Phase 3 ingests complete: 8/8 done. Now ready for Phase 3 syntheses (US-309..314) which combine these inputs into per-template voice contracts.
 ---
+
+## [2026-04-26] - US-309..314 (batched): Phase 3 — Synthesise template voices + pedagogy
+- 6 concept pages written, batched commit.
+- **Critical synthesis output:**
+  - O'Reilly is NOT one voice. 4 sub-variants: reference / friendly-rigorous / opinionated / practitioner-academic. Bundle-hints needs `--oreilly-variant` flag.
+  - Manning In Action needs a NEW theme directory (`themes/inaction/`). Spec captured in template-voice-inaction.md.
+  - pedagogy-techniques.md is the canonical input for the rubric's engagement-diversity dimension.
+- **Phase 3 closes here** (8 ingests + 6 syntheses, 14 stories total). Ready for Phase 4 (the /rubric skill build).
+- **Learnings:**
+  - Compressed scope helped: 100-line syntheses focus on bundle-hints recommendations and rubric inputs, not encyclopaedic prose.
+  - Drop caps inheritance is a known bug (Observatory says no, Dummies says yes; bundle-hints currently treats default-on). Flag for Phase 6.
+  - `obsidian://open` URLs in PDF render as plain text. Need a fallback. Flag for Phase 6.
+---
