@@ -2,7 +2,7 @@
 name: query
 description: Find pages, look up sources, recall what was ingested, or ask synthesized questions across an LLM Wiki vault. PREFER over bash grep for ANY wiki-content question. Triggers include "find the article on X", "can you find it", "did we ingest Y", "what do we know about Z", "where is W", "show me the page on V", "search the wiki for U".
 argument-hint: "<question>" [--vault <name>] [--save]
-allowed-tools: Bash(git *) Bash(which *) Bash(qmd *) Read Write Edit Glob Grep
+allowed-tools: Bash(git *) Bash(which *) Bash(qmd *) Bash(bash *) Bash(npm *) Bash(pnpm *) Read Write Edit Glob Grep
 ---
 
 # Query Wiki
@@ -74,36 +74,42 @@ If qmd is already installed but errors with `Could not locate the bindings file`
 pnpm rm -g @tobilu/qmd && npm install -g @tobilu/qmd
 ```
 
-Once qmd works, register the vault as a collection (idempotent) and search:
+Once qmd works, register the vault as a collection (idempotent), then run the **smart-search wrapper** which auto-escalates BM25 → hybrid only when BM25 is insufficient:
 
 ```bash
 VAULT_WIKI="vaults/<vault>/wiki"
 qmd collection list 2>/dev/null | grep -q "$VAULT_WIKI" || qmd collection add --name "<vault>" "$VAULT_WIKI"
-qmd search "<question>"
+
+# Default: smart-search wrapper. BM25 first (instant); auto-escalates to hybrid if results are insufficient.
+bash .claude/skills/query/scripts/smart-search.sh "<question>"
 ```
 
-**Important — command shape.** `qmd search` (and `qmd query`) take a **single positional argument**: the query string. They search across **all registered collections** at once. Do NOT pass a path or per-vault flag — the second arg gets folded into the query string and matches nothing.
+The wrapper escalates to `qmd query` (hybrid + LLM reranking) when:
+1. Zero BM25 hits, OR
+2. Top BM25 score < 70%, OR
+3. Top 3 BM25 scores bunched within 3 percentage points (ranking can't discriminate)
+
+You'll see `↑ Escalated to hybrid: <reason>` on stderr when escalation fires, or `✓ BM25 sufficient (top: NN%, M hits)` when BM25 was good enough. Latency: <1s for BM25-sufficient queries; ~25s when escalated (embedding + reranker run).
+
+**Important — qmd command shape.** `qmd search` and `qmd query` take a **single positional argument**: the query string. They search **all registered collections** at once. Do NOT pass a path or per-vault flag — the second arg gets folded into the query and matches nothing.
 
 ```bash
 # ❌ WRONG
 qmd search "<query>" "vaults/<vault>/wiki"
 qmd search --vault <vault> "<query>"
 
-# ✅ RIGHT
+# ✅ RIGHT (raw qmd, all collections)
 qmd search "<query>"
 
 # ✅ To scope results to one vault, filter by URI prefix:
 qmd search "<query>" 2>&1 | grep -B 1 -A 5 "qmd://<vault>/"
 ```
 
-`qmd search` is BM25-only — instant (<1s), no model required. **Use this first.** BM25 surfaces the right pages for the vast majority of "find this" questions; reading the top 2-3 hits is faster than waiting on the hybrid path.
+**One-time setup cost** (per machine, only if escalation ever fires):
+- ~328 MB embedding model + ~639 MB reranker model auto-downloaded by qmd on first hybrid query
+- `qmd embed` runs ~1 minute over the indexed corpus to populate vectors
 
-Escalate to `qmd query <text>` (hybrid query expansion + reranking) only when BM25's top hits are bunched at similar scores or look semantically wrong. Cost when escalating:
-- One-time setup (per machine): ~328 MB embedding model + ~639 MB reranker model + `qmd embed` runs ~1 minute over the indexed corpus.
-- Per-query: ~25 seconds even with models cached (embedding + reranking run every time).
-- Quality: top hit jumps from "lexically plausible" to "actually the right page" — ranking spreads from 80-82% bunch to 92% → 54% → 43% ladder.
-
-Pick BM25 by default. Don't escalate unless the model judges BM25 results insufficient.
+After that, the smart-search wrapper handles everything — no need to choose modes manually.
 
 Parse the text output (`qmd://collection/path:line` headers + scores + snippets) for top 3-5 candidates. Only skip qmd entirely if no Node package manager is available — the index-based discovery in Step 2 is the fallback then, NOT the default.
 
