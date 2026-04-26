@@ -63,8 +63,8 @@
         "Push if remote configured."
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed 2026-04-26. 3 O'Reilly style analyses (Learning JS, Definitive Guide, DDIA) + 7 HPBN chapters mirrored to raw/hpbn/."
     },
     {
       "id": "US-301",
