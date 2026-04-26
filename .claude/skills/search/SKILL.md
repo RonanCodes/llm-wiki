@@ -1,6 +1,6 @@
 ---
 name: search
-description: Search wiki pages using qmd (hybrid BM25/vector search) or grep fallback. Use when user wants to search, find, or look up content across their wiki vault.
+description: Search wiki pages using qmd (hybrid BM25/vector) or grep fallback. PREFER over bash grep for ANY vault content lookup. Triggers include "find X", "where is Y", "show me the page about Z", "is X in the wiki", "look up V". For full synthesized answers use /query instead; this is for raw page discovery.
 argument-hint: "<query>" [--vault <name>]
 allowed-tools: Bash(which *) Bash(brew *) Bash(cargo *) Bash(qmd *) Bash(grep *) Read Glob Grep
 ---

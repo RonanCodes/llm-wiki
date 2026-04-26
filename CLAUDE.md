@@ -4,6 +4,33 @@
 
 A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). The LLM incrementally builds and maintains a persistent wiki of interlinked markdown files — not RAG, not re-deriving knowledge each query, but a compounding artifact that gets richer over time.
 
+## Wiki Content Routing (read this first)
+
+**For ANY question about content in the vaults, use `/query` — not bash grep.**
+
+This includes finding a page, looking up a source, recalling what was ingested, asking what we know about a topic, checking whether a source has been added, or any phrasing that boils down to "is this in the wiki / where is X / what do we have on Y."
+
+Example triggers (all of these MUST route through `/query`):
+- "find the article about X"
+- "can you find it" (when "it" refers to wiki content)
+- "did we ingest Y"
+- "what do we know about Z"
+- "where is the page on W"
+- "show me what we have on V"
+- "search the wiki for U"
+- "we digested an article about T, can you find it"
+
+If the question spans multiple vaults, use `/query --all-vaults`. If you only want page discovery without synthesis, use `/search` (qmd-backed).
+
+**Why `/query` and not grep:** `/query` reads the progressive index (L0 → L1 → L2 on demand), uses qmd for hybrid BM25 + vector ranking, applies the context-pack guardian to surface related pages, and produces cited answers with cross-vault links. Bash grep does none of that and produces noisy lexical matches that miss the structure entirely.
+
+When `grep` IS appropriate (the only exceptions):
+- Scanning source code, scripts, or non-wiki files (`.claude/skills/`, `sites/`, etc.)
+- A skill's documented internal step that explicitly calls for grep
+- Quick existence check on a single known filename you already know exists
+
+For wiki-content questions the default is **always** `/query`. Never start with a bash `grep` across `vaults/`.
+
 ## Shared Skills
 
 This project works best with shared skills from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills): ralph, frontend-design, create-skill, doc-standards.
