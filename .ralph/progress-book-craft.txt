@@ -1,0 +1,13 @@
+# Ralph Progress — book-craft PRD
+
+PRD: .ralph/prd-book-craft.json
+Started: 2026-04-26
+Branch: ralph/book-craft (engine repo) — vault repos commit on main
+
+## [2026-04-26 03:55] - Setup: PRD authored
+- 28 stories across Phases 2-6.
+- Phase 1 (open-book sourcing) was completed before Ralph kicked off; see vaults/llm-wiki-book-craft/log.md.
+- Each story is sized to fit one context window. Synthesis stories (US-309..314) are the heaviest — they read 1-3 source-summaries each plus a bundle-hints.md and write ~400-600 lines.
+- Phase 4 builds the /rubric skill which becomes the close-the-loop instrument.
+- Phase 5 runs the closed-loop test on a small topic (qmd-architecture); Phase 6 rolls lessons back and re-validates on the Golden Stack book.
+---

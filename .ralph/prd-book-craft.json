@@ -1,0 +1,487 @@
+{
+  "project": "llm-wiki",
+  "branchName": "ralph/book-craft",
+  "description": "Build the book-craft pipeline end-to-end: source publisher samples, ingest open + sample books into llm-wiki-book-craft vault, build a /rubric skill that scores generated artifacts, run a closed-loop test case on a small topic, then update generate-book based on what the rubric reveals. Phase 1 (open-book sourcing) is already complete; this PRD covers Phases 2-6.",
+  "userStories": [
+    {
+      "id": "US-201",
+      "title": "Phase 2 — Fetch For Dummies samples + cheat sheets",
+      "description": "As the book-craft vault, I want voice exemplars from the For Dummies series so I can tune the dummies template-voice contract beyond what bundle-hints.md captures.",
+      "acceptanceCriteria": [
+        "Fetch sample chapters / Look-Inside PDFs for 3 dev-relevant For Dummies titles. Suggested: JavaScript All-in-One For Dummies, Python All-in-One For Dummies, AWS For Dummies. Substitute if a title's free preview is unavailable.",
+        "Fetch 3 free Cheat Sheets from dummies.com (Wiley publishes these openly).",
+        "Land everything under vaults/llm-wiki-book-craft/raw/samples/dummies/ as PDFs or HTML, named by title slug.",
+        "Use WebFetch / curl. Do NOT pirate full books from third-party uploaders.",
+        "Append a [phase-2 dummies] entry to vaults/llm-wiki-book-craft/log.md with provenance URLs.",
+        "Commit (vault repo) with message: 📝 docs(samples): fetch For Dummies voice exemplars",
+        "Push if remote configured; otherwise log 'no remote' and continue."
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-202",
+      "title": "Phase 2 — Fetch Head First samples",
+      "description": "As the book-craft vault, I want voice exemplars from the Head First series — its hook-explore-do-check loop, Q&A blocks, exercise panels, handwritten marginalia — so the headfirst template-voice contract has real exemplars.",
+      "acceptanceCriteria": [
+        "Fetch sample chapters for 3 Head First titles. Strong picks: Head First Design Patterns, Head First JavaScript Programming, Head First Java. Use O'Reilly's free-preview pages or the publisher's official samples.",
+        "Land under vaults/llm-wiki-book-craft/raw/samples/headfirst/ as PDFs or HTML.",
+        "Append a [phase-2 headfirst] entry to log.md with URLs.",
+        "Commit with message: 📝 docs(samples): fetch Head First voice exemplars",
+        "Push if remote configured."
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-203",
+      "title": "Phase 2 — Fetch Manning In Action samples",
+      "description": "As the book-craft vault, I want voice exemplars from Manning's In Action series — hands-on, problem-driven, code-heavy — to inform a future inaction template-voice contract.",
+      "acceptanceCriteria": [
+        "Fetch free chapter 1 from Manning liveBook for 3 In Action titles. Strong picks: Spring in Action, Angular in Action (the user owns this one), Microservices in Action, or substitute Microservices Patterns if Microservices in Action is unavailable.",
+        "Land under vaults/llm-wiki-book-craft/raw/samples/inaction/ as PDFs or HTML.",
+        "Append a [phase-2 inaction] entry to log.md with URLs.",
+        "Commit: 📝 docs(samples): fetch Manning In Action voice exemplars",
+        "Push if remote configured."
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-204",
+      "title": "Phase 2 — Fetch O'Reilly animal-book samples + add HPBN",
+      "description": "As the book-craft vault, I want voice exemplars for the indexable, reference-grade O'Reilly animal-book voice. Bonus: High Performance Browser Networking is fully free at hpbn.co — fetch it as a Phase 1 supplement.",
+      "acceptanceCriteria": [
+        "Fetch sample chapters for 3 O'Reilly animal titles. Strong picks: Learning JavaScript (Sandler), JavaScript: The Definitive Guide (Flanagan), Designing Data-Intensive Applications (Kleppmann).",
+        "Additionally fetch the FULL High Performance Browser Networking text from hpbn.co (CC BY-NC-ND, free) into vaults/llm-wiki-book-craft/raw/hpbn/.",
+        "Sample chapters land under vaults/llm-wiki-book-craft/raw/samples/oreilly/ as PDFs or HTML.",
+        "Append a [phase-2 oreilly] entry to log.md with URLs.",
+        "Commit: 📝 docs(samples): fetch O'Reilly samples + HPBN full text",
+        "Push if remote configured."
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-301",
+      "title": "Phase 3 — Ingest Eloquent JavaScript",
+      "description": "As the book-craft vault, I want a wiki/sources/ summary of Eloquent JavaScript that captures its voice, structure, and pedagogy techniques so future template-voice syntheses have it as input.",
+      "acceptanceCriteria": [
+        "Read raw/eloquent-js/eloquent-javascript.pdf (or the HTML index).",
+        "Produce vaults/llm-wiki-book-craft/wiki/sources/eloquent-javascript.md following the source-note page-type convention.",
+        "Frontmatter: title, date-created (today), date-modified (today), page-type: source-note, domain: [book-craft], tags: [voice, pedagogy, opinionated-personal], sources (URL + raw path), related: [[voice-template-mix]].",
+        "Body sections: # Eloquent JavaScript / ## What it is / ## Voice characteristics (concrete observations: register, tone, sentence length, in-jokes) / ## Pedagogy techniques (drop caps, exercises, code samples, sidebars, illustrations) / ## What's portable to a generated book / ## Sources.",
+        "Update wiki/index.md L1 + L2 to reference this new source page.",
+        "Commit: 📝 docs(sources): ingest Eloquent JavaScript",
+        "Push if remote configured."
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-302",
+      "title": "Phase 3 — Ingest YDKJS series",
+      "description": "As the book-craft vault, I want a wiki/sources/ summary covering the whole You Don't Know JS series (one summary, not one per book) so the opinionated-O'Reilly variant voice is captured.",
+      "acceptanceCriteria": [
+        "Read raw/ydkjs/ — at minimum: get-started/, scope-closures/, objects-classes/, types-grammar/. Skim the rest.",
+        "Produce vaults/llm-wiki-book-craft/wiki/sources/ydkjs-series.md (one summary covering the series).",
+        "Frontmatter conforms to the convention (page-type: source-note).",
+        "Body captures: voice (Kyle Simpson's authoritative + opinionated tone), pedagogy (deep-dive, no hand-holding, frequent reader-confront 'no really, are you sure you know this?'), structure (per-book chapter cadence), what makes it different from generic O'Reilly.",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest YDKJS series",
+        "Push if remote configured."
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-303",
+      "title": "Phase 3 — Ingest Crafting Interpreters",
+      "description": "As the book-craft vault, I want a wiki/sources/ summary of Crafting Interpreters that captures its branch-checkpoint companion-repo pattern, its voice, and its 'build something real over the whole book' pedagogy.",
+      "acceptanceCriteria": [
+        "Read raw/crafting-interpreters/book/ — focus on a-map-of-the-territory.md, a-tree-walk-interpreter.md, intro/preface, plus 1-2 mid-chapters.",
+        "Produce wiki/sources/crafting-interpreters.md.",
+        "Body specifically discusses the companion-repo pattern (per-chapter snapshot branches), the marginalia/aside style, and the 'build the same artifact across the whole book' progression that distinguishes it.",
+        "Cross-link to [[companion-repo-per-book]] (bidirectional: add a 'Mentions' section in companion-repo-per-book.md).",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest Crafting Interpreters",
+        "Push if remote configured."
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-304",
+      "title": "Phase 3 — Ingest Pro Git",
+      "description": "As the book-craft vault, I want a Pro Git source summary capturing its 'official-tool reference book' voice and the way it stays usable across many editions.",
+      "acceptanceCriteria": [
+        "Read raw/pro-git/book/en/ — focus on book.asc, ch01-getting-started.asc, plus 2-3 mid-chapters.",
+        "Produce wiki/sources/pro-git.md following the source-note convention.",
+        "Body captures: third-person reference voice, how it sequences from 'why' to 'how' to 'reference', use of figures/diagrams, and how the same source generates HTML + PDF + EPUB.",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest Pro Git",
+        "Push if remote configured."
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-305",
+      "title": "Phase 3 — Ingest The Rust Programming Language",
+      "description": "As the book-craft vault, I want a Rust Book source summary capturing the 'official-language-book' voice — patient, second-person, exercise-driven, careful with terminology.",
+      "acceptanceCriteria": [
+        "Read raw/rust-book/src/ — focus on title-page.md, ch01-*.md, ch04-*.md (ownership intro), ch10-*.md (generics).",
+        "Produce wiki/sources/rust-book.md.",
+        "Body captures: 'You'll learn...' framings, 'Listing N-N' code-sample numbering, careful terminology gating (introduces concepts in dependency order), end-of-chapter summary blocks.",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest The Rust Programming Language",
+        "Push if remote configured."
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-306",
+      "title": "Phase 3 — Ingest The Linux Command Line",
+      "description": "As the book-craft vault, I want a TLCL source summary capturing William Shotts's accessible-but-thorough beginner voice.",
+      "acceptanceCriteria": [
+        "Read raw/linux-command-line/tlcl.pdf via pdftotext (write to /tmp first), or skim major sections.",
+        "Produce wiki/sources/linux-command-line.md.",
+        "Body captures: how it handles complete-novice readers, command-listing conventions, screenshots/transcripts, exercise approach.",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest The Linux Command Line",
+        "Push if remote configured."
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-307",
+      "title": "Phase 3 — Ingest Dive Into Python 3",
+      "description": "As the book-craft vault, I want a Dive Into Python source summary capturing Mark Pilgrim's signature voice and his 'You Already Know Python' inversion technique.",
+      "acceptanceCriteria": [
+        "Read raw/dive-into-python/<chapters>.html — focus on installing-python.html, native-datatypes.html, comprehensions.html, plus 1-2 mid-chapters.",
+        "Produce wiki/sources/dive-into-python.md.",
+        "Body captures: Pilgrim's distinctive 'hit the ground running' opener pattern, his use of 'In this chapter you'll learn:' boxes, his footnote style, and the larger pedagogy of teaching by reading working code.",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest Dive Into Python 3",
+        "Push if remote configured."
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-308",
+      "title": "Phase 3 — Ingest SICP",
+      "description": "As the book-craft vault, I want an SICP source summary capturing the canonical 'computer-science textbook' voice — exercise-heavy, abstraction-first, mathematical.",
+      "acceptanceCriteria": [
+        "Read raw/sicp/sicp.pdf via pdftotext on first ~100 pages, OR read the source LaTeX in raw/sicp/src/ if more tractable.",
+        "Produce wiki/sources/sicp.md.",
+        "Body captures: definition/example/exercise rhythm, prose density, reliance on mathematical notation, explicit metalanguage about programming as expression.",
+        "Update wiki/index.md.",
+        "Commit: 📝 docs(sources): ingest SICP",
+        "Push if remote configured."
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-309",
+      "title": "Phase 3 — Synthesise template-voice-dummies",
+      "description": "As the book-craft vault, I want a concept page that distils the For Dummies voice from the publisher samples + cheat sheets into a concrete contract that extends bundle-hints.md.",
+      "acceptanceCriteria": [
+        "Read all files under raw/samples/dummies/ + the existing themes/dummies/bundle-hints.md.",
+        "Produce vaults/llm-wiki-book-craft/wiki/concepts/template-voice-dummies.md (page-type: concept, tags: [voice, template, dummies]).",
+        "Body sections: # Template Voice — For Dummies / ## Voice signatures (concrete patterns observed across the samples — 'second-person address', 'In This Chapter checklist openers', specific phrasings) / ## Pedagogy patterns (cheat sheets, callout icons, worked examples) / ## What bundle-hints.md misses (gaps for /generate book) / ## Recommended bundle-hints additions / ## Sources.",
+        "Cross-link [[voice-template-mix]] and the source-summaries this synthesis drew from.",
+        "Update wiki/index.md.",
+        "Commit: ✨ feat(concepts): synthesise template-voice-dummies",
+        "Push if remote configured."
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-310",
+      "title": "Phase 3 — Synthesise template-voice-headfirst",
+      "description": "As the book-craft vault, I want a concept page distilling the Head First voice from samples + bundle-hints into a concrete contract.",
+      "acceptanceCriteria": [
+        "Read raw/samples/headfirst/ + themes/headfirst/bundle-hints.md.",
+        "Produce wiki/concepts/template-voice-headfirst.md.",
+        "Body identifies HF-specific patterns: hook-explore-do-check loop, .qa blocks, .exercise panels, brain-friendly redundancy, conversational marginalia.",
+        "Compare/contrast with template-voice-dummies (same target reader; different pedagogy).",
+        "Recommended bundle-hints additions section.",
+        "Update wiki/index.md.",
+        "Commit: ✨ feat(concepts): synthesise template-voice-headfirst",
+        "Push if remote configured."
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-311",
+      "title": "Phase 3 — Synthesise template-voice-oreilly",
+      "description": "As the book-craft vault, I want a concept page distilling the O'Reilly animal-book voice from samples + YDKJS (opinionated O'Reilly variant) + HPBN (canonical reference O'Reilly) + bundle-hints.",
+      "acceptanceCriteria": [
+        "Read raw/samples/oreilly/, raw/hpbn/ (if Phase 2 added it), wiki/sources/ydkjs-series.md, themes/oreilly/bundle-hints.md.",
+        "Produce wiki/concepts/template-voice-oreilly.md.",
+        "Body distinguishes the 'reference O'Reilly' voice (HPBN, Definitive Guide style: third-person, indexable, terminology-careful) from the 'opinionated O'Reilly' variant (YDKJS, JS Good Parts: first-person opinions, contrarian asides). Both are valid O'Reilly voices; bundle-hints.md should note the variant.",
+        "Recommended bundle-hints additions.",
+        "Update wiki/index.md.",
+        "Commit: ✨ feat(concepts): synthesise template-voice-oreilly",
+        "Push if remote configured."
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-312",
+      "title": "Phase 3 — Synthesise template-voice-inaction (NEW template family)",
+      "description": "As the book-craft vault, I want a NEW concept page for the Manning In Action voice. There is no existing themes/inaction/ in /generate book yet — this synthesis is the spec for adding one.",
+      "acceptanceCriteria": [
+        "Read raw/samples/inaction/.",
+        "Produce wiki/concepts/template-voice-inaction.md.",
+        "Body identifies In Action signatures: hands-on framing, problem-driven chapters ('In this chapter we'll build X'), heavy code-sample weighting, copy-paste-ready scaffolds.",
+        "Include a 'New theme spec' section: what themes/inaction/{theme.css, bundle-hints.md, cover-prompt.md} should contain if /generate book grows an inaction theme. Don't actually create the theme files — that's Phase 6 territory.",
+        "Update wiki/index.md.",
+        "Commit: ✨ feat(concepts): synthesise template-voice-inaction (new template spec)",
+        "Push if remote configured."
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-313",
+      "title": "Phase 3 — Synthesise template-voice-observatory",
+      "description": "As the book-craft vault, I want a concept page distilling the Observatory voice — this project's native default — based on bundle-hints + the Golden Stack book that just shipped.",
+      "acceptanceCriteria": [
+        "Read themes/observatory/bundle-hints.md, themes/observatory/theme.css, vaults/llm-wiki-research/artifacts/book/golden-stack-2026-04-26.bundle.md (the actual prose generated under Dummies, but observatory's intent is documented in its own bundle-hints).",
+        "Produce wiki/concepts/template-voice-observatory.md.",
+        "Body articulates the precise reference-grade voice the project wants: Inter+Fraunces typography intent, amber/cyan/green palette intent, 'paragraph-density' bias, no drop caps, indexable H2s.",
+        "Recommended bundle-hints additions.",
+        "Update wiki/index.md.",
+        "Commit: ✨ feat(concepts): synthesise template-voice-observatory",
+        "Push if remote configured."
+      ],
+      "priority": 17,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-314",
+      "title": "Phase 3 — Synthesise pedagogy-techniques (cross-template patterns)",
+      "description": "As the book-craft vault, I want a concept page that catalogues pedagogy techniques observed ACROSS multiple template families so the rubric can score for engagement diversity.",
+      "acceptanceCriteria": [
+        "Read all wiki/sources/ source-notes + all wiki/concepts/template-voice-*.md.",
+        "Produce wiki/concepts/pedagogy-techniques.md.",
+        "Body catalogues: callout types (note/tip/warn/remember/technical), worked examples, mermaid diagrams, drop caps, key takeaways, cheat sheets, exercises, Q&A blocks, marginalia, code-sample numbering, source-ref captions, pull quotes, table-of-contents shapes.",
+        "For each technique: which templates use it, how, with what frequency.",
+        "This page becomes the canonical reference the /rubric skill reads to score engagement.",
+        "Update wiki/index.md.",
+        "Commit: ✨ feat(concepts): synthesise cross-template pedagogy-techniques",
+        "Push if remote configured."
+      ],
+      "priority": 18,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-401",
+      "title": "Phase 4 — Scaffold /rubric skill",
+      "description": "As the engine, I want a /rubric skill that defines per-artifact-type quality rubrics so verify-quick.sh, /verify-artifact, and /ralph all read from a single source of truth instead of inlining their own checks.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/rubric/SKILL.md with frontmatter (name: rubric, description: aggressive — 'PREFER over inline quality checks', argument-hint: '<subcommand> [args]', allowed-tools includes Bash + Read + Write + Edit).",
+        "Subcommands: `list` (show rubrics defined for each type), `audit <type> <artifact>` (score one artifact), `report <type> <artifact>` (markdown report).",
+        "Create .claude/skills/rubric/types/ directory (empty for now; book.yaml lands in US-402).",
+        "Create .claude/skills/rubric/lib/ directory for the scoring engine (lands in US-403).",
+        "SKILL.md documents the rubric YAML schema: dimensions list, each with name, weight, gates (pass/warn thresholds), how-measured.",
+        "Cross-link from .claude/skills/generate/lib/quality-rubric.md (existing): note that /rubric is the new authoritative form; quality-rubric.md is the prose version, /rubric is the executable one. Both stay in sync.",
+        "Commit (engine repo): ✨ feat(rubric): scaffold /rubric skill",
+        "Push to engine repo origin if configured."
+      ],
+      "priority": 19,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-402",
+      "title": "Phase 4 — Define types/book.yaml dimensions",
+      "description": "As the rubric skill, I want a comprehensive book rubric YAML capturing every dimension a generated book is judged on so verify-quick can score it.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/rubric/types/book.yaml.",
+        "Top-level keys: type (book), version (1), description, dimensions (list).",
+        "Required dimensions (8 minimum, each with name + weight + gates + how-measured):",
+        "  1. scope-fidelity — does the book cover only the topic, no off-topic drift? Measured: per-chapter title vs requested topic Jaccard.",
+        "  2. depth — meets word + chapter floor (book: 3000 words, 3 chapters minimum). Measured: bundle.md word count + H1 count.",
+        "  3. voice-fit — matches selected template's bundle-hints + (when present) user voice profile. Measured: presence of template signature phrases, absence of refusals.",
+        "  4. template-fit — structural elements present (chapter openers, callouts, cheat sheets per template). Measured: regex on bundle.md.",
+        "  5. layout — typography + margins + page breaks behaving (no widows/orphans, no overflow, page breaks where chapters start). Measured: PDF render check via pdftotext + page boundary inspection.",
+        "  6. cover — cover page present, image-quality threshold (>500KB PNG, expected aspect ratio). Measured: file existence + size + dimensions.",
+        "  7. ai-slop — absence of em-dashes, AI-tells (delve, leverage, robust, tapestry, etc.), rhetorical-reversal filler. Measured: regex blacklist scan on bundle.md. THIS IS A HARD GATE — any hit is a fail.",
+        "  8. source-coverage — every paragraph traceable to a source page in generated-from. Measured: sample N paragraphs, attempt to locate substring in source pages, expect ≥80% hits.",
+        "Each dimension's gates: { pass: <numeric or boolean>, warn: <looser threshold> }. Score: pass / warn / fail.",
+        "Overall verdict: ALL pass = pass. Any hard-gate fail = fail. Otherwise warn.",
+        "Commit: ✨ feat(rubric): define book.yaml with 8 dimensions",
+        "Push if remote configured."
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-403",
+      "title": "Phase 4 — Implement rubric scoring engine",
+      "description": "As the /rubric skill, I want a scoring engine that reads types/<type>.yaml + an artifact path and emits per-dimension scores + an overall verdict.",
+      "acceptanceCriteria": [
+        "Create .claude/skills/rubric/lib/score-rubric.sh — takes <type> <artifact-path> <sidecar-path>, reads types/<type>.yaml, runs each dimension's how-measured, emits JSON: { dimensions: [{name, score, value, threshold}], overall: pass|warn|fail, hard_failures: [], warnings: [] }.",
+        "Use Python embedded in the bash script (heredoc) for YAML parsing + regex measurement, since the existing verify-quick.sh uses the same pattern.",
+        "Each how-measured implementation must be a small Python function — keep them short, all in one file.",
+        "Patches the artifact's sidecar with: rubric: { version, type, scored-at, dimensions: [...], overall: pass|warn|fail, hard_failures: [...], warnings: [...] }",
+        "Exit code: 0 = pass, 1 = warn, 2 = fail (hard gate hit).",
+        "Test: run against vaults/llm-wiki-research/artifacts/book/golden-stack-2026-04-26.pdf — should produce a structured score report. Note any false positives in the progress log.",
+        "Commit: ✨ feat(rubric): implement score-rubric.sh engine",
+        "Push if remote configured."
+      ],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-404",
+      "title": "Phase 4 — Wire verify-quick.sh to read rubric/types",
+      "description": "As verify-quick.sh, I want to delegate to /rubric instead of inlining its own checks so the depth + engagement + sidecar checks stay aligned with the canonical rubric.",
+      "acceptanceCriteria": [
+        "Edit .claude/skills/generate/lib/verify-quick.sh.",
+        "If .claude/skills/rubric/types/<type>.yaml exists: invoke .claude/skills/rubric/lib/score-rubric.sh <type> <artifact> <sidecar> and use its result.",
+        "If not: fall back to existing inline checks (backwards compatibility).",
+        "Stamp the sidecar with: quality.verify-quick = pass|warn|fail derived from rubric overall verdict.",
+        "Print a clear status summary: ✅ pass (N dimensions) / ⚠️ warn (N pass, M warn) / ❌ fail (hard gate: <name>).",
+        "Re-run on the Golden Stack book. Output must match what /rubric audit produces directly.",
+        "Commit: ♻️ refactor(verify-quick): delegate to /rubric for type-typed checks",
+        "Push if remote configured."
+      ],
+      "priority": 22,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-405",
+      "title": "Phase 4 — Add /rubric audit subcommand + portal integration",
+      "description": "As a developer, I want to run `/rubric audit <type> <artifact>` directly to score any pre-existing artifact, plus have rubric scores show up in the artifact portal.",
+      "acceptanceCriteria": [
+        "Implement the audit subcommand handler inside .claude/skills/rubric/SKILL.md (Step N) — parses args, calls score-rubric.sh, prints the human report.",
+        "Implement the report subcommand — same scoring but emits a markdown report file alongside the artifact (artifact.rubric-report.md).",
+        "If .claude/skills/generate-portal/ exists: update its renderer to show rubric.overall + per-dimension chips on each card. If not, just note in progress.txt.",
+        "Re-render the engine repo's docs page that catalogues skills (sites/docs/src/content/docs/features/) to include /rubric. (Light touch — one new page.)",
+        "Commit: ✨ feat(rubric): add audit + report subcommands and portal integration",
+        "Push if remote configured."
+      ],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-501",
+      "title": "Phase 5 — Generate qmd-architecture book in 4 themes (sample mode)",
+      "description": "As the rubric closed-loop test, I want to generate the qmd-architecture topic as a sample book (chapter 1 only) in all 4 themes, score each via the rubric, and identify the worst performer.",
+      "acceptanceCriteria": [
+        "Test topic: vaults/llm-wiki-ai-research/wiki/concepts/qmd-architecture.md (a single page, ~750 lines, fits a chapter).",
+        "Run /generate book qmd-architecture --vault llm-wiki-ai-research --theme observatory --sample (chapter 1 only).",
+        "Repeat for --theme dummies, --theme oreilly, --theme headfirst.",
+        "All 4 PDFs land in vaults/llm-wiki-ai-research/artifacts/book/samples/.",
+        "Run /rubric audit book <each-pdf> --sidecar <each.meta.yaml>. All 4 rubric reports stored.",
+        "Produce a comparison table in vaults/llm-wiki-book-craft/wiki/comparisons/rubric-test-qmd-architecture-2026-04-26.md showing per-dimension scores across 4 themes + the worst-performing theme.",
+        "Commit (across both vaults + engine if needed): 🧪 test(rubric): score qmd-architecture sample books across 4 themes",
+        "Push as available."
+      ],
+      "priority": 24,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-502",
+      "title": "Phase 5 — Iterate worst theme",
+      "description": "As the rubric closed-loop test, I want to take the worst-scoring theme from US-501, identify the specific dimensions that failed, regenerate with rubric feedback applied, and re-score.",
+      "acceptanceCriteria": [
+        "Read vaults/llm-wiki-book-craft/wiki/comparisons/rubric-test-qmd-architecture-2026-04-26.md to identify the worst theme + which dimensions tripped.",
+        "Apply targeted fix: edit themes/<worst>/bundle-hints.md, or themes/<worst>/theme.css, or generate-book/SKILL.md to address the specific failure mode (e.g. cover too small, AI-slop hits, missing cheat sheets, scope drift).",
+        "Re-run /generate book qmd-architecture --theme <worst> --sample.",
+        "Re-score with /rubric audit. Append the new score to the comparison page with a note on what changed and the delta.",
+        "If Nano Banana cover scored low: re-invoke ro:generate-image with --count 4 and pick the best.",
+        "Commit: ✨ feat(themes/<worst>): apply rubric-driven fixes; <delta> score improvement",
+        "Push as available."
+      ],
+      "priority": 25,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-503",
+      "title": "Phase 5 — Re-iterate or conclude",
+      "description": "As the rubric closed-loop test, I want to keep iterating on the worst theme until either it plateaus or it passes.",
+      "acceptanceCriteria": [
+        "Read the latest rubric scores for the iterated theme.",
+        "If overall verdict moved from fail → warn → pass: stop, success.",
+        "If improvement < 5% across all dimensions over the last iteration: stop, plateau.",
+        "Otherwise: apply ONE more targeted fix (same shape as US-502) and re-score.",
+        "Maximum 2 additional iterations within this story; if still failing, raise the issue in progress.txt and stop.",
+        "Update the comparison page with the final iteration log.",
+        "Commit: 🧪 test(rubric): close the loop on qmd-architecture iteration",
+        "Push as available."
+      ],
+      "priority": 26,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-601",
+      "title": "Phase 6 — Roll lessons into themes/*/bundle-hints.md",
+      "description": "As the engine, I want every theme's bundle-hints.md updated based on what Phase 3 syntheses + Phase 5 iterations revealed so future /generate book runs benefit from what we learned.",
+      "acceptanceCriteria": [
+        "Read each wiki/concepts/template-voice-*.md page's 'Recommended bundle-hints additions' section.",
+        "Edit .claude/skills/generate-book/themes/{observatory,dummies,oreilly,headfirst}/bundle-hints.md to incorporate the recommendations. Keep the existing structure; add to it.",
+        "If template-voice-inaction.md is solid: scaffold themes/inaction/ with bundle-hints.md, theme.css (start as a fork of oreilly's CSS, tuned for In-Action's hands-on feel), and cover-prompt.md. Otherwise note as deferred.",
+        "Re-run /rubric audit on the Phase 5 iteration's final PDFs to confirm scores hold.",
+        "Commit: ✨ feat(themes): roll Phase 3-5 learnings into bundle-hints.md",
+        "Push as available."
+      ],
+      "priority": 27,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-602",
+      "title": "Phase 6 — Re-render Golden Stack book v2 + score delta",
+      "description": "As proof the rubric loop pays off, I want to re-render the Golden Stack book (the original Dummies one) with the updated themes/dummies/bundle-hints and compare rubric scores v1 vs v2.",
+      "acceptanceCriteria": [
+        "Run /generate book \"golden stack\" --vault llm-wiki-research --theme dummies. Note: pages don't auto-resolve from the topic string; pass the canonical 3 docs explicitly via the bundle pre-step or use a folder/tag the user has tagged. If select-pages.sh still doesn't match, document the workaround in the progress log.",
+        "New artifact lands at vaults/llm-wiki-research/artifacts/book/golden-stack-2026-04-26-v2.pdf with sidecar version: 2 and replaces: golden-stack-2026-04-26.pdf.",
+        "Run /rubric audit book on both v1 and v2; produce a delta report.",
+        "Land the delta report at vaults/llm-wiki-book-craft/wiki/comparisons/rubric-delta-golden-stack-v1-v2-2026-04-26.md.",
+        "If v2 scores worse than v1: investigate, fix the regression, regenerate. Don't ship a worse v2.",
+        "Open both PDFs in the default viewer for visual confirmation: open <v1>; open <v2>.",
+        "Commit: 🧪 test(rubric): Golden Stack book v2 — score delta validates the loop",
+        "Push as available."
+      ],
+      "priority": 28,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
