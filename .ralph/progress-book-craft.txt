@@ -61,3 +61,12 @@ Branch: ralph/book-craft (engine repo) — vault repos commit on main
   - End-of-chapter exercises are NOT in /generate book today — flagging as gap. Should map to a `.exercise` block per theme. Head First's `.exercise` panel already exists in dummies/headfirst CSS but bundle-hints doesn't currently emit them programmatically.
   - "Project chapter" pattern (a chapter that BUILDS instead of explains) is a future generate-book mode (`--with-project <task>`). Flagged for Phase 6 / future.
 ---
+
+## [2026-04-26] - US-302: Phase 3 — Ingest YDKJS series
+- wiki/sources/ydkjs-series.md (~120 lines).
+- **Learnings:**
+  - YDKJS preface is rich enough to extract the whole series voice from — chapter content adds detail but the preface IS the voice statement.
+  - Defined 4 O'Reilly sub-variants: reference, friendly, opinionated, practitioner-academic. /generate book oreilly should accept a `--variant` flag. This is a Phase 6 spec input.
+  - YDKJS pattern that DOES NOT exist in other voice exemplars: NOTE blocks rendered as inline tables (not asides). Worth having as a callout option.
+  - YDKJS has NO end-of-chapter exercises — different pedagogy from Eloquent JS. Confirms that exercises are theme-specific, not universal.
+---
