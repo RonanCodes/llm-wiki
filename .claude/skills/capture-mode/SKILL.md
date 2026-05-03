@@ -54,9 +54,16 @@ Once confirmed, converse naturally. React, ask follow-ups, push back, suggest fr
 journal_entry:
   date: <today YYYY-MM-DD>
   raw_chunks: [<verbatim user passages worth quoting>, ...]
-  themes: [<short bullets of what this entry is about>]
-  mood: <if user expresses one>
+  themes: [<short kebab-case slugs, 2-6 items: work-stress, family-call, gym, deep-work>]
   status: draft
+  # Structured frontmatter signals (capture if user surfaces them; omit otherwise)
+  mood: <integer 1-5; 1=low, 3=neutral, 5=high>
+  energy: <integer 1-5; 1=wiped, 3=baseline, 5=wired>
+  weight: <number kg if user reports a weigh-in>
+  sleep: <number hours of last night's sleep if reported>
+  food: <list of meals/notes if diet content surfaced>
+  wins: [<one-line items from positive content>]
+  drains: [<one-line items from annoyances, frustrations, low moments>]
 
 entities:
   people:
@@ -79,6 +86,19 @@ cross_routes:
   work_spokes: [<vault-short>: <why>, ...]
   other_hubs: [<vault-short>: <why>, ...]
 ```
+
+### Inferring structured fields from chat
+
+The user usually won't say "mood: 4" or "energy: 2". Infer cautiously, only when the signal is clear, and prefer to omit a field rather than guess.
+
+- **mood (1-5)**: from emotional language. "feeling great", "had a really good day" → 4 or 5. "fine", "okay" → 3. "off", "drained", "in a funk" → 2. "really down", "depressed", "rough day" → 1. If the user says only neutral facts, omit.
+- **energy (1-5)**: from physical/cognitive cues. "wiped", "exhausted" → 1. "tired" → 2. "fine" → 3. "good energy", "got loads done" → 4. "wired", "flying" → 5.
+- **weight**: only if the user explicitly says a number ("weighed in at 78.4").
+- **sleep**: only if explicitly mentioned ("slept 6 hours", "had a great 9-hour sleep").
+- **wins / drains**: capture in the user's own words, one line each, when they describe a positive or negative moment with weight. Do not invent items; only capture what was actually said.
+- **themes**: 2-6 short slugs summarising the entry. These are your synthesis of what the day was about, not direct quotes.
+
+If you infer a value, use the user's own framing; if it's a stretch, ask once at the close summary ("would you say today was a 4 on mood, or a 3?"). Better to ask than invent.
 
 Maintain the buffer silently. Don't narrate buffer state every message.
 
@@ -105,7 +125,10 @@ Before writing anything, surface a single confirmation summary listing every pla
 > **Ready to write:**
 >
 > **`personal-journal`** (Activity)
-> - `wiki/sources/entry-2026-05-03.md`: today's entry, ~<word count> words, themes: <list>
+> - `wiki/sources/entry-2026-05-03.md`: today's entry, ~<word count> words
+>   - themes: `[deep-work, family-call, low-mood-morning]`
+>   - inferred frontmatter: `mood: 4, energy: 3, sleep: 7.5h, weight: 78.2`  *(omit any not signalled)*
+>   - wins: 2 captured, drains: 1 captured
 >
 > **`personal-life`** (Hub)
 > - `wiki/entities/person-sarah.md`: created (first mention; relationship: friend, last-seen 2026-05-03)
@@ -130,7 +153,7 @@ For each vault touched, in order: journal first, then life, then any spokes.
 1. **Resolve the file paths.** Use the vault's CLAUDE.md naming convention (e.g. `entry-YYYY-MM-DD.md`, `person-<first-name>.md`).
 2. **Deduplicate entities.** Before creating an entity page, check `vaults/<vault>/wiki/entities/` for existing pages by name or alias. If a match exists, **update** it; do not create a duplicate.
 3. **Write or edit each file** with proper frontmatter (see `wiki-templates` for spec).
-   - Journal entries: `page-type: entry`, `status: draft`, frontmatter date set to today, narrative body, inline wikilinks to entities created in this session, `## Sources` section pointing to `[capture-mode session 2026-05-03]` (no external source).
+   - Journal entries: `page-type: entry`, `status: draft`, frontmatter date set to today, plus all inferred structured fields (`mood`, `energy`, `weight`, `sleep`, `themes`, `people`, `places`, `food`, `wins`, `drains`) per the journal vault's CLAUDE.md spec. Body is a narrative write-up with inline wikilinks to entities created in this session, then `## Wins` and `## Drains` sections (mirroring the frontmatter lists with one-line context each), then `## Sources` pointing to `[capture-mode session 2026-05-03]`.
    - Person pages: `page-type: entity`, `domain: [personal-life, relationships]`, fields for `first-met`, `last-seen`, `relationship`, `notes` section that prepends new mentions at the top with date headers.
    - Concept pages: `page-type: concept`, `domain: [personal-life, principles|habits|protocols|goals]`, body explains the principle and links back to journal entries that surfaced it.
 4. **Cross-vault links.** Journal entries reference Hub pages via the markdown-link form:
