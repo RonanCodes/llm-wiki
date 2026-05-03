@@ -31,6 +31,27 @@ When `grep` IS appropriate (the only exceptions):
 
 For wiki-content questions the default is **always** `/query`. Never start with a bash `grep` across `vaults/`.
 
+## Capture Mode (free-form chat as journaling)
+
+**On the first message of a session in this repo,** check whether the user is opening with narrative/life content rather than a code/research/skill task. If so, invoke the `capture-mode` skill before anything else.
+
+Triggers (capture-mode applies):
+- "today I…", "I just…", "I've been thinking about…"
+- "had a chat with <person>", "saw <person>", recap of a day or week
+- Subjective / reflective ("I'm worried about", "I'm proud of", "I noticed that I…")
+- Life events: people, milestones, relationships, health, home, money, travel, family
+- Anything that reads like a journal opener
+
+Do NOT trigger on:
+- Code/dev/build/refactor/test/deploy asks
+- Research / lookup / explanation asks
+- Slash-command invocations or skill ops
+- Vault meta-questions
+
+The `capture-mode` skill handles the rest: a single short confirm on the first message ("Capture mode? routing to journal + life Hub + work spokes if relevant"), silent buffering through the session, and a batched multi-vault write at session close. Aggressive entity extraction (every named person → entity page in `personal-life`). Cancelable any time with "stop capturing" or by pivoting to a code/research task.
+
+If unsure whether the opener is capture-worthy, default to NOT triggering and let the user direct.
+
 ## Shared Skills
 
 This project works best with shared skills from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills): ralph, frontend-design, create-skill, doc-standards.
@@ -164,11 +185,14 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 | AI/LLM paradigm pieces, model commentary, agent theory, prompting deep-dives, AI essays, creator-economy meta on AI | `llm-wiki-ai-research` | Hub | "Is this shaping how I think about AI?" — pure-knowledge AI hub. Workflows go to skill-lab; stack decisions go to research |
 | Marketing playbooks, platform research (LinkedIn, TikTok, Instagram, YouTube), creator tactics, content-format studies | `llm-wiki-marketing` | Hub | Pure reusable marketing knowledge; specific campaigns live in the spoke vault they serve |
 | LinkedIn profile artefacts, CV, bio, cover banners, brand palette, personal positioning | `llm-wiki-personal-work` | Hub | Canonical self-entity; other vaults link in for bio/headline reuse |
+| Health protocols, habits, principles, goals, people pages, life-admin reference | `llm-wiki-personal-life` | Hub | Stable life knowledge; sister to personal-journal; feeds quarterly/monthly review artefacts |
+| Daily/weekly journal entries, monthly reflections, quarterly reviews, dated personal captures | `llm-wiki-personal-journal` | Activity | Pipeline of dated entries; promotes stable insights to personal-life Hub |
 | Recruiter chats, company dossiers, interview prep, offers, salary research | `llm-wiki-career-moves` | Activity | Pipeline-style: chats, interviews, offers; status-stamped |
 | Trend scans (HN/Reddit/X/LinkedIn), theme lifecycle tracking, idea candidates for 12-in-12 | `llm-wiki-trend-radar` | Activity | Pipeline: spotted → shortlisted → picked/dropped/graduated |
 | Weekly builds, MVPs, connections-helper and future app-a-week projects | `llm-wiki-side-projects` | Spoke | Per-project `project-<slug>` domain tag; `/promote` out when a project graduates |
 | Simplicity x Taskforce partnership (e-commerce co-pilot) | `llm-wiki-simplicity-taskforce-partnership` | Spoke | Dedicated spoke for the venture; links into research + marketing hubs |
 | Startup strategy knowledge (pitching, ICP, moats, PMF, GTM, fundraising) | `llm-wiki-startup-strategy` | Hub | Feeds quizzes, grill sessions, cheat sheets for hackathons and pitches |
+| Tech-book generation craft — voice profiles, template deconstructions (Dummies / O'Reilly / Head First / Observatory), ingested tech books, side-project ideas around the book pipeline | `llm-wiki-book-craft` | Hub | Lives upstream of `/generate book`; specific generated books stay in the topic's own vault |
 | LLM Wiki project knowledge, architecture decisions, development context | `llm-wiki` (engine repo) | Meta | The engine itself; not a vault, stays in this repo |
 
 **Rule of thumb:**
