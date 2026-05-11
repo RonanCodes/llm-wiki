@@ -1,9 +1,15 @@
 ---
 name: respond-as-html
-description: Render the current response (or a specific piece of content under discussion) as a single-file HTML artefact instead of a long Markdown reply. Use whenever the user asks for a "human-readable version", "an artifact", "a shareable page", "an HTML version", "make it pretty", "save that as a page", or similar phrasing. Auto-detects an llm-wiki vault or any repo/folder and writes to `<root>/artifacts/html/<timestamp>-<slug>.html`. Tailwind via CDN, opens in the user's default browser. Markdown stays the default chat surface; this skill is the explicit promote-to-artefact step.
+description: Render the current response (or a specific piece of content under discussion) as a single-file HTML artefact instead of a long Markdown reply. Use whenever the user asks for a "human-readable version", "an artifact", "a shareable page", "an HTML version", "make it pretty", "save that as a page", or similar phrasing. Auto-detects an llm-wiki vault or any repo/folder and writes to `<root>/artifacts/html/<timestamp>-<slug>.html`. Editorial typography baseline with libraries layered in per the decision tree; opens in the user's default browser. Markdown stays the default chat surface; this skill is the explicit promote-to-artefact step.
 user-invocable: true
 allowed-tools: Bash(mkdir *) Bash(date *) Bash(open *) Bash(git *) Bash(pwd *) Bash(realpath *) Bash(basename *) Bash(test *) Read Write Glob
 ---
+
+## Philosophy
+
+The artefact will always be opened online. Size does not matter. The question to ask before reaching for any library is: *does it save real work or does it just add weight without changing the outcome?* If it saves real work (diagrams, charts, accessibility-correct components, icons), pull it. Do not optimise for offline-ness or for shaving bytes; optimise for the artefact being good.
+
+The voice lives in the typography and the rhythm. Handcraft those. Libraries handle the visual primitives and the interactive bits where rolling your own would be reinventing wheels.
 
 # Respond as HTML
 
@@ -70,20 +76,51 @@ SLUG="<derived-from-title>"
 FILE="$OUT_DIR/${TIMESTAMP}-${SLUG}.html"
 ```
 
-## Step 3: Render the HTML
+## Step 3: Pick the libraries (decision tree)
 
-Use the template at `.claude/skills/respond-as-html/template.html` as the starting point. The template:
+Walk the content. For each item below, if the answer is yes, include the library's CDN tag in the artefact's `<head>` and use it. Online is always available; size does not matter; the question is whether the library saves real work.
 
-- Loads Tailwind via CDN (single `<script>` tag, no build step).
-- Has a `prose` container so Markdown converts to readable typography.
-- Light/dark colour scheme respects `prefers-color-scheme`.
-- A header block with title + generation timestamp.
-- A footer block with the path to the source vault/repo (so the artefact is self-describing).
-- Inline mermaid renderer (lazy-loaded via CDN) if the content contains ` ```mermaid` fences.
+| If the artefact has… | Pull this library | CDN |
+|---|---|---|
+| Diagrams (flowchart, sequence, mindmap, gantt, timeline, ER, state) | **Mermaid 10** | `cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js` |
+| Standard charts (line, bar, pie, radar, scatter, area) | **Chart.js 4** | `cdn.jsdelivr.net/npm/chart.js@4` |
+| Genuinely custom data visualisation (force graphs, sankey, treemap, geo, anything Chart.js can't do well) | **D3 7** | `cdn.jsdelivr.net/npm/d3@7` |
+| Icons (visual hierarchy, section markers, status indicators) | **Lucide** (font version) | `unpkg.com/lucide-static@latest/font/lucide.css` |
+| Interactive primitives (tabs, accordions, alerts, badges, tooltips, copy buttons, dialogs, disclosures, dropdowns) | **Shoelace 2** (web components, accessibility built in) | `cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/cdn/shoelace-autoloader.js` + the matching theme CSS |
+| Light state / toggles (only if Shoelace's reactivity isn't already covering it) | **Alpine.js 3** | `unpkg.com/alpinejs@3` |
+| Math / equations | **KaTeX** | `cdn.jsdelivr.net/npm/katex` |
+| Code highlighting (when the artefact shows multiple code blocks worth styling) | **highlight.js** (auto-detect) or **Prism** (deliberate theme) | `cdn.jsdelivr.net/npm/highlight.js@11` |
+| Sortable / filterable tables (more than ~10 rows, user will want to interact) | **Tabulator** | `cdn.jsdelivr.net/npm/tabulator-tables@6` |
+| Animations / scroll effects | **Motion One** (~10KB, modern) or **GSAP** | `cdn.jsdelivr.net/npm/motion@10` |
+| Maps | **Leaflet** (light, OSM) or **MapLibre** (vector tiles) | `unpkg.com/leaflet@1.9` |
+| 3D / WebGL | **Three.js** | `cdn.jsdelivr.net/npm/three@latest` |
 
-Render the content body as semantic HTML (convert Markdown to HTML, preserve code blocks, tables, lists, blockquotes, images). Do NOT just paste raw Markdown inside a `<pre>` block; that defeats the point.
+For layout, pick by content shape, not by reflex:
 
-If the content has structure cues (multiple H2 sections, lists, tables), use them as visual anchors. Long syntheses get section dividers; short reflections get one calm column of prose. Don't add navigation chrome for a single-page artefact.
+- **Editorial / long-form reading / narrative synthesis** → handcrafted CSS with serif body (Iowan Old Style, Palatino, Georgia stack). The voice lives in the typography; libraries would generic-ify it.
+- **Dashboard / report / multi-card comparison** → **Tailwind via Play CDN**, optionally with **DaisyUI** for shadcn-style components. (Note: real shadcn cannot run via CDN; it requires a build step.)
+
+**Default to editorial** unless the content is clearly dashboard-shaped (cards, grids, side-by-side comparisons, KPIs). When in doubt, editorial wins. The user has confirmed editorial typography is the preferred voice.
+
+Avoid by default: jQuery, Bootstrap, full React, MUI, shadcn (build step required).
+
+## Step 3b: Render the HTML
+
+Start from the editorial baseline at `.claude/skills/respond-as-html/template.html`. Layer the libraries you picked in the decision tree above. The baseline gives you:
+
+- Serif body type (Iowan Old Style stack) and sans hierarchy (Inter)
+- Light/dark colour scheme respecting `prefers-color-scheme`
+- Observatory palette CSS variables (amber, cyan, green, plum accents)
+- Header with breadcrumb back to index + eyebrow + title + deck
+- Chaptered section structure with section-meta tags
+- Editorial pull-quote, stat-strip, figure-with-caption blocks
+- Footer with source + back-to-index link
+
+Render the content body as semantic HTML. Convert Markdown to proper HTML, preserve code blocks, tables, lists, blockquotes, images. Never paste raw Markdown inside a `<pre>` block; that defeats the point of promoting to HTML.
+
+If the content has structure cues (multiple H2 sections, lists, tables, sequences, comparisons), use them as visual anchors. Long syntheses get chaptered sections; short reflections get one calm column of prose with a pull quote.
+
+For the Tailwind dashboard variant (when the content is dashboard-shaped), use the Tailwind Play CDN baseline instead. Same content philosophy, different layout primitives.
 
 ## Step 4: Write the file
 
@@ -145,14 +182,16 @@ That's it. No long summary, no commentary, no "let me know if you'd like changes
 - No em-dashes or en-dashes in body text. Convert any present in the source to commas, colons, or full stops per the user's house style.
 - No AI-tell vocabulary added by this skill (delve, leverage, robust, seamless, unlock, empower, streamline).
 - Preserve the user's voice in any quoted material exactly as-is, even if it contains those words.
-- Code blocks: monospace, subtle background, no syntax-highlighting library by default (keeps the artefact under 50KB for fast loads).
+- Code blocks: monospace, subtle background. Pull `highlight.js` when the artefact shows multiple code blocks worth styling.
 - Tables: full-width, zebra-striped rows, readable on mobile.
 - Links: underlined on hover only; never `target="_blank"` by default (let the user choose).
+- Light/dark scheme: always respect `prefers-color-scheme`. Both themes must read well.
 
 ## Notes
 
-- Single-file output. No external assets except the Tailwind CDN script and (optionally) the mermaid CDN script.
-- Self-contained: the artefact must render correctly when opened directly from disk, even offline (Tailwind CDN gracefully degrades; the content is still readable as plain HTML).
+- Single-file output. CDN dependencies are fine; do not try to inline them.
+- Online assumption: the artefact will always be opened with network. Do not optimise for offline; optimise for the artefact being good.
+- Size does not matter. Do not skip a library because it adds weight. The criterion is whether the library saves real work or just adds weight without changing the outcome.
 - Idempotent path: re-running the skill on the same content within a minute produces a different filename (timestamp includes HHMM), so nothing gets clobbered.
 - Not committed by default. The user decides what to keep. If the artefact lives inside a vault under git, mention that in the status line; do not auto-`git add`.
 
