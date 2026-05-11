@@ -56,3 +56,6 @@ TASKS.md
 .docker/
 sites/*/node_modules/
 social-cards/
+
+# Local bridge contract for external skills (vault names are private)
+bridge.json
