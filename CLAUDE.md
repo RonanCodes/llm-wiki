@@ -172,11 +172,12 @@ llm-wiki/                            <- PUBLIC repo (the engine)
 
 ## Vault Routing
 
-When the user discusses topics, route content to the correct vault. Vaults fall into three archetypes (see `.claude/skills/vault-create/SKILL.md` § Vault Archetypes for the full taxonomy):
+When the user discusses topics, route content to the correct vault. Vaults fall into four archetypes (see `.claude/skills/vault-create/SKILL.md` § Vault Archetypes for the full taxonomy):
 
 - **Hub** = pure reusable knowledge (one coherent domain, grows from ingests + syntheses, referenced by many other vaults)
 - **Spoke** = applied project work (mixed content tied to specific projects; cross-vault-links OUT into hubs)
 - **Activity** = pipeline or flow-scoped (content moves through status stages over time)
+- **Bulk** = machine-populated mirror of an external knowledge base (SharePoint, Confluence, large folder, git wiki). Not curated. Refresh-driven. Source-of-truth lives upstream. Managed by `/vault-bulk`, never `/vault-create`.
 
 | Topic | Vault | Archetype | Why |
 |-------|-------|-----------|-----|
@@ -193,6 +194,7 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 | Simplicity x Taskforce partnership (e-commerce co-pilot) | `llm-wiki-simplicity-taskforce-partnership` | Spoke | Dedicated spoke for the venture; links into research + marketing hubs |
 | Startup strategy knowledge (pitching, ICP, moats, PMF, GTM, fundraising) | `llm-wiki-startup-strategy` | Hub | Feeds quizzes, grill sessions, cheat sheets for hackathons and pitches |
 | Tech-book generation craft — voice profiles, template deconstructions (Dummies / O'Reilly / Head First / Observatory), ingested tech books, side-project ideas around the book pipeline | `llm-wiki-book-craft` | Hub | Lives upstream of `/generate book`; specific generated books stay in the topic's own vault |
+| Bulk mirror of an external knowledge base (SharePoint site, Confluence space, inherited doc folder, git wiki repo) | `llm-wiki-bulk-<source-slug>` | Bulk | One vault per upstream source. Created and refreshed via `/vault-bulk`; never hand-curated. Source-shaped slug (e.g. `llm-wiki-bulk-redacted-prod`, `llm-wiki-bulk-acme-engineering`) |
 | LLM Wiki project knowledge, architecture decisions, development context | `llm-wiki` (engine repo) | Meta | The engine itself; not a vault, stays in this repo |
 
 **Rule of thumb:**
@@ -200,6 +202,7 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 - Pure reusable knowledge (a technique, a platform playbook, a tool evaluation, a brand asset) goes to the relevant Hub.
 - Applied work on one project (plans, specific campaigns, retros, decisions) goes to a Spoke; cross-vault-link into the Hub for any reference material.
 - Pipeline state over time (this conversation, that interview, this week's status) goes to an Activity vault.
+- A high-volume external KB the user does not curate (SharePoint, Confluence, inherited folder, git wiki) goes in its own Bulk vault. Set up via `/vault-bulk create <slug> --source-type <type>`. Refreshed via `/vault-bulk refresh`. Bulk vaults relax lint rules (orphans are expected) and forbid `/promote` between bulk vaults; promote to a Hub if a single insight is worth graduating.
 - If unsure, ask. New vaults should follow the archetype taxonomy; see `.claude/skills/vault-create/SKILL.md` for when to split vs when to keep as a concept page in an existing vault.
 
 ## Conventions
