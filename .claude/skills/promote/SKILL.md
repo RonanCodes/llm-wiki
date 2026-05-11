@@ -110,6 +110,19 @@ Transfer reusable, cross-cutting knowledge from one vault to another (typically 
 - `--to <vault>`: target vault (default: `meta`)
 - Verify both vaults exist in `vaults/`
 
+### Step 1.5: Bulk archetype guard
+
+Read both vaults' `CLAUDE.md` and check for `Archetype:`. Apply these rules before doing anything else:
+
+| Source | Target | Allowed? | Behaviour |
+|--------|--------|----------|-----------|
+| Bulk | Bulk | **No** | Refuse with a clear message. Bulk vaults are mirrors of distinct upstream sources; merging them violates that 1-vault-per-source contract. |
+| Bulk | Hub / Spoke / Activity | **Yes, with conversion** | The page being promoted is converted to a `concept` (default) or `entity` page on write: drop bulk frontmatter fields (`bulk-source-id`, `imported-at`, `source-modified-at`, `last-refreshed-at`, `source-hash`, `source-local-path`), add `derived-from: <source-vault>/wiki/sources/<page>` so the lineage is preserved, retain `source-url` as a `## Sources` entry. The `## Notes` divider is stripped. Confirm the conversion via AskUserQuestion if the user has not already passed `--as <page-type>`. |
+| Hub / Spoke / Activity | Bulk | **No** | Refuse. Bulk vaults are machine-populated and refresh-overwrites everything above the `## Notes` divider. Hand-written pages would be destroyed on next refresh. |
+| Hub / Spoke / Activity | Hub / Spoke / Activity | Yes | Standard flow, as below. |
+
+If the operation is refused, abort with a one-paragraph explanation citing the table above. Do NOT half-apply.
+
 ## Step 2: Read Source Vault
 
 Read the source vault's wiki pages, focusing on:

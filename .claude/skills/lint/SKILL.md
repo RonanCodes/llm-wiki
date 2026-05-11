@@ -27,6 +27,56 @@ Health-check a vault's wiki for structural and content issues. With `--artifacts
 
 **Mode routing:** if `--artifacts` is passed, skip Steps 2–6 and run Step 7 (`Artifact Drift Detection`) instead. Existing wiki-lint behaviour is unchanged when `--artifacts` isn't passed.
 
+## Step 1.5: Detect Archetype
+
+Before running checks, read the vault's `CLAUDE.md` and look for an `Archetype:` line under `## Vault Info`. The four possible values are `Hub`, `Spoke`, `Activity`, `Bulk`. If the field is missing (older vaults), treat as `Hub` for backward compatibility.
+
+The archetype shapes which checks run and at what severity. Hub/Spoke/Activity run the full check suite at the levels documented in Step 3. **Bulk vaults** relax several rules and add one bulk-specific check:
+
+| Check | Hub / Spoke / Activity | Bulk |
+|-------|------------------------|------|
+| 3b Orphan pages | Warning | **Info only** (orphans expected — pages are not curated) |
+| 3i Backlink density (near-orphans, hubs) | Warning / info | **Info only** |
+| 3f Concepts without pages | Info | **Skipped** (bulk vaults don't curate concepts) |
+| 3j Near-duplicate detector | Info | **Skipped** (high false-positive rate against a mirrored tree) |
+| 3m Auto-promote candidates | Info | **Skipped** (bulk pages don't promote into hubs en-masse; user promotes one at a time) |
+| 3n Bulk refresh-safety (NEW) | n/a | **Critical** |
+
+When archetype is `Bulk`, additionally:
+
+- `wiki/sources/` is the bulk-mirrored area; treat it as the bulk content surface.
+- `wiki/concepts/` and `wiki/entities/` are user-curated (rare in bulk vaults) and lint against them at full strength.
+- Cross-vault link audit treats bulk source-notes as leaves — `source-url` and `source-local-path` frontmatter values are intentionally not resolvable wikilinks; do not flag them.
+
+### Check 3n: Bulk refresh-safety (Bulk vaults only)
+
+Every page under `wiki/sources/` MUST:
+
+1. Have these bulk-specific frontmatter fields: `bulk-source-id`, `imported-at`, `source-modified-at`, `last-refreshed-at`, `source-hash`, `source-url` or `source-local-path`.
+2. End with a `## Notes` divider followed by either user-added content or `_(empty)_`.
+
+A page missing either is **refresh-unsafe** — the next `/vault-bulk refresh` will refuse to write it.
+
+```bash
+# Bulk-only: list pages under wiki/sources/ missing the ## Notes divider
+find "$VAULT/wiki/sources" -name "*.md" -type f 2>/dev/null | while read -r f; do
+  grep -q '^## Notes' "$f" || echo "missing-notes-divider: $f"
+done
+
+# Bulk-only: list pages under wiki/sources/ missing required bulk frontmatter
+find "$VAULT/wiki/sources" -name "*.md" -type f 2>/dev/null | while read -r f; do
+  for field in bulk-source-id imported-at last-refreshed-at source-hash; do
+    grep -q "^$field:" "$f" || { echo "missing-$field: $f"; break; }
+  done
+done
+```
+
+Additionally validate against the manifest at `$VAULT/bulk-source.yaml`: every `bulk-source-id` referenced by a page MUST exist in the manifest's `sources:` list.
+
+**Severity:** Critical. Refresh-unsafe pages WILL block the next refresh.
+
+**Auto-fix:** Cannot auto-fix safely. The bulk frontmatter is derived from the original import — fabricating values would corrupt the refresh contract. Report only; user must either restore the page from git history or re-import the source.
+
 ## Step 2: Gather All Pages
 
 ```bash
