@@ -1,0 +1,37 @@
+{
+  "description": "Template for bridge.json. Copy this file to bridge.json, then customise the vaults map to match your local vault setup. External bridges (e.g. ro:wiki) read your local bridge.json to discover vault routing without invoking project-local skills directly. bridge.json itself is gitignored so your private vault list does not leak to the public engine repo.",
+  "schema_version": 1,
+  "vault_root": "vaults",
+  "vault_prefix": "llm-wiki-",
+  "ingest_routes": {
+    "session": {
+      "skill": ".claude/skills/ingest-session/SKILL.md",
+      "purpose": "Long working session: findings, decisions, calibration notes, knowledge captured."
+    },
+    "text": {
+      "skill": ".claude/skills/ingest-text/SKILL.md",
+      "purpose": "Pasted text or a local markdown file."
+    },
+    "notes": {
+      "skill": ".claude/skills/rough-notes/SKILL.md",
+      "purpose": "Drop raw notes into scratchpad/ for later cleanup."
+    }
+  },
+  "vaults": {
+    "my-research-hub": {
+      "purpose": "Example hub vault for one stable knowledge domain (replace with your own).",
+      "shape": "hub",
+      "tags": ["example", "hub"]
+    },
+    "my-project-spoke": {
+      "purpose": "Example spoke vault tied to a specific project (replace with your own).",
+      "shape": "spoke",
+      "tags": ["example", "project"]
+    },
+    "my-pipeline-activity": {
+      "purpose": "Example activity vault: pipeline state over time (replace with your own).",
+      "shape": "activity",
+      "tags": ["example", "activity"]
+    }
+  }
+}
