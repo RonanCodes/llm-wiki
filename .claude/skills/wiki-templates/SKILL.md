@@ -36,6 +36,60 @@ related:
 - `related` lists wikilinks to related pages in the wiki.
 - `date-modified` updates whenever the page content changes.
 
+## Bulk frontmatter (Bulk archetype vaults only)
+
+Pages under `wiki/sources/` in a Bulk vault (managed by `/vault-bulk`) carry additional fields on top of the universal frontmatter. They MUST be present for refresh to work, and `/lint` Check 3n flags pages that are missing any of them.
+
+```yaml
+---
+title: "<page title from source>"
+date-created: 2026-05-11             # when first imported, never changes
+date-modified: 2026-05-11             # = last-refreshed-at
+page-type: source-note
+domain:
+  - bulk-<source-slug>
+tags:
+  - bulk-import
+sources:
+  - raw/<source-id>/<path>.md         # local mirror path
+  - https://<original-url>             # upstream URL when applicable
+bulk-source-id: confluence-prod        # MUST match an entry in bulk-source.yaml
+imported-at: 2026-05-11T09:14:22Z      # first-import timestamp, never changes
+source-modified-at: 2026-04-30T14:22Z  # upstream last-modified (from connector)
+last-refreshed-at: 2026-05-11T09:14:22Z
+source-hash: sha256:abcd1234...        # hash of raw bytes, used by refresh diff
+source-url: https://<original-url>     # canonical upstream URL, repeated for grep
+source-local-path: raw/<source-id>/<path>.md
+related: []
+---
+```
+
+**Three timestamps because they answer different questions:**
+
+| Field | Updated by | Question it answers |
+|-------|------------|---------------------|
+| `imported-at` | First import only | When did this page first land in the vault? |
+| `source-modified-at` | Refresh, when connector reports a new value | When did the upstream last change? |
+| `last-refreshed-at` | Every refresh that touches the page | When did we last re-pull? |
+
+`source-hash` is the load-bearing field for refresh. Refresh keys off hash comparison, not file mtime - mtime is noisy across rsync/git operations.
+
+### The `## Notes` divider contract
+
+Every bulk source-note ends with a `## Notes` H2 followed by user-added content (or `_(empty)_`). The body **above** the divider is auto-generated and overwritten by refresh; everything **below** is user-curated and preserved verbatim.
+
+```markdown
+... auto-generated body from source ...
+
+## Notes
+
+<!-- Anything below this divider is user-added and preserved across refresh. -->
+
+_(empty)_
+```
+
+If the divider is missing, refresh refuses to write the page and `/lint` Check 3n flags it as refresh-unsafe. Connector skills that create the body MUST emit the divider; user-curated bulk source-notes (rare) MUST keep it.
+
 ## Wikilinks
 
 **Same-vault:** `[[page-name]]` — standard Obsidian syntax. Use in the `related` frontmatter field and inline in prose when mentioning any entity/concept with its own page.
