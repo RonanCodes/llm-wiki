@@ -91,10 +91,41 @@ If the content has structure cues (multiple H2 sections, lists, tables), use the
 Write tool with file_path=$FILE and content=<rendered HTML>
 ```
 
+## Step 4b: Auto-create or update the index
+
+After writing the new artefact, check how many `.html` files (excluding `index.html` itself) live in `$OUT_DIR`:
+
+```bash
+COUNT=$(ls "$OUT_DIR"/*.html 2>/dev/null | grep -v "/index.html$" | wc -l | tr -d ' ')
+```
+
+- **If COUNT is 1** (just the file you wrote): do nothing. A single artefact does not need an index.
+- **If COUNT >= 2**: create or refresh `$OUT_DIR/index.html`. The index:
+  - Lists every artefact in the folder, newest first.
+  - Title per artefact pulled from `<title>` tag.
+  - One-line summary pulled from the artefact's first paragraph or H1 deck (heuristic; fall back to the slug).
+  - Stack pill (Tailwind / Plain / etc.) inferred from the artefact's contents.
+  - Uses the plain editorial style by default (lightest viable, no CDN dependency).
+
+**Every artefact must include a back-link to the index** in its header *and* its footer:
+
+```html
+<nav><a href="index.html">← Back to index</a></nav>
+```
+
+The index page itself does NOT need a back-link (it is the root).
+
+The index filename is always literally `index.html`, never timestamped, so its URL stays stable across sessions.
+
 ## Step 5: Open in browser
 
 ```bash
-open "$FILE"
+# If an index exists, open the index. Otherwise open the new artefact.
+if [ -f "$OUT_DIR/index.html" ]; then
+  open "$OUT_DIR/index.html"
+else
+  open "$FILE"
+fi
 ```
 
 ## Step 6: Report
