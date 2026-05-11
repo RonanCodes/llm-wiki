@@ -44,15 +44,36 @@ test -f "$VAULT/ROADMAP.md" && grep -cE "^- \[ \]|^[0-9]+\." "$VAULT/ROADMAP.md"
 cd "$VAULT" && git status --porcelain | wc -l  # 0 = clean
 ```
 
-3. **Display results** as a markdown table:
+3. **Detect Bulk vaults** (added: any vault whose `CLAUDE.md` contains `Archetype: Bulk`) and gather per-source state from `bulk-source.yaml`:
+
+```bash
+# Bulk-only: list registered sources + their last-pulled-at + drift staleness
+test -f "$VAULT/bulk-source.yaml" && awk '
+  /^  - id:/        {id=$3}
+  /^    last-pulled-at:/ {pulled=$2; print id, pulled}
+' "$VAULT/bulk-source.yaml"
+```
+
+For each source, compute days since `last-pulled-at`. Default staleness threshold is 14 days; the manifest may override per-source via `stale-after-days:`.
+
+4. **Display results** as a markdown table:
 
 ```
 ## LLM Wiki Vaults
 
-| Vault | Domain | Pages | Sources | Last Activity | Git |
-|-------|--------|-------|---------|---------------|-----|
-| my-research | ai-research | 42 | 15 | 2026-04-13 ingest | clean |
-| personal | personal | 8 | 3 | 2026-04-10 query | 2 dirty |
+| Vault | Archetype | Domain | Pages | Sources | Last Activity | Git |
+|-------|-----------|--------|-------|---------|---------------|-----|
+| my-research | Hub | ai-research | 42 | 15 | 2026-04-13 ingest | clean |
+| personal | Hub | personal | 8 | 3 | 2026-04-10 query | 2 dirty |
+| bulk-acme-engineering | Bulk | bulk-acme-engineering | 412 | 412 | 2026-05-09 refresh | clean |
+```
+
+For Bulk vaults, follow the main row with an indented per-source line:
+
+```
+| bulk-acme-engineering | Bulk | … |
+|   ↳ confluence-prod | last-pulled 2026-05-09 (2d) — ✓ fresh |
+|   ↳ sharepoint-eng  | last-pulled 2026-04-22 (19d) — ⚠ stale |
 ```
 
 4. **If no vaults found**, suggest creating one:

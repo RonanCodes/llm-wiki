@@ -49,6 +49,22 @@ Or via Glob: `.claude/skills/generate-*/SKILL.md`.
 
 The router does **not** maintain a registry. Adding a new artifact type is just creating a new `.claude/skills/generate-<type>/` directory. The router will pick it up on the next invocation.
 
+## Step 2.5: Bulk archetype filter prompt
+
+Before dispatch, read the resolved vault's `CLAUDE.md` and check for `Archetype: Bulk`. A bulk vault often holds hundreds or thousands of mirrored pages, and most `/generate` types collapse if pointed at the full set (a 400-page bulk vault produces a useless 800-page book, an unfocused slide deck, an unscoped quiz).
+
+If the vault is Bulk **and** no narrowing flag has been passed, prompt the user via AskUserQuestion for a filter before dispatching:
+
+- `--path <subpath>` — restrict to pages under `wiki/sources/<subpath>/` (e.g. `--path docs/architecture`)
+- `--source <source-id>` — restrict to one registered source from `bulk-source.yaml`
+- `--since <iso-date>` — restrict to pages where `source-modified-at` ≥ date
+- `--tag <tag>` — restrict to pages carrying that tag (user-added under `## Notes`)
+- "Generate anyway, no filter" — explicit opt-out for cases where the user wants the full corpus
+
+Pass the chosen flag through to the handler. Handlers MAY interpret narrowing flags themselves; if a handler does not yet recognise the flag, the router logs a warning so the user knows the filter may be partially ignored.
+
+Non-Bulk vaults skip this step entirely.
+
 ## Step 3: Dispatch to Handler
 
 Look up `.claude/skills/generate-<type>/SKILL.md`.
