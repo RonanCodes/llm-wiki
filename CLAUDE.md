@@ -4,6 +4,20 @@
 
 A personal knowledge base system powered by LLMs, inspired by [Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). The LLM incrementally builds and maintains a persistent wiki of interlinked markdown files — not RAG, not re-deriving knowledge each query, but a compounding artifact that gets richer over time.
 
+## Vault-Agnostic Engine (read this before committing)
+
+**This repo (`llm-wiki`) is the public engine. Vaults live in `vaults/` and are gitignored — each vault is its own separate git repo.** Anything committed to THIS repo MUST be vault-agnostic.
+
+What this means in practice:
+
+- Never hardcode a vault name (e.g. `llm-wiki-research`, `llm-wiki-personal-life`) in skills, scripts, docs, configs, workflows, or examples in a way that assumes that vault exists. Take vault name as a parameter (`--vault <name>`), resolve from `cwd`, or list `vaults/*/` at runtime.
+- Never commit content, frontmatter, page templates, or examples that only make sense for one user's specific vault. Examples in docs should use placeholder names like `my-research`, `my-vault`, or `<vault-name>`.
+- Never reference paths under `vaults/<some-specific-vault>/...` from engine code. The engine reads vault structure conventions (index.md, log.md, ROADMAP.md, wiki/, scratchpad/, artifacts/), not vault-specific contents.
+- The "Vault Routing" table below in this CLAUDE.md is the **one exception** — it's personal-config-as-code for this user's setup, and it lives in CLAUDE.md precisely because CLAUDE.md is the seam between engine and operator. Don't replicate that routing into skill logic.
+- Private/personal config that isn't vault-agnostic goes in `.private/` (its own git repo, overlaid via `--add-dir`), not in the public engine.
+
+Before staging any change here, ask: "would this still make sense for a stranger who cloned this repo and created their own vault from scratch?" If no, it belongs in `.private/` or in the vault's own repo, not here.
+
 ## Wiki Content Routing (read this first)
 
 **For ANY question about content in the vaults, use `/query` — not bash grep.**
@@ -209,6 +223,7 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 
 - **Vaults are data, not applications.** Keep logic centralized in `.claude/skills/`.
 - **Each vault is its own git repo**, gitignored from this repo. All vault names prefixed with `llm-wiki-` (e.g. `llm-wiki-research`, `llm-wiki-personal`).
+- **Engine code in this repo MUST be vault-agnostic.** See "Vault-Agnostic Engine" at the top of this file. Skills, scripts, docs, and examples take vault as a parameter — they never hardcode a specific vault name or reference vault-specific content.
 - **Vault-specific conventions** go in each vault's own CLAUDE.md (thin config, not skills).
 - **Private skills**: either use `.private/` overlay OR add `.local` to the skill name (e.g. `my-company.local/SKILL.md`) — both are gitignored.
 - **Shared skills** (ralph, frontend-design, etc.) come from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills). Install via `npx skills add` or clone + symlink.
