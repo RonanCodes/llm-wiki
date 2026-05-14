@@ -219,6 +219,20 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 - A high-volume external KB the user does not curate (SharePoint, Confluence, inherited folder, git wiki) goes in its own Bulk vault. Set up via `/vault-bulk create <slug> --source-type <type>`. Refreshed via `/vault-bulk refresh`. Bulk vaults relax lint rules (orphans are expected) and forbid `/promote` between bulk vaults; promote to a Hub if a single insight is worth graduating.
 - If unsure, ask. New vaults should follow the archetype taxonomy; see `.claude/skills/vault-create/SKILL.md` for when to split vs when to keep as a concept page in an existing vault.
 
+## Default flow for feature work (agent-native repos)
+
+In any repo with a `gh` remote, default to the **agent-native Pocock pattern** for non-trivial feature work:
+
+- PRDs and slices live as **GitHub issues**, not `.ralph/` local files. `/ro:write-a-prd` publishes the PRD as a single GH issue using Matt's 7-section template; `/ro:slice-into-issues` publishes each vertical slice as a child GH issue with `## Parent\n\n#<N>` and `## Blocked by` references.
+- One label gates the queue: **`ready-for-agent`** (or a project synonym like `Sandcastle`, configured in `docs/agents/triage-labels.md`).
+- `/ro:ralph` and `/ro:planner-worker` default to `--source github:ready-for-agent` when a gh remote is present and `.ralph/` is empty. PRs use `Closes #<slice-number>` so slices auto-close on merge; the parent PRD stays open until all children close.
+- Domain language lives in **`CONTEXT.md`** at repo root (or `CONTEXT-MAP.md` + per-context files for multi-bounded-context repos). Hard-to-reverse decisions go in `docs/adr/000N-*.md`. Both are written **lazily during `grill-with-docs`** (Matt's symlinked skill, routed via `/grill`).
+- Repo-level CLAUDE.md stays **thin**, pointing at `docs/agents/{backlog,triage-labels,domain}.md` for agent-onboarding detail.
+
+To kick off the full pipeline end-to-end, invoke **`/agentic-e2e-flow`** (also responds to "matt pocock flow", "autonomous agent flow", "agentic e2e flow", "the high-level flow", "the big flow", "the whole flow"). The orchestrator is a thin sequencer over swarm → grill → write-a-prd → slice-into-issues → ralph-or-planner-worker → gh-ship, with confirmation gates between phases.
+
+See [skill-lab:agent-native-repo-pocock](obsidian://open?vault=llm-wiki-skill-lab&file=wiki%2Fpatterns%2Fagent-native-repo-pocock) for the full pattern, gap table, and rationale. Repos without a gh remote fall back to the legacy `.ralph/` local-file flow automatically; nothing breaks.
+
 ## Conventions
 
 - **Vaults are data, not applications.** Keep logic centralized in `.claude/skills/`.
