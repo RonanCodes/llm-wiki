@@ -1,5 +1,19 @@
 ## Codebase Patterns (llm-wiki)
 
+## Canon DB flip: D1 to Neon (2026-05-19)
+
+The canon default DB for SaaS-shape multi-tenant apps is now **Neon Postgres**, not D1 (Cloudflare SQLite). Locked via factory's Phase 3 PRD and a night-shift that pivoted mid-build after hitting D1 multi-writer and pgvector gaps. Five concept files in `vaults/llm-wiki-research/wiki/concepts/` were updated in issue #4 (2026-05-20):
+
+- `ideal-tech-setup.md`: DB section, mermaid diagram, stack table, cost target
+- `stack-decision-map.md`: DB slot row, flowchart reading guide
+- `ai-agent-stack.md`: Layer 3 (shared memory), Layer 4 (RAG pgvector), cost profile
+- `agent-native-stack-design.md`: scoring table, sources
+- `db-pick-decision-rule.md`: new page, full decision matrix + factory case study
+
+Rule: Neon for multi-tenant SaaS. D1 for embedded / edge-cache / CLI / local-first. Connection via `@neondatabase/serverless` HTTP driver (no Hyperdrive needed). See `vaults/llm-wiki-research/wiki/concepts/db-pick-decision-rule.md`.
+
+
+
 This is the durable knowledge surface for the local factory running on this repo. Read at every iteration start; the orchestrator harvests new learnings into this file at session close. Worker-scratch files under `.ralph/sessions/` are ephemeral.
 
 llm-wiki is a vault repo: each `vaults/llm-wiki-<short>/` is its own git submodule with its own commit history, ROADMAP, log, and `wiki/` content. The local factory rules apply to the umbrella llm-wiki repo; per-vault skills (ingest-session, ingest-text, rough-notes) live inside the vault submodules.
