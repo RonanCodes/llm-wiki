@@ -1,6 +1,21 @@
-# Ralph Codebase Patterns
+## Codebase Patterns (llm-wiki)
 
-Cross-PRD learnings shared across every Ralph run in this repo. Read on every iteration; add only when a pattern is general enough to benefit any future story.
+This is the durable knowledge surface for the local factory running on this repo. Read at every iteration start; the orchestrator harvests new learnings into this file at session close. Worker-scratch files under `.ralph/sessions/` are ephemeral.
+
+llm-wiki is a vault repo: each `vaults/llm-wiki-<short>/` is its own git submodule with its own commit history, ROADMAP, log, and `wiki/` content. The local factory rules apply to the umbrella llm-wiki repo; per-vault skills (ingest-session, ingest-text, rough-notes) live inside the vault submodules.
+
+### Local factory hooks
+
+- This repo participates in the **local factory** (`/ro:ralph`, `/ro:planner-worker`, `/ro:matt-pocock-coding-workflow`, `/ro:night-shift`, `/ro:day-shift`). See `~/Dev/ronan-skills/skills/ralph/SKILL.md` § "Run artefacts (the canonical shape)".
+- Artefact shape:
+  - `.ralph/patterns.md` (this file) — committed, durable, harvested at session close.
+  - `.ralph/<phase>.session.md` — committed, per-session aggregate.
+  - `.ralph/sessions/<session-id>/<worker-id>.md` — gitignored worker scratch.
+  - `.ralph/<phase>.json` (PRD) — committed.
+- The **bridge.json** in this repo root is the contract for the `/ro:wiki` cross-repo skill (separate concern; do not modify in this PR).
+- The companion **remote factory** is the Factory app (tracked separately) that will run equivalent loops as a cloud service.
+
+Cross-PRD learnings harvested from previous Ralph runs follow.
 
 ## Repo Structure
 - Engine repo at `/Users/ronan/Dev/ai-projects/llm-wiki/`. Vaults live as siblings under `vaults/llm-wiki-*/`, each its own git repo (gitignored from the engine repo).
