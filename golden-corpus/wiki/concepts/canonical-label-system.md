@@ -2,6 +2,7 @@
 title: "Canonical Label System"
 date-created: 2026-05-19
 date-modified: 2026-05-19
+date-reviewed: 2026-05-19
 page-type: concept
 domain:
   - llm-wiki
@@ -46,7 +47,7 @@ Three axes, mutually exclusive within each axis except modifiers:
 
 - **Lifecycle** (exactly one set at all times): `needs-grilling`, `ready-for-agent`, `in-progress`, `needs-human`. The state machine has four nodes and well-defined transitions.
 - **Kind** (exactly one set): `kind:prd`, `kind:slice`, `kind:incident`, `kind:chore`. Lets the orchestrator query by work-type without parsing body shapes.
-- **Modifiers** (additive): `hitl-likely`, `parallel-eligible`, `repo-lock`, `bug-fix`, `phase-0..3`, `from-retro`, `needs-grilling-skipped`. These drive scheduler decisions (parallel/serial, HITL concurrency cap) and reviewer attention.
+- **Modifiers** (additive): `hitl-likely`, `parallel-eligible`, `repo-lock`, `bug-fix`, `phase-0..3`, `from-retro`, `needs-grilling-skipped`, `deferred`. These drive scheduler decisions (parallel/serial, HITL concurrency cap) and reviewer attention. `deferred` is the "valid idea, parked" flag: orchestrators skip it regardless of lifecycle, no need to close-as-wontfix.
 
 ## The decision tree (rationale)
 
