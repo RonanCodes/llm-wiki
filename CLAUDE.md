@@ -66,9 +66,27 @@ The `capture-mode` skill handles the rest: a single short confirm on the first m
 
 If unsure whether the opener is capture-worthy, default to NOT triggering and let the user direct.
 
+## Output Style: Understanding-First
+
+**Every wiki page, README, POC explainer, integration doc, ADR, or any generated artefact whose purpose is for a human to *understand* a topic MUST follow `/ro:understanding-first`.**
+
+The principle (from the user): _outsource the thinking, not the understanding_. Generated docs teach the reader; they don't merely record facts. If the reader finishes the page knowing only what it's *about* — not **why** it exists and **how** it works at a glance — the doc failed.
+
+Minimum contract (see `/ro:understanding-first` for the full spec):
+
+1. Plain-English explainer paragraph leading the page.
+2. Every acronym expanded on first use; glossary section if 4+.
+3. At least one mermaid diagram of the flow/structure.
+4. At least one concrete worked example with real values.
+5. Citations for every non-obvious claim (inline + `sources:` frontmatter).
+6. "Further reading" section with ≥3 online links for any tech topic.
+7. Explicit "Open questions" section — never bury uncertainty in prose.
+
+The skill includes a pre-publish checklist. Walk it before saving.
+
 ## Shared Skills
 
-This project works best with shared skills from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills): ralph, frontend-design, create-skill, doc-standards.
+This project works best with shared skills from [`RonanCodes/ronan-skills`](https://github.com/RonanCodes/ronan-skills): ralph, frontend-design, create-skill, doc-standards, **understanding-first**.
 
 On every new session, first check if `.claude/skip-plugin-check` exists — if so, skip this entirely.
 
