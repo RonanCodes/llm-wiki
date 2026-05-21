@@ -78,13 +78,13 @@ If the user has clearly already calibrated these in the vault (e.g. the most-rec
 - Verb-first opening drives motion ("Shipping", "Building", "Designing") — not a noun-list.
 - Primary anchor is a specific tech or depth marker ("10y Angular", "Rust since 2019") — avoid vague "Senior Engineer".
 - Current role framing matches the person's honest calibration: not "Lead X" if they're "helping with X".
-- Credibility anchor is a past-role signal ("Ex-Fidelity", "Ex-Google", specific exit) in 2 words.
+- Credibility anchor is a past-role signal ("Ex-Google", "Ex-Microsoft", specific exit) in 2 words.
 - Personality beat is one emoji or one short phrase ("Hot Sauce Sommelier 🌶"). Never more than one.
 - Use `·` as the separator throughout. Never use em-dash, en-dash, or pipe mixed with dots.
 
 **Examples from the vault** (see `headline-bio-drafts-v*.md` for context):
-- v2: `Lead Engineer shipping AI into FinTech · 10y Angular · AI Lead @ Redacted · Ex-Fidelity · Amsterdam 🌶`
-- v3: `Shipping AI-native software · 10y Angular · Agentic engineering @ Redacted · Ex-Fidelity · Hot Sauce Sommelier 🌶`
+- v2: `Lead Engineer shipping AI into FinTech · 10y Angular · AI Lead @ Acme · Ex-BigBank · Amsterdam 🌶`
+- v3: `Shipping AI-native software · 10y Angular · Agentic engineering @ Acme · Ex-BigBank · Hot Sauce Sommelier 🌶`
 
 v3 shows the honest-calibration outcome: `AI Lead` → `Agentic engineering` (real activity, not claimed title).
 
@@ -243,7 +243,7 @@ Saved to: wiki/comparisons/headline-bio-drafts-v<N+1>.md
 
 If `--include-photo`, also include the profile photo path.
 
-If the user's CV or cover needs matching updates (detected in Step 9), call them out with a clear prompt: "Do you want me to reconcile the CV Redacted bullet and cover tagline to match?"
+If the user's CV or cover needs matching updates (detected in Step 9), call them out with a clear prompt: "Do you want me to reconcile the CV employer bullet and cover tagline to match?"
 
 ## Rules
 

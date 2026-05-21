@@ -64,3 +64,6 @@ social-cards/
 
 # Local bridge contract for external skills (vault names are private)
 bridge.json
+
+# Local-only notes (never commit work-context content)
+CLAUDE.local.md

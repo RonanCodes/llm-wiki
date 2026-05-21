@@ -228,7 +228,7 @@ When the user discusses topics, route content to the correct vault. Vaults fall 
 | Simplicity x Taskforce partnership (e-commerce co-pilot — Dataforce only) | `llm-wiki-simplicity-taskforce-partnership` | Spoke | Dedicated spoke for the Taskforce partnership and Dataforce product; cross-links into `simplicity-labs` for general venture state and into research + marketing hubs |
 | Startup strategy knowledge (pitching, ICP, moats, PMF, GTM, fundraising) | `llm-wiki-startup-strategy` | Hub | Feeds quizzes, grill sessions, cheat sheets for hackathons and pitches |
 | Tech-book generation craft — voice profiles, template deconstructions (Dummies / O'Reilly / Head First / Observatory), ingested tech books, side-project ideas around the book pipeline | `llm-wiki-book-craft` | Hub | Lives upstream of `/generate book`; specific generated books stay in the topic's own vault |
-| Bulk mirror of an external knowledge base (SharePoint site, Confluence space, inherited doc folder, git wiki repo) | `llm-wiki-bulk-<source-slug>` | Bulk | One vault per upstream source. Created and refreshed via `/vault-bulk`; never hand-curated. Source-shaped slug (e.g. `llm-wiki-bulk-redacted-prod`, `llm-wiki-bulk-acme-engineering`) |
+| Bulk mirror of an external knowledge base (SharePoint site, Confluence space, inherited doc folder, git wiki repo) | `llm-wiki-bulk-<source-slug>` | Bulk | One vault per upstream source. Created and refreshed via `/vault-bulk`; never hand-curated. Source-shaped slug (e.g. `llm-wiki-bulk-acme-prod`, `llm-wiki-bulk-acme-engineering`) |
 | LLM Wiki project knowledge, architecture decisions, development context | `llm-wiki` (engine repo) | Meta | The engine itself; not a vault, stays in this repo |
 
 **Rule of thumb:**
