@@ -9,7 +9,7 @@ Confluence Cloud uses an Atlassian email + API token; Confluence Server/Data Cen
 When `vault-bulk` encounters a `type: confluence` source, it scans the loaded skill list for a connector in this order:
 
 1. **Vault-local override**: a skill named `bulk-connector-confluence` in the vault's own `.claude/skills/`.
-2. **Work plugin connector**: `yellowtail:confluence`, `<employer>:confluence`, or any `*:confluence` skill provided by a loaded plugin.
+2. **Work plugin connector**: `<employer>:confluence`, or any `*:confluence` skill provided by a loaded plugin.
 3. **Personal connector**: `ro:confluence`.
 4. None found -> abort.
 
@@ -21,7 +21,7 @@ If no connector resolves, print exactly this and stop:
 >
 > Options:
 >
-> 1. If your work plugin provides one (you mentioned `yellowtail` skills on your work machine that touch Confluence), enable that plugin in this session.
+> 1. If your work plugin provides one (a work-plugin skill on your work machine that touches Confluence), enable that plugin in this session.
 > 2. Create a connector: `/ro:create-skill bulk-connector-confluence` and implement the cross-skill contract below.
 > 3. As a workaround, export the Confluence space (Space settings -> Content tools -> Export -> HTML or Word) and import via `--type local`.
 
@@ -39,7 +39,7 @@ Skill bulk-connector-confluence operation=list-pages
   [--since <iso-timestamp>]
 ```
 
-Return: JSON array of `{ id, path, url, modified-at, hash }` records. `id` is the Confluence page ID. `path` is the breadcrumb hierarchy (`<parent-title>/<child-title>/...`), slugified. `url` is the canonical wiki URL (e.g. `https://acme.atlassian.net/wiki/spaces/PROD/pages/12345/Page+Title`). `modified-at` is the page's `version.when`. `hash` is the `version.number` concatenated with a sha256 of the rendered storage-format body.
+Return: JSON array of `{ id, path, url, modified-at, hash }` records. `id` is the Confluence page ID. `path` is the breadcrumb hierarchy (`<parent-title>/<child-title>/...`), slugified. `url` is the canonical wiki URL (e.g. `https://example.atlassian.net/wiki/spaces/PROD/pages/12345/Page+Title`). `modified-at` is the page's `version.when`. `hash` is the `version.number` concatenated with a sha256 of the rendered storage-format body.
 
 For `--since`, prefer the Confluence CQL query `lastModified > "<iso>"` for cheap incremental listing.
 
@@ -81,4 +81,4 @@ For each attachment on the page (via `/rest/api/content/<id>/child/attachment`),
 
 - Frontmatter, manifest, hashing, refresh policy, `## Notes` preservation, lint-rule downgrades, log entries.
 
-The split keeps Confluence auth out of this repo entirely. Personal-plugin and work-plugin connectors can both register under the `*:confluence` namespace, so you can have `ro:confluence` for personal stuff and `yellowtail:confluence` for work-tenant access without overlap.
+The split keeps Confluence auth out of this repo entirely. Personal-plugin and work-plugin connectors can both register under the `*:confluence` namespace, so you can have `ro:confluence` for personal stuff and `<employer>:confluence` for work-tenant access without overlap.

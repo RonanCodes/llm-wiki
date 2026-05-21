@@ -41,7 +41,7 @@ Parse `$ARGUMENTS`. First positional token is the subcommand. Route to the corre
 Bulk vault directory name MUST be `llm-wiki-bulk-<source-slug>` where `<source-slug>` identifies the source, not the topic. Source-shaped because the vault's identity IS its source.
 
 - A SharePoint site at `acme.sharepoint.com/sites/Engineering` -> `llm-wiki-bulk-acme-engineering`
-- A Confluence space `PROD` on `yellowtail.atlassian.net` -> `llm-wiki-bulk-yellowtail-prod`
+- A Confluence space `PROD` on `acme.atlassian.net` -> `llm-wiki-bulk-acme-prod`
 - A local folder of inherited HR docs -> `llm-wiki-bulk-hr-archive`
 - A git wiki repo at `github.com/org/handbook` -> `llm-wiki-bulk-org-handbook`
 
@@ -80,8 +80,8 @@ created: 2026-05-11
 sources:
   - id: confluence-prod
     type: confluence
-    location: https://yellowtail.atlassian.net/wiki/spaces/PROD
-    connector-skill: yellowtail:confluence    # or null if local-folder/git
+    location: https://acme.atlassian.net/wiki/spaces/PROD
+    connector-skill: <employer>:confluence    # or null if local-folder/git
     auth-ref: env:CONFLUENCE_TOKEN            # how to find credentials, never the token itself
     first-pulled-at: 2026-05-11T09:14:22Z
     last-pulled-at: 2026-05-11T09:14:22Z
@@ -305,7 +305,7 @@ Connectors are external to this skill. The dispatcher looks up the right one in 
 
 For SharePoint/Confluence the skill checks for an available connector skill by scanning the loaded skill list for any of:
 
-- `yellowtail:sharepoint`, `yellowtail:confluence` (work plugin)
+- `<employer>:sharepoint`, `<employer>:confluence` (work plugin)
 - `ro:sharepoint`, `ro:confluence` (personal plugin if it ever exists)
 - `<plugin>:sharepoint`, `<plugin>:confluence` (other plugins)
 - A user-created skill named `bulk-connector-<type>` (vault-local override)
@@ -314,7 +314,7 @@ If none is found, the dispatcher MUST abort with:
 
 > No connector skill found for <type>. To bulk-import from <type> you need a skill that can authenticate, list pages, fetch content, and detect changes. Options:
 >
-> 1. If your work plugin has one (e.g. `yellowtail:confluence`), make sure it's enabled in this session.
+> 1. If your work plugin has one (e.g. `<employer>:confluence`), make sure it's enabled in this session.
 > 2. Create one with `/ro:create-skill bulk-connector-<type>` - it must expose `list-pages`, `fetch-page <id>`, and ideally `since <iso-timestamp>` for incremental refresh.
 > 3. Until then, you can export the source to a local folder and use `--type local`.
 

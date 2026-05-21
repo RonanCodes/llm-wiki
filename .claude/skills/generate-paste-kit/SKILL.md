@@ -65,7 +65,7 @@ If the source has code blocks without `### Label` headers, fall back to auto-lab
 Max 220 chars.
 
 \`\`\`
-Shipping AI-native software · 10y Angular · Agentic engineering @ Yellowtail · Ex-Fidelity · Amsterdam 🌶
+Shipping AI-native software · 10y Angular · Agentic engineering @ Acme · Ex-BigBank · Amsterdam 🌶
 \`\`\`
 
 ### About
@@ -75,7 +75,7 @@ Shipping AI-native software · 10y Angular · Agentic engineering @ Yellowtail �
 \`\`\`
 I ship AI-native software...
 
-Tech Builder at Yellowtail...
+Tech Builder at Acme...
 \`\`\`
 ```
 

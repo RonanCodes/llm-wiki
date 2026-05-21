@@ -9,7 +9,7 @@ SharePoint requires Microsoft Graph API authentication (app registration, tenant
 When `vault-bulk` encounters a `type: sharepoint` source, it scans the loaded skill list for a connector in this order:
 
 1. **Vault-local override**: a skill named `bulk-connector-sharepoint` in the vault's own `.claude/skills/` (if the vault has one).
-2. **Work plugin connector**: `yellowtail:sharepoint`, `<employer>:sharepoint`, or any `*:sharepoint` skill provided by a plugin the user has loaded.
+2. **Work plugin connector**: `<employer>:sharepoint`, or any `*:sharepoint` skill provided by a plugin the user has loaded.
 3. **Personal connector**: `ro:sharepoint`.
 4. None found -> abort.
 
@@ -21,7 +21,7 @@ If no connector resolves, print exactly this and stop:
 >
 > Options:
 >
-> 1. If your work plugin provides one (e.g. on your work machine you may have `yellowtail:sharepoint`), enable that plugin in this session.
+> 1. If your work plugin provides one (e.g. on your work machine you may have an `<employer>:sharepoint` skill), enable that plugin in this session.
 > 2. Create a connector: `/ro:create-skill bulk-connector-sharepoint` and implement the cross-skill contract below.
 > 3. As a workaround, export the SharePoint library to a local folder (Files -> Sync, or the SharePoint export tools) and use `--type local` instead.
 

@@ -39,7 +39,7 @@ Bulk vault names are **source-shaped**, not topic-shaped: `llm-wiki-bulk-<source
 | Source | Vault slug |
 |--------|------------|
 | `acme.sharepoint.com/sites/Engineering` | `llm-wiki-bulk-acme-engineering` |
-| Confluence space `PROD` on `yellowtail.atlassian.net` | `llm-wiki-bulk-yellowtail-prod` |
+| Confluence space `PROD` on `acme.atlassian.net` | `llm-wiki-bulk-acme-prod` |
 | Inherited folder of HR docs | `llm-wiki-bulk-hr-archive` |
 | `github.com/org/handbook` | `llm-wiki-bulk-org-handbook` |
 
@@ -69,8 +69,8 @@ Four source types are supported:
 |------|--------------|----------------|
 | `local` | No | Built in. Walks a folder, mirrors with `rsync`, hashes with `sha256` |
 | `git` | SSH agent or `gh` auth | Built in. Clones the repo, uses `git diff` for cheap refresh |
-| `sharepoint` | MS Graph token | **Delegated.** Requires a separate connector skill (e.g. work-plugin `yellowtail:sharepoint`, or you create `bulk-connector-sharepoint` via `/ro:create-skill`) |
-| `confluence` | Atlassian API token or PAT | **Delegated.** Same pattern: `yellowtail:confluence`, `ro:confluence`, or a vault-local override |
+| `sharepoint` | MS Graph token | **Delegated.** Requires a separate connector skill (e.g. work-plugin `<employer>:sharepoint`, or you create `bulk-connector-sharepoint` via `/ro:create-skill`) |
+| `confluence` | Atlassian API token or PAT | **Delegated.** Same pattern: `<employer>:confluence`, `ro:confluence`, or a vault-local override |
 
 If you point `/vault-bulk` at a SharePoint or Confluence source and no connector skill is loaded, it aborts with instructions on which skill to enable or scaffold. Auth never lives in the bulk skill itself.
 
@@ -154,7 +154,7 @@ You can opt out with "Generate anyway, no filter" when you genuinely want the fu
 /vault-bulk create hr-archive --source-type local --source /Users/me/Archives/hr-2024-export
 
 # Or wire up a Confluence space (requires a connector skill)
-/vault-bulk create yellowtail-prod --source-type confluence --source https://yellowtail.atlassian.net/wiki/spaces/PROD
+/vault-bulk create acme-prod --source-type confluence --source https://acme.atlassian.net/wiki/spaces/PROD
 
 # Check what's mirrored and when it was last refreshed
 /vault-status                  # bulk vaults get an Archetype column and per-source freshness rows

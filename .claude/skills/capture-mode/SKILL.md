@@ -40,7 +40,7 @@ On detecting a capture-worthy opener, respond with a single short confirm, no ot
 > Capture mode? I'll route to:
 > - `personal-journal`: today's entry (always)
 > - `personal-life`: entities (people, places) and principles/protocols/goals as they come up
-> - any work spoke if work content surfaces (Yellowtail / Taskforce / a side project)
+> - any work spoke if work content surfaces (your employer / a side venture / a side project)
 >
 > I'll buffer through the session and propose all writes at the end. Cancel any time by saying "stop capturing" or asking me a code/research question.
 
@@ -107,7 +107,7 @@ Maintain the buffer silently. Don't narrate buffer state every message.
 - If user pivots to a clear non-capture task ("now help me debug X", "let's run /lint"), pause Capture Mode, serve the task, resume buffering when they switch back. Acknowledge the pivot only briefly.
 - If user mentions a name not yet in the buffer, add it. If they mention an existing name, append to that person's mention list and update last-seen.
 - If user articulates a principle or protocol ("I think the rule for me is…"), capture it as a concept.
-- If user mentions a work topic (Yellowtail, Taskforce, a specific side project), record the cross-route hint.
+- If user mentions a work topic (their employer, a side venture, a specific side project), record the cross-route hint.
 
 ## Step 2: Detect close
 

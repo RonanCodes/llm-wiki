@@ -69,7 +69,7 @@ Examples: `career-moves` (recruiter chats → interviews → offers, pipeline-st
 
 ### 4. Bulk vault (machine-populated mirror)
 
-Examples: `llm-wiki-bulk-acme-engineering` (mirror of a SharePoint site), `llm-wiki-bulk-yellowtail-prod` (mirror of a Confluence space), `llm-wiki-bulk-hr-archive` (mirror of a local folder of inherited docs), `llm-wiki-bulk-org-handbook` (mirror of a git repo).
+Examples: `llm-wiki-bulk-acme-engineering` (mirror of a SharePoint site), `llm-wiki-bulk-acme-prod` (mirror of a Confluence space), `llm-wiki-bulk-hr-archive` (mirror of a local folder of inherited docs), `llm-wiki-bulk-org-handbook` (mirror of a git repo).
 
 - One vault per upstream source. The vault's identity IS its source.
 - Naming MUST be source-shaped: `llm-wiki-bulk-<source-slug>` (not topic-shaped).

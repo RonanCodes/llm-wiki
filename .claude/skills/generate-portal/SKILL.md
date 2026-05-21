@@ -101,7 +101,7 @@ Count for the portal header:
 
 ## Safety Gate — MANDATORY before any write
 
-Portal output references **private vault names**. If it gets committed to a non-private repo, it leaks client/project identity (e.g. "llm-wiki-aviva" → Aviva is a client).
+Portal output references **private vault names**. If it gets committed to a non-private repo, it leaks client/project identity (e.g. `llm-wiki-<client-slug>` — the client name is embedded in the vault path).
 
 Before writing ANY output file, verify the path is gitignored:
 
