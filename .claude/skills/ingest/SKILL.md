@@ -147,6 +147,18 @@ git add .
 git commit -m "✨ feat: ingest <source-title>"
 ```
 
+## Step 8b: AI Insight Summary (auto-fire for review-shaped sources)
+
+If the detected source type is one of `meeting-call`, `interview`, `discovery-call`, `1-on-1`, `session`, `podcast`, or `video` (transcript >2000 words extracted), OR the user passed an explicit review-shaped `--type` flag (e.g. `--type founder-tool-review`, `--type meeting-note`), invoke the `ai-insight-summary` skill on the freshly-created source-note:
+
+```
+/ai-insight-summary $VAULT/wiki/sources/<source-name>.md --position after-h1 --open
+```
+
+This adds a top-of-doc `> [!summary] AI Insight Summary` callout and opens the doc in Obsidian. The callout is synthesis (what the doc actually means + open questions), not restatement. See engine CLAUDE.md § "AI Insight Summaries" for the full firing contract.
+
+Skip the auto-fire when the source is a pure reference (frontmatter-only entity stub, glossary import, config dump) or when the user passed `--no-summary`.
+
 ## Step 9: Report
 
 Show the user:
