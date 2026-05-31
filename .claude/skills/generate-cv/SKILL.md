@@ -94,24 +94,56 @@ For **tailored mode**, reshape the content model against the target:
 
 Do not invent facts. Every claim must trace to a wiki page or CV source. If a gap is obvious (e.g. target uses tech X; CV never mentions X), flag it in the handler's final report to the user rather than papering over.
 
-### Repetition guard (Profile vs Bullets vs Skills)
+### Repetition guard (Profile vs Bullets vs Sidebar Achievements vs Skills)
 
-Three sections risk re-listing the same content:
+Four sections risk re-listing the same content:
 
 - **Profile** = positioning paragraph. Job: identity, depth, current role at top level, optional aspiration line. Target ~85–100 words.
 - **First experience bullet** = top-level role description. Job: what the role is, what the function is.
+- **Sidebar Achievements** = recognitions only. Job: awards, public-talks count, monthly event cadence, longevity, the single most-defensible outcome. NEVER a restatement of the role description.
 - **Skills > Frontier AI / equivalent** = tool list with stage tiers.
 
 Common drift patterns:
 - Profile lists tools → Bullet 1 lists same tools → Skills lists tools again. Reader sees the same tool list 3x.
 - Profile lists projects → Bullets list same projects again. Bullets become redundant.
+- Sidebar Achievements restates the headline role ("Lead the X work at Y") that the Profile and the job bullet already cover. Padded-CV smell.
 
 Cut rules:
 - **Tool lists belong in Skills.** Profile may name a small subset (1–3 tools max) for recruiter-skim signal — Bullets must NOT then repeat that subset.
 - **Projects belong in Bullets.** Profile names projects only when flagship-defining (one or two, max). "Profile lists everything I did at the company" is anti-pattern.
+- **Sidebar Achievements is recognitions only.** Awards, hackathon wins, public talks, monthly event cadence, longevity ("building since age N"), or one outcome too big to bury in a bullet. If a sidebar achievement could also live as a job bullet, it almost always belongs in the job bullet, not the sidebar.
 - **Aspiration goes in Profile, not Achievements.** Profile is positioning; Achievements is proof points.
 
-After every render, before finalising, scan Profile and the first experience bullet for verbatim phrase overlap. If a noun phrase >= 3 words appears in both, cut from one.
+After every render, before finalising, scan **Profile + first experience bullet + sidebar Achievements** for verbatim noun-phrase overlap (>= 3 words). If a phrase shows up in two of those three sections, cut from at least one.
+
+### Scope-of-claim discipline
+
+Claim scope drifts up the hierarchy without effort:
+**engagement → project → team → business line → department → company-wide → industry-wide**
+
+Every step up the ladder is an overclaim if it isn't literally true. Common drifts to catch:
+
+- "I lead AI on **my engagement**" → "AI lead for **the business line**" (drift +2 levels)
+- "I **interface with** the client daily" → "**embedded with** the client team" (different relationship — embedded implies on their payroll)
+- "I **build internal tooling** with LLMs" → "**wiring LLMs into products**" (internal tooling ≠ shipped product)
+- "I **help teammates adopt** AI-assisted delivery" → "I **drive AI-assisted delivery across teams**" (helping ≠ driving)
+
+Interview a borderline claim against three questions:
+1. Is the scope (engagement / team / business line / company) **literally accurate**, or is it aspirational shorthand?
+2. Is the **relationship word** ("embedded", "lead", "drive", "own") defensible if a reviewer asks "what specifically did you own"?
+3. Would the **employer's own org chart** back this up if the interviewer pulls it?
+
+If any answer is "not quite", scope the claim down. Defensible-and-specific beats vague-and-impressive.
+
+### Scope personal-work vs day-job
+
+A claim that's only true on side projects MUST be scoped explicitly when it appears in Profile or any framing block. Don't let it sit unscoped as if it's a day-job credential.
+
+Pattern:
+- Wrong: "Strong on … wiring LLMs and agents into products."
+- Right: "At <employer> I do X; on personal projects and at <personal-venture> I wire LLMs and agents into products end-to-end."
+
+Same for any claim about regulated-industry depth, leadership scope, comp-stage of agentic work, etc. The Profile sentence should make the work-domain split legible at a glance.
 
 ## Step 3: Render HTML
 
@@ -153,7 +185,15 @@ Fall back to `chromium` or `google-chrome` if Chrome is missing. If none availab
 pdfinfo "$OUT.pdf" | awk '/^Pages:/ { print $2 }'
 ```
 
-If page count > 1, report it clearly. Offer to tighten typography and re-render (rather than silently truncating).
+If page count > 1, do NOT ship a 2-page CV with a mostly-empty page 2. Iterate in this order until page count == 1:
+
+1. Tighten typography (reduce `main` padding, `section + section margin-top`, `.job margin-bottom` by ~20%).
+2. Drop the weakest sidebar Achievement (least-defensible / most-padded one).
+3. Compress Profile by one sentence (usually the redundant tools/aspiration tail).
+4. Merge two adjacent skill rows if their cats are close (e.g. fold "Productionising X" into the broader "AI / Agentic" row when the boundary is fuzzy).
+5. If still over, ask the user before dropping any factual content from bullets.
+
+Re-render and re-check after each step. Don't go to step 5 without exhausting 1–4.
 
 ## Step 6: Refresh source-note
 
@@ -266,6 +306,9 @@ This keeps every generated HTML in git history (so any past CV can be re-rendere
   - "framework-agnostic and happy to pick up whatever the job needs" (without specifics following)
   - generic CV verbs as bullet leads: spearhead, drive, transform, deliver
   - parenthetical noise that doesn't add specificity (e.g. "(often with X)" where X is implicit from context)
+  - vague trailing adjective phrases on otherwise-concrete bullets: "...throughout the build", "...across teams", "...as needed", "X working" (where X is e.g. "IaC"). Replace with a concrete fact or cut.
+  - unscoped emerging-tech claims when only true on personal projects (see Scope personal-work vs day-job)
+  - "embedded" used metaphorically (only use when literally on the client's payroll; otherwise "interface with", "in daily contact with", "regular client-facing on …")
 - **Avoid sales-game vocabulary for client outcomes.** "Won the client", "won additional clients" reads gamey. Prefer factual: "POC led to a signed engagement", "led to additional client engagements", "selected for the build", or just "(signed)" inline. Hackathon "won" is fine — it's a literal competition.
 - **Aspirational line.** Profile may include one short aspirational sentence ("would love to do X full-time") only if the proof points (Skills tier, achievements, projects) support it elsewhere in the CV. Without proof points, it reads as a wish.
 - **Present-tense gerund for in-progress work.** "I'm building X" beats "I build X" or "I built X" when the work is mid-flight. Signals stage honestly.
