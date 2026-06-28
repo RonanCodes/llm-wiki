@@ -67,3 +67,7 @@ bridge.json
 
 # Local-only notes (never commit work-context content)
 CLAUDE.local.md
+
+# Stray scratch screenshots + resume at repo root — never commit to the public engine
+/*.png
+.claude/RESUME.md
