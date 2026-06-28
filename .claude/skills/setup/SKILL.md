@@ -1,7 +1,7 @@
 ---
 name: setup
 description: First-time setup for the llm-wiki system. Checks tools, skills, and Obsidian. Use when setting up llm-wiki on a new machine.
-allowed-tools: Bash(brew *) Bash(which *) Bash(npm *) Bash(pnpm *) Bash(ls *) Read Glob
+allowed-tools: Bash(brew *) Bash(which *) Bash(npm *) Bash(pnpm *) Bash(ls *) Bash(bash *) Read Glob
 ---
 
 # LLM Wiki Setup
@@ -75,6 +75,22 @@ npx skills add RonanCodes/ronan-skills/src/doc-standards
 1. Ask the user where they'd like to clone it
 2. `git clone https://github.com/RonanCodes/ronan-skills.git <their-path>/ronan-skills`
 3. For each skill: `ln -s <their-path>/ronan-skills/src/<name> ~/.claude/skills/<name>`
+
+## Step 4.5: Register in the repo ecosystem
+
+The wiki engine, the `ro` skills plugin, and (for Ronan) the private skills plugin hook together through `~/.claude/.env`, so any of them can find the others no matter where they're checked out. Resolve the `ro` plugin, self-register this wiki repo, then show which siblings are present:
+
+```bash
+RO="${RONAN_SKILLS_DIR:-$HOME/Dev/ronan-skills}"
+if [ -d "$RO" ]; then
+  bash "$RO/scripts/register-repo.sh" LLM_WIKI "$(pwd)"   # writes LLM_WIKI_DIR to ~/.claude/.env
+  bash "$RO/scripts/ecosystem-check.sh"                    # which siblings are present + how to install the rest
+else
+  echo "→ ronan-skills not found — install it (Step 4) to enable cross-repo discovery, then re-run /setup."
+fi
+```
+
+This is what lets `/ro:wiki` and the `wiki-curator` agent resolve THIS wiki repo automatically from any other project, with no hardcoded path.
 
 ## Step 5: Check Obsidian
 
