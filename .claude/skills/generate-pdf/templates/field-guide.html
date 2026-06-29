@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Your Job Now — Field Guide</title>
+<style>
+  :root{
+    --ink:#161514; --ink-soft:#43403c; --faint:#8a857d;
+    --paper:#fbf9f5; --card:#ffffff; --line:#e7e2d8;
+    --amber:#d99821; --cyan:#2b91ad; --green:#3f9e6a; --red:#c0392b;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  @page{size:A4; margin:0;}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans); color:var(--ink); background:var(--paper); font-size:13.2px; line-height:1.62; -webkit-font-smoothing:antialiased;}
+  .page{width:210mm; height:297mm; padding:18mm 19mm; margin:0 auto; background:var(--paper); position:relative; page-break-after:always; overflow:hidden;}
+  .page:last-child{page-break-after:auto;}
+  h1,h2,h3{font-family:var(--serif); font-weight:600; line-height:1.12; letter-spacing:-.01em;}
+  p{margin:0 0 .8em;}
+  a{color:var(--cyan); text-decoration:none;}
+  .mono{font-family:var(--mono);}
+  .kicker{font-family:var(--sans); font-weight:700; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--amber);}
+
+  /* COVER */
+  .cover{display:flex; flex-direction:column; justify-content:space-between;}
+  .cover .top .tag{display:inline-block; border:1.5px solid var(--ink); border-radius:40px; padding:4px 13px; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;}
+  .cover h1{font-size:60px; margin:16mm 0 0; letter-spacing:-.025em;}
+  .cover h1 .q{color:var(--amber);}
+  .cover .sub{font-size:19px; color:var(--ink-soft); max-width:150mm; margin-top:14px; font-family:var(--serif); font-style:italic;}
+  .cover .meta{display:flex; gap:26px; flex-wrap:wrap; font-size:12px; color:var(--faint); border-top:1px solid var(--line); padding-top:14px;}
+  .cover .meta b{color:var(--ink); font-weight:600;}
+  .thesis{margin-top:26px; border-left:4px solid var(--amber); padding:6px 0 6px 18px; font-family:var(--serif); font-size:21px; line-height:1.4; color:var(--ink);}
+
+  /* general */
+  .lead{font-size:15.5px; color:var(--ink-soft); font-family:var(--serif);}
+  h2.sec{font-size:30px; margin:0 0 4px;}
+  .sec-rule{height:3px; width:54px; background:var(--amber); border-radius:2px; margin:0 0 18px;}
+  h3{font-size:17px; margin:22px 0 6px;}
+  figure{margin:14px 0 6px; break-inside:avoid;}
+  figure img{width:100%; border:1px solid var(--line); border-radius:7px; display:block; box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  figcap, figcaption{font-size:10.5px; color:var(--faint); margin-top:6px; font-style:italic;}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:9px; padding:14px 16px; break-inside:avoid;}
+  .card .n{font-family:var(--serif); font-size:13px; color:var(--cyan); font-weight:700;}
+  .card h4{margin:.2em 0 .35em; font-size:14.5px; font-family:var(--sans); font-weight:700;}
+  .card p{margin:0; font-size:12.2px; color:var(--ink-soft);}
+
+  .stat{display:flex; gap:16px; align-items:center; background:#fff; border:1px solid var(--line); border-left:5px solid var(--green); border-radius:9px; padding:14px 18px; margin:12px 0; break-inside:avoid;}
+  .stat .big{font-family:var(--serif); font-size:40px; font-weight:700; color:var(--green); line-height:1; white-space:nowrap;}
+  .stat .big.amber{color:var(--amber);}
+  .stat .txt{font-size:12.5px; color:var(--ink-soft);}
+  .stat .txt b{color:var(--ink);}
+
+  .quote{font-family:var(--serif); font-size:19px; line-height:1.4; color:var(--ink); border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); padding:16px 0; margin:18px 0; break-inside:avoid;}
+  .quote .who{display:block; font-family:var(--sans); font-style:normal; font-size:11px; letter-spacing:.04em; color:var(--faint); margin-top:8px;}
+
+  .ways li{margin-bottom:10px;}
+  ol.big{counter-reset:w; list-style:none; padding:0; margin:0;}
+  ol.big > li{position:relative; padding:12px 0 12px 52px; border-bottom:1px solid var(--line); break-inside:avoid;}
+  ol.big > li:before{counter-increment:w; content:counter(w); position:absolute; left:0; top:10px; width:34px; height:34px; background:var(--ink); color:var(--paper); font-family:var(--serif); font-weight:700; font-size:18px; border-radius:50%; display:flex; align-items:center; justify-content:center;}
+  ol.big h4{margin:0 0 2px; font-size:15.5px;}
+  ol.big p{margin:0; font-size:12.4px; color:var(--ink-soft);}
+
+  /* action checklist */
+  .actions{background:#fff; border:1px solid var(--line); border-radius:10px; padding:4px 18px 8px;}
+  .actions .grp{font-family:var(--sans); font-weight:800; font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--amber); margin:16px 0 4px;}
+  .actions .grp.cyan{color:var(--cyan);} .actions .grp.green{color:var(--green);}
+  .act{display:flex; gap:11px; padding:7px 0; border-top:1px solid var(--line); break-inside:avoid;}
+  .act:first-of-type{border-top:none;}
+  .box{flex:0 0 16px; width:16px; height:16px; border:2px solid var(--ink); border-radius:4px; margin-top:2px;}
+  .act .a-t{font-size:12.6px;} .act .a-t b{font-weight:700;}
+  .act .a-t .why{color:var(--faint); font-size:11.4px;}
+
+  .bridge{background:linear-gradient(180deg,#fff,#fbf7ee); border:1.5px solid var(--amber); border-radius:11px; padding:18px 20px; margin-top:14px;}
+  .bridge h3{margin:0 0 6px; color:var(--ink);}
+  .tbl{width:100%; border-collapse:collapse; font-size:11.6px; margin-top:8px;}
+  .tbl th{text-align:left; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); border-bottom:1.5px solid var(--ink); padding:5px 8px;}
+  .tbl td{padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top;}
+  .tbl td.role{font-weight:700;} .tbl td.lens{color:var(--cyan);}
+  .foot{position:absolute; bottom:11mm; left:19mm; right:19mm; display:flex; justify-content:space-between; font-size:9px; color:var(--faint); letter-spacing:.05em; border-top:1px solid var(--line); padding-top:7px;}
+  .pill{display:inline-block; background:#f0ebe0; color:var(--ink-soft); font-size:10px; font-weight:600; padding:2px 9px; border-radius:30px; margin:2px 4px 2px 0;}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div class="top">
+    <span class="tag">Field Guide · Ways of Working</span>
+  </div>
+  <div>
+    <div class="kicker">Farhan Thawar · VP Engineering, Shopify · Cursor Compile 26</div>
+    <h1>What Is Your <span class="q">Job</span> Now?</h1>
+    <div class="sub">When AI writes most of the code, your value moves off the keyboard, onto taste, judgment, planning, and review.</div>
+    <div class="thesis">"The clankers will write and review the code. Get over it. You will spend your time on planning, validation, taste, judgment, and learning."</div>
+  </div>
+  <div>
+    <div class="meta">
+      <span><b>Talk</b> · 26 min</span>
+      <span><b>Source</b> · youtube.com/watch?v=ByOF8qByGHU</span>
+      <span><b>Captured</b> · 29 Jun 2026</span>
+      <span><b>Vault</b> · llm-wiki-ai-research</span>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 2: the shift -->
+<section class="page">
+  <div class="kicker">The argument</div>
+  <h2 class="sec">The work didn't vanish. It moved.</h2>
+  <div class="sec-rule"></div>
+  <p class="lead">Thawar frames the whole AI shift through Theory of Constraints, the idea from the novel <em>The Goal</em>: a system has one binding bottleneck at a time, and the moment you remove it, a new one appears. For decades the bottleneck was <b>writing code</b>. AI removed it. So the constraint relocated, upstream to planning and problem framing, and downstream to validation and review.</p>
+
+  <figure>
+    <img src="slides/02-sdlc-time-allocation-shift.png" alt="SDLC time allocation shift" style="max-height:70mm; width:auto; max-width:100%; margin:0 auto;">
+    <figcaption>The software development life cycle, before and after. The big blue "coding" block shrinks; framing and validation grow. (SDLC = the plan → code → test → maintain loop.)</figcaption>
+  </figure>
+
+  <div class="grid2" style="margin-top:12px;">
+    <div class="card"><div class="n">Then</div><h4>Your value was the typing</h4><p>You turned intent into machine code, character by character, in the language and editor you chose.</p></div>
+    <div class="card"><div class="n">Now</div><h4>Your value is the judgment</h4><p>What to build, why, when, the architecture, understanding the problem, and choosing the green-path solution among the 10,000 possible right ones.</p></div>
+  </div>
+
+  <div class="quote" style="margin:13px 0; padding:13px 0; font-size:17px;">"Where you spend your time is moving. Your value just changes from the person who typed character by character to taste, judgment, and architecture."<span class="who">Farhan Thawar · 2:17</span></div>
+
+  <h3 style="margin-top:14px;">The end of the AI centaur</h3>
+  <p style="margin-bottom:0;">The "centaur" era (human brain + LLM, pairing to build) ran from 2021 to late 2025. In December 2025, the "Opus 4.5 / GPT 5.2 moment", top engineers concluded the model was simply better at coding than they were. His claim: 90%+ of code should now be AI-written.</p>
+  <div class="foot"><span>WHAT IS YOUR JOB NOW · FIELD GUIDE</span><span>The shift</span></div>
+</section>
+
+<!-- PAGE 3: seven ideas + worked examples -->
+<section class="page">
+  <div class="kicker">The load-bearing ideas</div>
+  <h2 class="sec">Seven things to internalize</h2>
+  <div class="sec-rule"></div>
+  <div class="grid2">
+    <div class="card"><div class="n">01</div><h4>The bottleneck always moves</h4><p>Automate a stage and the constraint jumps elsewhere. Always ask "what's the new bottleneck?" and instrument it before celebrating.</p></div>
+    <div class="card"><div class="n">02</div><h4>Learning is the collateral</h4><p>The durable asset is what the team learned, not the lines it shipped. Code is now cheap to regenerate; understanding isn't.</p></div>
+    <div class="card"><div class="n">03</div><h4>Code review is the new bottleneck</h4><p>When AI writes the volume, review decides throughput and quality. Humans were never good at it anyway.</p></div>
+    <div class="card"><div class="n">04</div><h4>Responsibility can't be given away</h4><p>Use the LLM all you want. Your name goes on the PR. It can be shared, never delegated to a model.</p></div>
+    <div class="card"><div class="n">05</div><h4>A prototype is not production</h4><p>Don't confuse the map with the territory. Vibe-coded demos are green-path exploration. Delete them; keep the lesson.</p></div>
+    <div class="card"><div class="n">06</div><h4>Scale ambition, don't shrink</h4><p>Jevons paradox: cheaper code means more ambition per engineer, not fewer engineers. "Why can't 3,000 act like 100,000?"</p></div>
+  </div>
+  <div class="card" style="margin-top:14px;"><div class="n">07</div><h4>You can't manage by spreadsheet</h4><p>Lines of code, pull requests per engineer, and token counts are artifacts, not productivity. None of them, even together, tell you if a team is doing the right thing.</p></div>
+
+  <h3 style="margin-top:24px;">Two numbers that make the point</h3>
+  <div class="stat">
+    <div class="big amber">18→3</div>
+    <div class="txt"><b>The Tobi rebuild.</b> 50 engineers, 18 months. CEO asks "if you could start over, how would you build it?" They delete it and rebuild simpler in <b>3 months</b>. Rule: read the old code, never copy-paste it. The 18 months bought the learning that made the 3-month version possible.</div>
+  </div>
+  <div class="stat">
+    <div class="big">$600K</div>
+    <div class="txt"><b>The intern's six lines.</b> One intern deleted <b>6 lines of code</b> and saved over $600,000 a year in infrastructure. No output metric on any dashboard would have flagged it. Outcomes over output.</div>
+  </div>
+  <div class="foot"><span>WHAT IS YOUR JOB NOW · FIELD GUIDE</span><span>Ideas</span></div>
+</section>
+
+<!-- PAGE 4: five ways -->
+<section class="page">
+  <div class="kicker">The operating manual</div>
+  <h2 class="sec">The five ways Shopify works</h2>
+  <div class="sec-rule"></div>
+  <ol class="big">
+    <li><h4>Model selection: only the biggest models</h4><p>Engineers may only use the largest, most expensive models. Human time is worth more than clanker time: a small model's subtle bug costs hours of human debugging that a big model avoids.</p></li>
+    <li><h4>Code review is the bottleneck → a Council of LLMs</h4><p>"The four scariest letters: LGTM." Humans weren't reading the code. Review it with a panel of models, each on a different task and lens, deciding ship-or-send-back. Better than humans, not perfect.</p></li>
+    <li><h4>Responsibility cannot be given away</h4><p>Have the LLM write everything, do your validation, but your name is on the PR. Tag the model if you like. It's about you, not the model.</p></li>
+    <li><h4>Hire with a 3-tier test</h4><p>No-AI (solve by hand, prove the fundamentals), AI-optional (pull it in if you want), AI-mandatory (a problem so large you must wield the tool). Across all three you get a real signal.</p></li>
+    <li><h4>Scale ambition, not headcount</h4><p>"Can I make my dev team smaller?" is the unambitious question. The play is more entrepreneurship and more productivity per person.</p></li>
+  </ol>
+
+  <div class="grid2" style="margin-top:16px;">
+    <figure><img src="slides/24-lgtm-four-scariest-letters.png" alt="LGTM"><figcaption>"LGTM" — the rubber stamp on PRs nobody read.</figcaption></figure>
+    <figure><img src="slides/27-responsibility-bot-cannot-own-pr.png" alt="Responsibility"><figcaption>Why a bot cannot own a pull request.</figcaption></figure>
+  </div>
+  <div class="foot"><span>WHAT IS YOUR JOB NOW · FIELD GUIDE</span><span>Five ways</span></div>
+</section>
+
+<!-- PAGE 5: council of LLMs deep -->
+<section class="page">
+  <div class="kicker">The pattern worth stealing</div>
+  <h2 class="sec">The Council of LLMs</h2>
+  <div class="sec-rule"></div>
+  <p class="lead">The single most transferable idea in the talk: don't review a change with one reviewer. Use a panel of models, each given a <b>different role, a different lens, and a different reasoning budget</b>, composed into one gate that decides ship or send-back-with-commentary.</p>
+  <figure>
+    <img src="slides/26-council-of-llms-ensemble-table.png" alt="Council of LLMs ensemble table">
+    <figcaption>Shopify's ensemble (the exact model names are illustrative). The shape is the lesson: cheap fast model triages, the strongest model does the general review, specialists carry one lens each, offline judges cross-check the panel itself.</figcaption>
+  </figure>
+  <p style="margin-top:12px;">The differentiator is the <b>lenses</b>, not the model count. A security lens, an accessibility lens, a maintenance lens, and an architecture lens each see a different slice of the same diff, and catch failure modes that one reviewer never would.</p>
+  <table class="tbl">
+    <thead><tr><th>Role</th><th>Lens it carries</th><th>Reasoning</th></tr></thead>
+    <tbody>
+      <tr><td class="role">Main reviewer</td><td class="lens">correctness, general quality</td><td>highest</td></tr>
+      <tr><td class="role">Triage / selection</td><td class="lens">which lenses even apply?</td><td>none (fast)</td></tr>
+      <tr><td class="role">Maintenance specialist</td><td class="lens">future change cost, simplicity</td><td>high</td></tr>
+      <tr><td class="role">Accessibility specialist</td><td class="lens">a11y, inclusive UX</td><td>medium</td></tr>
+      <tr><td class="role">Auth / security specialist</td><td class="lens">authz, secrets, attack surface</td><td>fit-for-task</td></tr>
+      <tr><td class="role">Eval judges (offline)</td><td class="lens">grade the panel itself</td><td>cross-check</td></tr>
+    </tbody>
+  </table>
+  <div class="quote" style="margin-top:12px; font-size:16.5px; padding:12px 0;">"Your humans were not looking at the code. Is the LLM 100% accurate? No. Is it better than humans? Yes."<span class="who">Farhan Thawar · 22:10</span></div>
+  <div class="foot"><span>WHAT IS YOUR JOB NOW · FIELD GUIDE</span><span>Council of LLMs</span></div>
+</section>
+
+<!-- PAGE 6: ACTION POINTS -->
+<section class="page">
+  <div class="kicker">So what do you actually do</div>
+  <h2 class="sec">Action points</h2>
+  <div class="sec-rule"></div>
+  <p class="lead">Concrete moves, grouped by who owns them. Tick them off.</p>
+  <div class="actions">
+    <div class="grp">For you, the individual engineer</div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Shrink your time-to-reach-for-AI.</b> <span class="why">Measure reflexivity by reaction time: when you hit a problem, how fast do you pull AI in? Make that distance small.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Default to the biggest model.</b> <span class="why">Your time is the expensive resource. Stop economizing on tokens to save a subtle-bug debugging session.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Spend the freed time upstream and downstream.</b> <span class="why">Plan harder, frame the problem with the customer, and validate output. That's where the bottleneck is now.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Put your name on the PR and own it.</b> <span class="why">Tag the model if you want, but responsibility is yours. Validate before you ship.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Answer "what did I learn this week?"</b> <span class="why">Not "what did I ship." Name one secret you now believe that others don't, because you tried it.</span></div></div>
+
+    <div class="grp cyan">For the team / engineering lead</div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Make code review the most-engineered stage.</b> <span class="why">It's the new bottleneck. Stand up a multi-model review gate before optimizing anything else.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Build a Council of LLMs with real lenses.</b> <span class="why">Security, accessibility, maintenance, architecture, each a distinct reviewer, composed into one ship/send-back verdict.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Delete the prototype, keep the learning.</b> <span class="why">Read the old code, never copy-paste it. Rebuild for production. Resist the map-for-territory trap.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Stop managing by spreadsheet.</b> <span class="why">Retire the token leaderboard for a value dashboard. Use weekly demos to gauge velocity, not LoC or PR counts.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Set circuit breakers, not token limits.</b> <span class="why">Don't cap exploration. Surface runaway spend and let a human say keep-going or stop.</span></div></div>
+    <div class="act"><div class="box"></div><div class="a-t"><b>Raise ambition, don't cut headcount.</b> <span class="why">Ask "how do our N engineers act like 10N?" Pull the roadmap in: why not this month, this week, today?</span></div></div>
+  </div>
+  <div class="foot"><span>WHAT IS YOUR JOB NOW · FIELD GUIDE</span><span>Action points</span></div>
+</section>
+
+<!-- PAGE 7: bridge to the build -->
+<section class="page">
+  <div class="kicker">From talk to build</div>
+  <h2 class="sec">What this means for the agent fleet</h2>
+  <div class="sec-rule"></div>
+  <p class="lead">This talk is the external validation for building a Council of LLMs into your own tooling: a fleet of specialized review agents, each with one lens, gating every push, with humans keeping responsibility and taste.</p>
+  <div class="bridge">
+    <h3>The fleet, mapped to lenses</h3>
+    <p style="font-size:12.2px; color:var(--ink-soft); margin-bottom:4px;">Each agent is one role on the council. Different focus, different docs linked, composed into a pre-push gate that returns severity-tagged findings and routes failures back to the implementer.</p>
+    <table class="tbl">
+      <thead><tr><th>Agent</th><th>Lens</th><th>Reads from</th></tr></thead>
+      <tbody>
+        <tr><td class="role">code-reviewer</td><td class="lens">correctness, the general gate</td><td>code-review skill</td></tr>
+        <tr><td class="role">architecture</td><td class="lens">boundaries, coupling, deep modules</td><td>coding-principles</td></tr>
+        <tr><td class="role">simplicity (YAGNI / rule-of-3)</td><td class="lens">over-engineering, premature abstraction</td><td>simplicity, abstraction</td></tr>
+        <tr><td class="role">solid-dry</td><td class="lens">SRP, DRY, single source of truth</td><td>solid, abstraction</td></tr>
+        <tr><td class="role">security</td><td class="lens">authz, secrets, attack surface</td><td>security-audit</td></tr>
+        <tr><td class="role">way-of-working</td><td class="lens">tests, commits, definition-of-done</td><td>way-of-working</td></tr>
+        <tr><td class="role">dev (implementer)</td><td class="lens">fixes what the council flags</td><td>the report</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3 style="margin-top:20px;">The loop</h3>
+  <p>A pre-push hook runs the council, writes an "investigate" report, and blocks the push on critical findings. The report routes back to the agent that wrote the code if it's still alive, or spins up a fresh dev agent to work it. A per-project config file (with a first-run prompt) decides whether the review runs at all, so it stays opt-in per repo.</p>
+  <div class="quote">"Responsibility can be shared, but it cannot be given away. Your name on the PR, your PR going to production."<span class="who">Farhan Thawar · 22:49 · the design constraint for any autonomous loop</span></div>
+  <p style="margin-top:14px;">
+    <span class="pill">council-of-llms</span><span class="pill">code-review-is-the-new-bottleneck</span><span class="pill">learning-is-the-collateral</span><span class="pill">the-bottleneck-always-moves</span><span class="pill">ai-reflexivity-and-ai-leverage</span>
+  </p>
+  <p style="font-size:11px; color:var(--faint);">Full notes, slides, and concept pages live in the <span class="mono">llm-wiki-ai-research</span> vault. Source: <a href="https://www.youtube.com/watch?v=ByOF8qByGHU">What Is Your Job Now, Farhan Thawar · Cursor Compile 26</a>.</p>
+  <div class="foot"><span>WHAT IS YOUR JOB NOW · FIELD GUIDE</span><span>The build</span></div>
+</section>
+
+</body>
+</html>

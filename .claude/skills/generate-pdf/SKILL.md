@@ -1,6 +1,6 @@
 ---
 name: generate-pdf
-description: Render a shareable PDF from a single wiki page or a folder of pages. Minimal print stylesheet — no title page, no TOC unless --toc passed. Renders mermaid diagrams inline. Closes the loop via verify-quick.sh. Used by /generate pdf. Not user-invocable directly — go through /generate.
+description: Render a beautiful, shareable PDF from a single wiki page or a folder of pages. Default is a designed editorial "field guide" (cover, idea cards, stat callouts, pulled quotes, embedded screenshots/figures, a takeaways checklist) rendered via headless Chrome; --plain falls back to the minimal Pandoc/LaTeX path. Renders mermaid diagrams inline. Closes the loop by reading the rendered pages back to check for overflow. Used by /generate pdf. Not user-invocable directly — go through /generate.
 user-invocable: false
 allowed-tools: Bash(which *) Bash(brew *) Bash(pandoc *) Bash(node *) Bash(npx *) Bash(pnpm *) Bash(npm *) Bash(git *) Bash(mkdir *) Bash(date *) Bash(cat *) Bash(sed *) Bash(grep *) Bash(awk *) Read Write Glob Grep
 ---
@@ -11,11 +11,33 @@ Produce a quick, shareable PDF from a **single wiki page** or a **folder of page
 
 Think of it as "print this page" rather than "compile a book."
 
+## Beautiful by default: the field-guide mode
+
+**Default output is a designed editorial PDF, not a plain LaTeX dump.** It uses the proven "field guide" template at `.claude/skills/generate-pdf/templates/field-guide.html` (a print-correct A4 document: serif display headings, an amber accent rule per section, idea cards, stat callouts with one huge number, pulled quotes, embedded figures, and a grouped action/takeaway checklist). The same look the `/ro:youtube-to-pdf` skill produces. Screenshots and figures are first-class: any image referenced by the source pages (including `raw/assets/**` screenshots) gets embedded with an italic caption.
+
+When the field-guide mode runs (default whenever headless Chrome is available):
+
+1. Read the source page(s) and understand the content. Pull out the thesis, the load-bearing points, the best quotes, the real numbers, and a takeaways/action list.
+2. Copy `templates/field-guide.html` to a build dir. **Keep its `<head>`/`<style>` verbatim** (it is print-tuned). Rewrite the `<section class="page">` bodies for this content using the component palette (cover, `.lead`, `.grid2>.card`, `.stat`, `.quote`, `figure`, `ol.big`, `.actions`, `.tbl`, `.foot`). Render mermaid blocks to inline SVG/PNG first (Step 4.5) and embed them as figures. Copy any referenced images next to the HTML and reference them relatively.
+3. Render with headless Chrome to A4:
+   ```bash
+   "$(.claude/skills/generate/lib/find-chrome.sh 2>/dev/null || echo "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")" \
+     --headless --disable-gpu --no-pdf-header-footer --no-margins \
+     --print-to-pdf="$OUT" "file://$BUILD/index.html"
+   ```
+4. **Verify it fits (REQUIRED):** read the rendered PDF pages back as images. Each `<section class="page">` is one fixed A4 sheet with `overflow:hidden`, so over-tall content silently collides with the footer. If any page overflows, cap the figure (`style="max-height:70mm;width:auto;margin:0 auto;"`), shorten copy, or move a block to a new page, then re-render. This replaces Step 7.5's verify for this mode.
+
+Style: no em-dashes or en-dashes; no AI-tell words; specific over abstract (use the real numbers and names from the pages).
+
+**Plain mode** (the Pandoc/LaTeX path in the steps below) is the fallback: used when `--plain` is passed, or when headless Chrome is unavailable. Keep the template's `<style>` in sync with the `/ro:youtube-to-pdf` copy so both stay beautiful.
+
 ## Usage (via /generate router)
 
 ```
-/generate pdf <path> [--vault <name>] [--toc] [--template <name>]
+/generate pdf <path> [--vault <name>] [--toc] [--template <name>] [--plain]
 ```
+
+`--plain` forces the minimal Pandoc/LaTeX path; default is the field-guide HTML mode described above.
 
 Where `<path>` is:
 
