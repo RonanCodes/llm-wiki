@@ -47,6 +47,7 @@ Identify the source type and delegate to the appropriate extraction method:
 | `*.pdf` (file path) | PDF | Extract text with `pdftotext`. Check `which pdftotext` first, install with `brew install poppler` if missing. See `ingest-pdf` skill. |
 | `*.docx`, `*.xlsx`, `*.pptx` (file path) | Office | Convert with `pandoc`. Check `which pandoc` first, install with `brew install pandoc` if missing. See `ingest-office` skill. |
 | `*.md` (file path) | Markdown | Read the file directly. |
+| `book` keyword (e.g. `/ingest book path/to/book.txt`), or a book-shaped file (`.epub`, `.mobi`, or a large `.txt`/`.pdf` the user calls a book) | Book | Decompose a full-length book into an interlinked page set (source-note + framework map + concept/entity pages) via a chapter fan-out. Do NOT flatten a book through `ingest-text`. See `ingest-book` skill. |
 | `session` keyword (e.g. `/ingest session`, `/ingest session --title <slug>`) | Session Notes | Capture the current Claude Code working session's decisions, calibration notes, artefacts, and learnings. See `ingest-session` skill. |
 | Everything else | Text | Treat as pasted text/notes. |
 
